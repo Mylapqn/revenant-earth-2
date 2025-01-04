@@ -1,6 +1,8 @@
-import { Application, Assets, Sprite, Ticker } from "pixi.js";
+import { Application, Assets, Container, Sprite, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { PixelSprite } from "./pixelRendering/pixelSprite";
+import { Terrain } from "./terrain";
+import { System } from "detect-collisions";
 
 export let game: Game;
 
@@ -8,13 +10,16 @@ export class Game {
     app: Application;
     keys: { [key: string]: boolean } = {};
 
+    terrain!: Terrain;
     player!: PixelSprite;
     robo!: Sprite;
     pixelLayer!: PixelLayer;
+    terrainContainer!: Container;
     pixelFG!:PixelLayer;
     pixelFG2!:PixelLayer;
 
     mousePos = { x: 0, y: 0 };
+    collisionSystem!: System;
 
     constructor(app: Application) {
         game = this;
@@ -36,9 +41,12 @@ export class Game {
     }
 
     async init() {
+        this.collisionSystem = new System();
         const bg = new Sprite(await Assets.load('./bg.png'));
         bg.scale.set(1);
         this.app.stage.addChild(bg);
+
+        this.app.stage.addChild(this.terrainContainer = new Container());
 
         this.pixelLayer = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
         this.app.stage.addChild(this.pixelLayer.sprite);
@@ -72,6 +80,9 @@ export class Game {
         this.player.scale.x *= -1;
         this.pixelLayer.container.addChild(this.player);
 
+
+        this.terrain = new Terrain();
+
         this.app.ticker.add(this.update, this);
 
     }
@@ -94,6 +105,8 @@ export class Game {
 
         this.pixelFG2.sprite.x = (this.mousePos.x - screen.width / 2)/-5;
         this.pixelFG2.sprite.y = (this.mousePos.y - screen.height / 2)/-5;
+
+        this.terrain.update();
 
         this.pixelLayer.render();
         this.pixelFG.render();

@@ -12,4 +12,7 @@ export class PixelSprite extends Sprite {
 
     set x(value: number) { this.realPosition.x = value; this.position.x = Math.round(value); }
     set y(value: number) { this.realPosition.y = value; this.position.y = Math.round(value); }
+
+    get x() { return this.realPosition.x; }
+    get y() { return this.realPosition.y; }
 }
