@@ -13,6 +13,7 @@
     "vite": "^6.0.1"
   },
   "dependencies": {
+    "detect-collisions": "^9.24.0",
     "pixi.js": "^8.6.2"
   }
 }
