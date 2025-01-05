@@ -3,6 +3,7 @@ import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { PixelSprite } from "./pixelRendering/pixelSprite";
 import { Terrain } from "./terrain";
 import { System } from "detect-collisions";
+import { Player } from "./player";
 
 export let game: Game;
 
@@ -11,8 +12,8 @@ export class Game {
     keys: { [key: string]: boolean } = {};
 
     terrain!: Terrain;
-    player!: PixelSprite;
     robo!: Sprite;
+    player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
     pixelFG!:PixelLayer;
@@ -65,21 +66,15 @@ export class Game {
         fg2.scale.set(1);
         this.pixelFG2.container.addChild(fg2);
 
+        this.player = new Player();
+        this.player.sprite.texture = await Assets.load("./char.png");
+        this.player.sprite.texture.source.scaleMode = "nearest";
 
         this.robo = new Sprite();
         this.robo.texture = await Assets.load('./robo.png');
         this.robo.texture.source.scaleMode = 'nearest';
         this.robo.anchor.set(0.5);
         this.pixelLayer.container.addChild(this.robo);
-
-        this.player = new PixelSprite();
-        this.player.texture = await Assets.load('./char.png');
-        this.player.texture.source.scaleMode = 'nearest';
-        this.player.anchor.set(0.5);
-        //player.scale.set(4);
-        this.player.scale.x *= -1;
-        this.pixelLayer.container.addChild(this.player);
-
 
         this.terrain = new Terrain();
 
@@ -97,8 +92,8 @@ export class Game {
         this.robo.position.set(x, y);
 
 
-        this.player.x = this.mousePos.x / 4;
-        this.player.y = this.mousePos.y / 4;
+        this.player.position.x = this.mousePos.x / 4;
+        this.player.position.y -= -1;
 
         this.pixelFG.sprite.x = (this.mousePos.x - screen.width / 2)/10;
         this.pixelFG.sprite.y = (this.mousePos.y - screen.height / 2)/10;
@@ -106,6 +101,7 @@ export class Game {
         this.pixelFG2.sprite.x = (this.mousePos.x - screen.width / 2)/-5;
         this.pixelFG2.sprite.y = (this.mousePos.y - screen.height / 2)/-5;
 
+        this.player.update();
         this.terrain.update();
 
         this.pixelLayer.render();

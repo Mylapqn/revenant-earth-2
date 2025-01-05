@@ -12,7 +12,6 @@ export class Terrain {
 
     hitbox: Polygon;
 
-    playerHitbox: Ellipse;
     constructor() {
         this.graphics = new Graphics();
         this.allNodes = [];
@@ -28,53 +27,38 @@ export class Terrain {
             { x: 0, y: 1 },
         ]);
 
-        //this goes to player
-        this.playerHitbox = game.collisionSystem.createEllipse({ x: 0, y: 0 }, 10, 20);
+       
     }
 
     considerNodes() {
         this.nodes = [];
 
         for (const node of this.allNodes) {
-            if (node.x > game.player.x - 200 && node.x < game.player.x + 200) {
+            if (node.x > game.player.position.x - 200 && node.x < game.player.position.x + 200) {
                 this.nodes.push(node);
             }
         }
 
         this.nodes.unshift({ x: this.nodes[0].x, y: 1000 });
         this.nodes.push({ x: this.nodes[this.nodes.length - 1].x, y: 1000 });
+        this.nodes.push({ x: this.nodes[0].x, y: 1000 });
         this.hitbox.setPoints(this.nodes.map((node) => new SATVector(node.x, node.y)));
         this.hitbox.updateBody(true);
     }
 
     update() {
         this.considerNodes();
-
-        this.playerHitbox.setPosition(game.player.x, game.player.y);
-        this.playerHitbox.updateBody(true);
-
-        game.collisionSystem.checkOne(this.playerHitbox, (response) => {
-            game.player.x -= response.overlapV.x
-            game.player.y -= response.overlapV.y;
-            this.playerHitbox.setPosition(game.player.position.x, game.player.position.y);
-            this.playerHitbox.updateBody(true);
-        });
-
         this.draw();
     }
 
     draw() {
         this.graphics.clear();
 
-        this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
+        this.graphics.moveTo(this.nodes[0].x * 4, this.nodes[0].y * 4);
         for (const node of this.nodes) {
             this.graphics.lineTo(node.x * 4, node.y * 4);
         }
 
-        this.graphics.closePath();
         this.graphics.fill(0xccaa99);
-
-        this.graphics.ellipse(game.player.x * 4, game.player.y * 4, this.playerHitbox.radiusX*4, this.playerHitbox.radiusY*4);
-        this.graphics.fill(0xff0000);
     }
 }
