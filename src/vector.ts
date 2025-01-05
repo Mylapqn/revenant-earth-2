@@ -149,6 +149,10 @@ export class Vector {
     static equals(v1: Vector, v2: Vector): boolean {
         return v1.x == v2.x && v1.y == v2.y;
     }
+
+    static lerp(v1: Vector, v2: Vector, t: number): Vector {
+        return new Vector(v1.x + (v2.x - v1.x) * t, v1.y + (v2.y - v1.y) * t);
+    }
 }
 
 export class Matrix2x2 {
