@@ -6,11 +6,12 @@ export class Limb {
     end: Vector = new Vector(0, 0);
     joint: Vector = new Vector(0, 0);
     target: Vector = new Vector(0, 0);
-    group:LimbGroup;
+    group: LimbGroup;
     moving = false;
     jointLength = 10;
     distToMove = 0;
-    constructor(group:LimbGroup, offset: Vector, jointHeight: number = 10) {
+    ratioRemaining = 0;
+    constructor(group: LimbGroup, offset: Vector, jointHeight: number = 10) {
         this.group = group;
         this.target = offset.result();
         this.end = offset.result();
@@ -22,15 +23,16 @@ export class Limb {
             if (this.end.distance(this.origin) > this.jointLength * 3) this.end = this.target.result();
             let moveDiff = this.target.result().diff(this.end);
             let moveDist = moveDiff.length();
-            let moveDir = moveDiff.result().mult(1/moveDist);
-            let ratioRemaining = this.distToMove / moveDist;
+            let moveDir = moveDiff.result().mult(1 / moveDist);
+            this.ratioRemaining = moveDist / this.distToMove;
             if (moveDist < 1) {
+                this.ratioRemaining = 0;
                 this.moving = false;
                 this.end = this.target.result();
             }
             else {
-                this.end.add(moveDir.result().mult(Math.min(moveDist, (160 * dt))));
-                if (ratioRemaining > .5) this.end.y -= dt * 10;
+                this.end.add(moveDir.result().mult(Math.min(moveDist, (80 * dt))));
+                if (this.ratioRemaining > .4) this.end.y -= dt * 40;
                 //else this.end.y+=dt*10;
             }
         }
