@@ -22,7 +22,7 @@ export class LimbGroup {
         if (moved.x > 10 * dt) actualTarget.x *= -1;
         let hit = game.collisionSystem.raycast(actualTarget.result().add(this.system.origin).add({ x: 0, y: -5 }), actualTarget.result().add(this.system.origin).add({ x: 0, y: 5 }));
         if (hit) actualTarget.y = hit.point.y - this.system.origin.y;
-        if(hit) console.log(hit.point);
+        //if(hit) console.log(hit.point);
         let groundedLimbs = 0;
         let tooFarAwayLimbs = 0;
         let farthestLimb: Limb | null = null;

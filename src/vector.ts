@@ -185,3 +185,65 @@ export class Matrix2x2 {
         return new Vector(vect.x * this.values[0][0] + vect.y * this.values[0][1], vect.x * this.values[1][0] + vect.y * this.values[1][1]);
     }
 }
+
+export class Edge<T extends Vector = Vector> {
+    start: T;
+    end: T;
+
+    constructor(start: T, end: T) {
+        this.start = start;
+        this.end = end;
+    }
+
+    doesIntersect(edge: Edge): boolean {
+        return doLinesIntersect(this, edge);
+    }
+
+    intersection(edge: Edge): Vectorlike {
+        return splitEdgeAtIntersection(this, edge);
+    }
+
+
+}
+
+
+function doLinesIntersect(e1: Edge, e2: Edge): boolean {
+    const { start: A, end: B } = e1;
+    const { start: C, end: D } = e2;
+
+    function cross(p1: Vectorlike, p2: Vectorlike): number {
+        return p1.x * p2.y - p1.y * p2.x;
+    }
+
+    function subtract(p1: Vectorlike, p2: Vectorlike): Vectorlike {
+        return { x: p1.x - p2.x, y: p1.y - p2.y };
+    }
+
+    const AB = subtract(B, A);
+    const AC = subtract(C, A);
+    const AD = subtract(D, A);
+    const CD = subtract(D, C);
+    const CA = subtract(A, C);
+    const CB = subtract(B, C);
+
+    const cross1 = cross(AB, AC);
+    const cross2 = cross(AB, AD);
+    const cross3 = cross(CD, CA);
+    const cross4 = cross(CD, CB);
+
+    return cross1 * cross2 < 0 && cross3 * cross4 < 0;
+}
+
+function splitEdgeAtIntersection(edge1: Edge, edge2: Edge): Vectorlike {
+    // Solve for intersection point using linear equations
+    const { start: A, end: B } = edge1;
+    const { start: C, end: D } = edge2;
+
+    const denominator = (A.x - B.x) * (C.y - D.y) - (A.y - B.y) * (C.x - D.x);
+    const t = ((A.x - C.x) * (C.y - D.y) - (A.y - C.y) * (C.x - D.x)) / denominator;
+
+    return {
+        x: A.x + t * (B.x - A.x),
+        y: A.y + t * (B.y - A.y),
+    };
+}
