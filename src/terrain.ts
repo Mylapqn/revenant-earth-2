@@ -2,7 +2,7 @@ import { Graphics } from "pixi.js";
 import { Edge, Vector, Vectorlike } from "./vector";
 import { game } from "./game";
 import { Ellipse, Polygon, SATVector } from "detect-collisions";
-import { TerrainMesh, TerrainNode } from "./terrainnode";
+import { TerrainMesh, TerrainNode } from "./terrainNode";
 
 export class Terrain {
     graphics: Graphics;
