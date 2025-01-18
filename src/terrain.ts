@@ -55,6 +55,7 @@ export class Terrain {
     }
 
     update() {
+        /*
         const editedNodes = new Array<TerrainNode>();
         for (const node of this.nodes) {
             if (node.distance(game.worldMouse) < 20) {
@@ -62,10 +63,10 @@ export class Terrain {
                 node.add(dir.normalize().mult(0.5));
                 editedNodes.push(node);
             }
-        }
+        }*/
 
         this.draw();
-        this.changeFixer(editedNodes);
+        //this.changeFixer(editedNodes);
         this.considerNodes();
     }
 
