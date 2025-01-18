@@ -5,8 +5,9 @@ import { PixelSprite } from "./pixelRendering/pixelSprite";
 import { Vector } from "./vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
+import { ISerializable, StateMode } from "./utils/serialise";
 
-export class Player {
+export class Player implements ISerializable {
     position = new Vector(200, 0);
     sprite: Sprite;
     playerHitbox: Ellipse;
@@ -142,4 +143,16 @@ export class Player {
         this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
 
     }
+
+    serialise(mode: StateMode): false | PlayerData {
+        return { kind: "Player", position: this.position, velocity: this.velocity };
+    }
+
+    static deserialise(data: PlayerData) {
+        game.player.position.set(data.position.x, data.position.y);
+        game.player.velocity.set(data.velocity.x, data.velocity.y);
+    }
 }
+
+
+export type PlayerData = { kind: "Player", position: Vector, velocity: Vector };

@@ -1,11 +1,11 @@
 import { Application, Assets, Container, Graphics, Sprite, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
-import { PixelSprite } from "./pixelRendering/pixelSprite";
 import { Terrain } from "./terrain";
 import { System } from "detect-collisions";
 import { Player } from "./player";
 import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./vector";
+import { initHandlers, StateManager } from "./utils/serialise";
 
 export let game: Game;
 
@@ -13,6 +13,7 @@ export class Game {
     app: Application;
     keys: { [key: string]: boolean } = {};
     camera!: Camera;
+    stateManager!: StateManager;
 
     terrain!: Terrain;
     robo!: Sprite;
@@ -55,6 +56,8 @@ export class Game {
     }
 
     async init() {
+        this.stateManager = new StateManager();
+        initHandlers(this.stateManager);
         this.collisionSystem = new System();
         this.camera = new Camera();
         const bg = new Sprite(await Assets.load('./bg.png'));
