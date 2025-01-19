@@ -3,8 +3,9 @@ import { Edge, Vector, Vectorlike } from "./vector";
 import { game } from "./game";
 import { Ellipse, Polygon, SATVector } from "detect-collisions";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
+import { ISerializable, StateMode } from "./utils/serialise";
 
-export class Terrain {
+export class Terrain implements ISerializable {
     graphics: Graphics;
     terrainMesh: TerrainMesh;
     /** contains only loaded nodes */
@@ -13,9 +14,31 @@ export class Terrain {
     hitbox: Polygon;
 
     constructor() {
+        game.stateManager.register(this);
         this.graphics = new Graphics();
         this.terrainMesh = new TerrainMesh();
         this.nodes = [];
+
+        game.terrainContainer.addChild(this.graphics);
+        this.hitbox = game.collisionSystem.createPolygon({ x: 0, y: 0 }, [
+            { x: 0, y: 0 },
+            { x: 0, y: 1 },
+        ]);
+
+        this.defaultTerrain();
+    }
+
+    static deserialise(raw: any) {
+        const data = raw as { kind: string, terrainMesh: Array<Vectorlike> };
+        game.terrain.terrainMesh = new TerrainMesh();
+        for (const node of data.terrainMesh) {
+            game.terrain.terrainMesh.push(new TerrainNode(node.x, node.y));
+        }
+
+        game.terrain.considerNodes();
+    }
+
+    defaultTerrain(){
 
         let lastHeight = 0;
         for (let index = 0; index < 1000; index++) {
@@ -29,14 +52,16 @@ export class Terrain {
             if (index > 25 && index < 50) element.add({ x: 0, y: -1000 })
         }
 
-        game.terrainContainer.addChild(this.graphics);
-        this.hitbox = game.collisionSystem.createPolygon({ x: 0, y: 0 }, [
-            { x: 0, y: 0 },
-            { x: 0, y: 1 },
-        ]);
-
         this.considerNodes();
+    }
 
+    serialise(mode: StateMode): false | { kind: string, terrainMesh: Array<Vectorlike> } {
+        let nodes = [];
+        for (const node of this.terrainMesh) {
+            nodes.push({x: Math.round(node.x), y: Math.round(node.y)});
+        }
+
+        return { kind: "Terrain", terrainMesh: nodes};
     }
 
     considerNodes() {
@@ -55,7 +80,7 @@ export class Terrain {
     }
 
     update() {
-        /*
+        
         const editedNodes = new Array<TerrainNode>();
         for (const node of this.nodes) {
             if (node.distance(game.worldMouse) < 20) {
@@ -63,7 +88,7 @@ export class Terrain {
                 node.add(dir.normalize().mult(0.5));
                 editedNodes.push(node);
             }
-        }*/
+        }
 
         this.draw();
         //this.changeFixer(editedNodes);
