@@ -23,6 +23,8 @@ export class Player implements ISerializable {
     constructor() {
         game.stateManager.register(this);
         this.pixelLayer = new PixelLayer(64, 64);
+        this.pixelLayer.worldSpace = false;
+        
         this.graphics = new Graphics();
         this.legGraphics = new Graphics();
         this.legGraphics.position = new Vector(32, 32);

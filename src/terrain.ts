@@ -98,13 +98,13 @@ export class Terrain implements ISerializable {
     draw() {
         this.graphics.clear();
 
-        this.graphics.moveTo(this.nodes[0].x * 4, this.nodes[0].y * 4);
+        this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
         for (const node of this.nodes) {
-            this.graphics.lineTo(node.x * 4, node.y * 4);
+            this.graphics.lineTo(node.x, node.y);
         }
 
-        this.graphics.stroke({ color: 0x0099ff, alpha: 0.5, width: 5 })
-        //this.graphics.fill(0xccaa99);
+        this.graphics.fill(0x552211);
+        this.graphics.stroke({ color: 0x889944, alpha: 1, width: 1 })
     }
 
     changeFixer(affectedNodes: Vector[]) {

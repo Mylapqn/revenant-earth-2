@@ -3,6 +3,10 @@ import { Vector, Vectorlike } from "./vector";
 
 export class Camera {
     position = new Vector(0, 0);
+    
+    subpixelOffset = new Vector(0, 0); 
+    pixelOffset = new Vector(0, 0);
+    offsetRemainder = new Vector(0, 0);
 
     get screen() {
         return {
@@ -32,13 +36,12 @@ export class Camera {
         this.position.x = (targetPosition.x + this.position.x * 19) / 20;
         this.position.y = (targetPosition.y + this.position.y * 19) / 20;
 
-        const offset = new Vector(-this.position.x + this.middle.x, -this.position.y + this.middle.y);
-        game.playerContainer.position.set(offset.x, offset.y);
-        game.terrainContainer.position.set(offset.x, offset.y);
-        game.worldDebugGraphics.position.set(offset.x, offset.y);
-        const sizedOffset = offset.result().mult(1/4).floor();
-        const decimalOffset = offset.result().mult(1/4).sub(sizedOffset);
-        game.pixelLayer.container.position.set(sizedOffset.x, sizedOffset.y);
-        game.pixelLayer.sprite.position.set(decimalOffset.x*4, decimalOffset.y*4);
+        this.subpixelOffset = new Vector(-this.position.x + this.middle.x, -this.position.y + this.middle.y);
+        this.pixelOffset = this.subpixelOffset.result().mult(1/4).floor();
+        this.offsetRemainder = this.subpixelOffset.result().mult(1/4).sub(this.pixelOffset);
+        game.playerContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
+        game.terrainContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
+        game.worldDebugGraphics.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
+
     }
 }

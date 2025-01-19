@@ -77,8 +77,8 @@ export class Game {
         this.app.stage.addChild(this.pixelLayer.sprite);
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
-        this.terrainContainer = this.pixelLayer.container;
         this.app.stage.addChild(this.playerContainer = new Container());
+        this.terrainContainer = this.pixelLayer.container;
         this.app.stage.addChild(this.worldDebugGraphics = new Graphics());
         this.worldDebugGraphics.scale.set(4);
 
