@@ -5,7 +5,8 @@ import { System } from "detect-collisions";
 import { Player } from "./player";
 import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./vector";
-import { initHandlers, StateManager, StateMode } from "./utils/serialise";
+import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
+import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 
 export let game: Game;
 
@@ -138,13 +139,11 @@ export class Game {
 
         if (this.keys["q"]) {
             let out = this.stateManager.serialise(StateMode.full);
-            localStorage.setItem("state", JSON.stringify(out));
+            htcrudSave("http://localhost:3000/state.json", out);
         }
 
         if (this.keys["e"]) {
-            this.stateManager.deserialise(JSON.parse(localStorage.getItem("state") || "[]"));
+            htcrudLoad("http://localhost:3000/state.json").then(data => this.stateManager.deserialise(data));
         }
     }
-
-
 }

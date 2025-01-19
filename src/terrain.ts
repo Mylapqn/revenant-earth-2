@@ -3,7 +3,7 @@ import { Edge, Vector, Vectorlike } from "./vector";
 import { game } from "./game";
 import { Ellipse, Polygon, SATVector } from "detect-collisions";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
-import { ISerializable, StateMode } from "./utils/serialise";
+import { ISerializable, StateMode } from "./hierarchy/serialise";
 
 export class Terrain implements ISerializable {
     graphics: Graphics;
@@ -38,7 +38,7 @@ export class Terrain implements ISerializable {
         game.terrain.considerNodes();
     }
 
-    defaultTerrain(){
+    defaultTerrain() {
 
         let lastHeight = 0;
         for (let index = 0; index < 1000; index++) {
@@ -58,10 +58,10 @@ export class Terrain implements ISerializable {
     serialise(mode: StateMode): false | { kind: string, terrainMesh: Array<Vectorlike> } {
         let nodes = [];
         for (const node of this.terrainMesh) {
-            nodes.push({x: Math.round(node.x), y: Math.round(node.y)});
+            nodes.push({ x: Math.round(node.x), y: Math.round(node.y) });
         }
 
-        return { kind: "Terrain", terrainMesh: nodes};
+        return { kind: "Terrain", terrainMesh: nodes };
     }
 
     considerNodes() {
@@ -80,26 +80,34 @@ export class Terrain implements ISerializable {
     }
 
     update() {
-        
-        const editedNodes = new Array<TerrainNode>();
+        this.graphics.clear();
+
+        const editedNodes = new Set<TerrainNode>();
+        let prev = this.nodes[0];
         for (const node of this.nodes) {
             if (node.distance(game.worldMouse) < 20) {
                 const dir = node.diff(game.worldMouse);
                 node.add(dir.normalize().mult(0.5));
-                editedNodes.push(node);
+                editedNodes.add(node);
+                editedNodes.add(prev);
+                if (node.next) editedNodes.add(node.next);
             }
+            prev = node;
         }
 
         this.draw();
-        //this.changeFixer(editedNodes);
+
+
+        this.changeFixer(editedNodes);
         this.considerNodes();
     }
 
     draw() {
-        this.graphics.clear();
 
         this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
-        for (const node of this.nodes) {
+
+
+        for (const node of this.hitbox.points) {
             this.graphics.lineTo(node.x, node.y);
         }
 
@@ -107,12 +115,15 @@ export class Terrain implements ISerializable {
         this.graphics.stroke({ color: 0x889944, alpha: 1, width: 1 })
     }
 
-    changeFixer(affectedNodes: Vector[]) {
+    changeFixer(affectedNodes: Set<TerrainNode>) {
 
         // when an edge overlaps with another edge, remove the overlap
-        let effectAA = new Vector(-Infinity, -Infinity);
-        let effectBB = new Vector(Infinity, Infinity);
+        let effectAA = new Vector(Infinity, Infinity);
+        let effectBB = new Vector(-Infinity, -Infinity);
 
+        if (game.keys["p"]) {
+            console.log("pressed p");
+        };
 
         for (const node of affectedNodes) {
             if (node.x < effectAA.x) effectAA.x = node.x;
@@ -121,31 +132,39 @@ export class Terrain implements ISerializable {
             if (node.y > effectBB.y) effectBB.y = node.y;
         }
 
+        this.graphics.rect(effectAA.x, effectAA.y, (effectBB.x - effectAA.x), (effectBB.y - effectAA.y));
+        this.graphics.stroke({ color: 0xff0000, width: 1 });
+        game.app.render();
         const relevantNodes = new Array<Vector>();
 
         const relevantEdges = new Array<Edge<TerrainNode>>();
 
         for (const node of this.terrainMesh) {
-            if (affectedNodes.includes(node)) {
-                continue;
-            }
 
-            if (node.x > effectAA.x && node.x < effectBB.x && node.y > effectAA.y && node.y < effectBB.y) {
+            if (node.x >= effectAA.x && node.x <= effectBB.x && node.y >= effectAA.y && node.y <= effectBB.y) {
                 relevantNodes.push(node);
                 if (node.next) relevantEdges.push(new Edge(node, node.next));
             }
         }
 
+        const skip = new Set<Edge>();
         for (const cedge of relevantEdges) {
+            if (skip.has(cedge)) continue;
             for (const redge of relevantEdges) {
+                if (skip.has(redge)) continue;
                 if (cedge.doesIntersect(redge)) {
+                    skip.add(cedge);
+                    skip.add(redge);
                     console.log("intersects");
                     const intersection = cedge.intersection(redge);
                     const node = new TerrainNode(intersection.x, intersection.y);
-                    const old1 = cedge.end;
+                    const old = cedge.start.next;
 
                     cedge.start.next = node;
+                    redge.start.next = null;
                     node.next = redge.end;
+
+                    old?.burn();
 
                     this.graphics.circle(intersection.x * 4, intersection.y * 4, 10);
                     this.graphics.fill({ color: 0x0099ff })

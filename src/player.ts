@@ -5,7 +5,7 @@ import { PixelSprite } from "./pixelRendering/pixelSprite";
 import { Vector, Vectorlike } from "./vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
-import { ISerializable, StateMode } from "./utils/serialise";
+import { ISerializable, StateMode } from "./hierarchy/serialise";
 
 export class Player implements ISerializable {
     position = new Vector(200, 0);

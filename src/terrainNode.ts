@@ -7,6 +7,12 @@ export class TerrainNode extends Vector {
         super(x, y);
     }
 
+    burn(till?: TerrainNode) {
+        if (till == this.next) return;
+        this.next?.burn(till);
+        this.next = null;
+    }
+
     static *[Symbol.iterator](node: TerrainNode): IterableIterator<TerrainNode> {
         while (node) {
             yield node;
