@@ -5,7 +5,7 @@ import { System } from "detect-collisions";
 import { Player } from "./player";
 import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./vector";
-import { initHandlers, StateManager } from "./utils/serialise";
+import { initHandlers, StateManager, StateMode } from "./utils/serialise";
 
 export let game: Game;
 
@@ -134,6 +134,15 @@ export class Game {
         this.pixelFG.render();
         this.pixelFG2.render();
         this.app.render();
+
+        if (this.keys["q"]) {
+            let out = this.stateManager.serialise(StateMode.full);
+            localStorage.setItem("state", JSON.stringify(out));
+        }
+
+        if (this.keys["e"]) {
+            this.stateManager.deserialise(JSON.parse(localStorage.getItem("state") || "[]"));
+        }
     }
 
 

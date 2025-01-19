@@ -1,5 +1,6 @@
 import { game } from "../game";
 import { Player, PlayerData } from "../player";
+import { Terrain } from "../terrain";
 
 export enum StateMode {
     /** identical replication  */
@@ -16,8 +17,8 @@ export type primitiveObject = { [key: string]: primitive | primitiveObject | pri
 
 export type KindedObject = primitiveObject & { kind: string };
 
-export interface ISerializable<T extends KindedObject = { kind: string }> {
-    serialise(mode: StateMode): T | false;
+export interface ISerializable {
+    serialise(mode: StateMode): KindedObject | false;
 }
 
 export class StateManager {
@@ -57,4 +58,5 @@ export class StateManager {
 
 export function initHandlers(manager: StateManager) {
     manager.addHandler("Player", Player.deserialise);
+    manager.addHandler("Terrain", Terrain.deserialise);
 }

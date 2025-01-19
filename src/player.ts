@@ -2,7 +2,7 @@ import { Ellipse } from "detect-collisions";
 import { game } from "./game";
 import { Graphics, Sprite } from "pixi.js";
 import { PixelSprite } from "./pixelRendering/pixelSprite";
-import { Vector } from "./vector";
+import { Vector, Vectorlike } from "./vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
 import { ISerializable, StateMode } from "./utils/serialise";
@@ -21,6 +21,7 @@ export class Player implements ISerializable {
     }
     groundedTimer = 0;
     constructor() {
+        game.stateManager.register(this);
         this.pixelLayer = new PixelLayer(64, 64);
         this.graphics = new Graphics();
         this.legGraphics = new Graphics();
@@ -155,4 +156,4 @@ export class Player implements ISerializable {
 }
 
 
-export type PlayerData = { kind: "Player", position: Vector, velocity: Vector };
+export type PlayerData = { kind: "Player", position: Vectorlike, velocity: Vectorlike };
