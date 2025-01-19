@@ -29,7 +29,7 @@ export class LimbGroup {
         let farthestDistance = 0;
         this.passingPhase = 0;
         for (const limb of this.limbs) {
-            this.passingPhase += Math.max(0, Math.min(1, (1 - (Math.abs(limb.ratioRemaining - 0.5) * 2)) * 3));
+            this.passingPhase += Math.max(0, Math.min(1, (1 - (Math.abs(limb.ratioRemaining - 0.7) * 2)) * 3));
             if (!limb.moving) limb.end.add(moved);
             limb.update(dt);
             if (!limb.moving) groundedLimbs++;
