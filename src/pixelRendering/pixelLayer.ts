@@ -9,7 +9,7 @@ export class PixelLayer {
     constructor(width: number, height: number) {
         this.container = new Container({ width, height });
         this.renderTexture = RenderTexture.create({ width, height, antialias: false, scaleMode: 'nearest' });
-        this.sprite = new PixelSprite();
+        this.sprite = new Sprite();
         this.sprite.texture = this.renderTexture;
         this.sprite.scale.set(4);
         let graphics = new Graphics;

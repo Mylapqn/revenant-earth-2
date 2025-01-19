@@ -36,7 +36,9 @@ export class Camera {
         game.playerContainer.position.set(offset.x, offset.y);
         game.terrainContainer.position.set(offset.x, offset.y);
         game.worldDebugGraphics.position.set(offset.x, offset.y);
-        const sizedOffset = offset.result().mult(1/4);
+        const sizedOffset = offset.result().mult(1/4).floor();
+        const decimalOffset = offset.result().mult(1/4).sub(sizedOffset);
         game.pixelLayer.container.position.set(sizedOffset.x, sizedOffset.y);
+        game.pixelLayer.sprite.position.set(decimalOffset.x*4, decimalOffset.y*4);
     }
 }

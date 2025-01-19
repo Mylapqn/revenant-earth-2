@@ -76,6 +76,12 @@ export class Vector {
         return this;
     }
 
+    floor(): Vector {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+        return this;
+    }
+
     normalize(length: number = 1): Vector {
         length = length ?? 1;
         const total = this.length();

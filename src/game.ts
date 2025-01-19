@@ -76,7 +76,8 @@ export class Game {
         this.pixelLayer = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
         this.app.stage.addChild(this.pixelLayer.sprite);
 
-        this.app.stage.addChild(this.terrainContainer = new Container());
+        //this.app.stage.addChild(this.terrainContainer = new Container());
+        this.terrainContainer = this.pixelLayer.container;
         this.app.stage.addChild(this.playerContainer = new Container());
         this.app.stage.addChild(this.worldDebugGraphics = new Graphics());
         this.worldDebugGraphics.scale.set(4);
