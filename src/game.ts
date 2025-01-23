@@ -7,6 +7,8 @@ import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./vector";
 import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
 import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
+import { Entity } from "./hierarchy/entity";
+import { initComponents } from "./components/componentIndex";
 
 export let game: Game;
 
@@ -17,7 +19,7 @@ export class Game {
     stateManager!: StateManager;
 
     terrain!: Terrain;
-    robo!: Sprite;
+    robo!: Entity;
     player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
@@ -59,6 +61,7 @@ export class Game {
     async init() {
         this.stateManager = new StateManager();
         initHandlers(this.stateManager);
+        initComponents();
         this.collisionSystem = new System();
         this.camera = new Camera();
         const bg = new Sprite(await Assets.load('./bg.png'));
@@ -94,11 +97,34 @@ export class Game {
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
 
-        this.robo = new Sprite();
-        this.robo.texture = await Assets.load('./robo.png');
-        this.robo.texture.source.scaleMode = 'nearest';
-        this.robo.anchor.set(0.5);
-        this.pixelLayer.container.addChild(this.robo);
+        this.robo = Entity.fromData({
+            kind: "Entity",
+            id: 0,
+            component: [
+                {
+                    componentType: "Transform",
+                    id: 0,
+                    data: {
+                        position: { x: 0, y: 0 },
+                    }
+                },
+                {
+                    componentType: "BasicSprite",
+                    id: 1,
+                    data: {
+                        asset: "./robo.png"
+                    }
+                },
+                {
+                    componentType: "RoboLogic",
+                    id: 2
+                },
+                {
+                    componentType: "EntitySerializer",
+                    id: 3
+                }
+            ]
+        });
 
         this.terrain = new Terrain();
 
@@ -111,12 +137,8 @@ export class Game {
 
         this.worldDebugGraphics.clear();
 
-
-        let x = (this.player.position.x - this.robo.position.x) * .01 + this.robo.position.x;
-        let y = (this.player.position.y - this.robo.position.y) * .01 + this.robo.position.y;
-
-        this.robo.scale.x = x < this.robo.position.x ? -1 : 1;
-        this.robo.position.set(x, y);
+        this.robo.emit("update", dt);
+        this.robo.emit("draw", dt);
 
         this.pixelFG.sprite.x = (this.mousePos.x - screen.width / 2) / 10;
         this.pixelFG.sprite.y = (this.mousePos.y - screen.height / 2) / 10;
@@ -137,13 +159,15 @@ export class Game {
         this.pixelFG2.render();
         this.app.render();
 
+        const address = "http://localhost:3000/state.json";
+
         if (this.keys["q"]) {
             let out = this.stateManager.serialise(StateMode.full);
-            htcrudSave("http://localhost:3000/state.json", out);
+            htcrudSave(address, out); 
         }
 
         if (this.keys["e"]) {
-            htcrudLoad("http://localhost:3000/state.json").then(data => this.stateManager.deserialise(data));
+            htcrudLoad(address).then(data => this.stateManager.deserialise(data));
         }
     }
 }

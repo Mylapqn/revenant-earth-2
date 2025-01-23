@@ -1,6 +1,6 @@
-import { game } from "../game";
 import { Player, PlayerData } from "../player";
 import { Terrain } from "../terrain";
+import { Entity } from "./entity";
 
 export enum StateMode {
     /** identical replication  */
@@ -59,4 +59,6 @@ export class StateManager {
 export function initHandlers(manager: StateManager) {
     manager.addHandler("Player", Player.deserialise);
     manager.addHandler("Terrain", Terrain.deserialise);
+    manager.addHandler("Entity", Entity.deserialise);
 }
+
