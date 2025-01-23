@@ -1,27 +1,25 @@
 import { Assets, Sprite, Texture } from "pixi.js";
 import { Component, ComponentData } from "../hierarchy/component";
 import { Entity } from "../hierarchy/entity";
-import { TransformableEntity } from "./transfrom";
 import { game } from "../game";
+import { SpriteDirectionComponent } from "./spriteDirectionComponent";
 
 
 
 export class BasicSprite extends Component {
     static componentType = "BasicSprite";
-    override parent: TransformableEntity;
     sprite!: Sprite;
     asset!: string;
+    directionComponent?: SpriteDirectionComponent;
 
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        this.parent = parent as TransformableEntity;
+        this.entity.on("draw", (dt) => this.draw(dt));
     }
 
     override toData(): ComponentData {
         const data = { asset: this.asset }
-        const out = super.toData();
-        out.data = data;
-        return out;
+        return super.toData(data);
     }
 
     override applyData(data: { asset: string }): void {
@@ -36,11 +34,12 @@ export class BasicSprite extends Component {
     }
 
     override init(): void {
-        this.parent.on("draw", (dt) => this.draw(dt));
+        this.directionComponent = this.entity.getComponent(SpriteDirectionComponent);
     }
 
     draw(dt: number) {
-        this.sprite.position.set(this.parent.position.x, this.parent.position.y);
+        if (this.directionComponent != undefined) this.sprite.scale.x = this.directionComponent.direction;
+        this.sprite.position.set(this.transform.position.x, this.transform.position.y);
     }
 
 }

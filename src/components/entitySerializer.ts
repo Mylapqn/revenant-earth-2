@@ -11,6 +11,6 @@ export class EntitySerializer extends Component implements ISerializable {
     }
 
     serialise(mode: StateMode): KindedObject | false {
-        return this.parent.toData();
+        return this.entity.toData();
     }
 }

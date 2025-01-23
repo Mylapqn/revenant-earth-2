@@ -102,11 +102,8 @@ export class Game {
             id: 0,
             component: [
                 {
-                    componentType: "Transform",
-                    id: 0,
-                    data: {
-                        position: { x: 0, y: 0 },
-                    }
+                    componentType: "SpriteDirectionComponent",
+                    id: 0
                 },
                 {
                     componentType: "BasicSprite",
@@ -158,6 +155,8 @@ export class Game {
         this.pixelFG.render();
         this.pixelFG2.render();
         this.app.render();
+
+
 
         const address = "http://localhost:3000/state.json";
 

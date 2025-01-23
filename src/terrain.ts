@@ -13,6 +13,11 @@ export class Terrain implements ISerializable {
 
     hitbox: Polygon;
 
+    terrainData = new Array<TerrainData>();
+    readonly dataWidth = 10;
+
+    totalWidth = 2000;
+
     constructor() {
         game.stateManager.register(this);
         this.graphics = new Graphics();
@@ -29,11 +34,13 @@ export class Terrain implements ISerializable {
     }
 
     static deserialise(raw: any) {
-        const data = raw as { kind: string, terrainMesh: Array<Vectorlike> };
+        const data = raw as { kind: string, terrainMesh: Array<Vectorlike>, terrainData: Array<TerrainData> };
         game.terrain.terrainMesh = new TerrainMesh();
         for (const node of data.terrainMesh) {
             game.terrain.terrainMesh.push(new TerrainNode(node.x, node.y));
         }
+
+        game.terrain.terrainData = data.terrainData;
 
         game.terrain.considerNodes();
     }
@@ -52,16 +59,21 @@ export class Terrain implements ISerializable {
             if (index > 25 && index < 50) element.add({ x: 0, y: -1000 })
         }
 
+        for (let index = 0; index < this.totalWidth; index += this.dataWidth) {
+            this.terrainData.push({ pollution: 0, fertility: 0, erosion: 0, moisture: 0 });
+        }
+
+
         this.considerNodes();
     }
 
-    serialise(mode: StateMode): false | { kind: string, terrainMesh: Array<Vectorlike> } {
+    serialise(mode: StateMode): false | { kind: string, terrainMesh: Array<Vectorlike>, terrainData: Array<TerrainData> } {
         let nodes = [];
         for (const node of this.terrainMesh) {
             nodes.push({ x: Math.round(node.x), y: Math.round(node.y) });
         }
 
-        return { kind: "Terrain", terrainMesh: nodes };
+        return { kind: "Terrain", terrainMesh: nodes, terrainData: this.terrainData };
     }
 
     considerNodes() {
@@ -97,9 +109,42 @@ export class Terrain implements ISerializable {
 
         this.draw();
 
+        if (game.keys["x"]) {
+            const data = this.getProperties(game.worldMouse.x)
+            data.fertility = Math.min(1, data.fertility + 0.1);
+        }
+
+        this.updateProperties();
 
         this.changeFixer(editedNodes);
         this.considerNodes();
+    }
+
+    private spread(a: TerrainData, b: TerrainData) {
+        if (a.fertility > 0.5) {
+            const half = (a.fertility - 0.5) / 2;
+            b.fertility += half;
+            a.fertility -= half;
+        }
+    }
+
+    getProperties(x: number) {
+        const a = this.terrainData[Math.round(x / this.dataWidth)];
+        return a;
+    }
+
+    updateProperties() {
+        for (let index = 0; index < this.terrainData.length - 1; index++) {
+            const a = this.terrainData[index];
+            const b = this.terrainData[index + 1];
+            this.spread(a, b);
+        }
+
+        for (let index = this.terrainData.length - 1; index > 0; index--) {
+            const a = this.terrainData[index];
+            const b = this.terrainData[index - 1];
+            this.spread(a, b);
+        }
     }
 
     draw() {
@@ -111,8 +156,34 @@ export class Terrain implements ISerializable {
             this.graphics.lineTo(node.x, node.y);
         }
 
+
         this.graphics.fill(0x552211);
         this.graphics.stroke({ color: 0x889944, alpha: 1, width: 1 })
+
+
+
+        for (const node of this.hitbox.points) {
+            const x = (Math.round(node.x / this.dataWidth)) * this.dataWidth
+            const data = this.getProperties(x);
+            //this.graphics.rect(node.x, node.y, 10, data.fertility * 100);
+            //this.graphics.moveTo(node.x, node.y);
+            //this.graphics.lineTo(node.x, node.y + data.fertility * 20);
+            this.graphics.lineTo(node.x, node.y + data.fertility * 20);
+
+            let r = Math.floor(Math.max(0, Math.min(1, (1 - data.fertility) * 2)) * 255).toString(16).padStart(2, "0");
+            let g = Math.floor(Math.max(0, Math.min(1, (data.fertility) * 2)) * 255).toString(16).padStart(2, "0");
+
+            this.graphics.stroke({ color: `0x${r}${g}00`, alpha: 1, width: 1 })
+        }
+
+        /*for (let index = -20; index < 20; index++) {
+            const x = (Math.round(game.player.position.x / this.dataWidth) + index) * this.dataWidth
+            const data = this.getProperties(x);
+            this.graphics.rect(x, game.player.position.y - 500, this.dataWidth, 1000);
+            this.graphics.fill({ color: 0x00ff00, alpha: data.fertility });
+        }*/
+
+
     }
 
     changeFixer(affectedNodes: Set<TerrainNode>) {
@@ -189,4 +260,12 @@ export class Terrain implements ISerializable {
             }
         }
     }
+}
+
+
+export type TerrainData = {
+    pollution: number
+    fertility: number
+    erosion: number
+    moisture: number
 }

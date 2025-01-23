@@ -7,14 +7,18 @@ export class Component {
     static componentType = "Component";
     static constructors = new Map<string, Constructor<Component>>();
     id: number;
-    parent: Entity;
+    entity: Entity;
 
     get componentType() { return (this.constructor as typeof Component).componentType; }
     get factory() { return (this.constructor as Constructor<typeof this>); }
 
-    constructor(parent: Entity, id: number) {
+    get transform() {
+        return this.entity.transform;
+    }
+
+    constructor(entity: Entity, id: number) {
         this.id = id;
-        this.parent = parent;
+        this.entity = entity;
     }
 
     init() { }
@@ -22,23 +26,23 @@ export class Component {
     applyData(data?: primitiveObject) { }
 
     remove() {
-        this.parent.removeComponent(this);
+        this.entity.removeComponent(this);
     }
 
     static register(constructor: Constructor<Component>) {
         this.constructors.set(constructor.componentType, constructor);
     }
 
-    static fromData(parent: Entity, data: ComponentData): Component {
+    static fromData(entity: Entity, data: ComponentData): Component {
         const constructor = this.constructors.get(data.componentType)
         if (constructor === undefined) throw new Error(`Unknown component type: ${data.componentType}`);
-        const component = new constructor(parent, data.id);
+        const component = new constructor(entity, data.id);
         component.applyData(data.data);
         return component;
     }
 
-    toData(): ComponentData {
-        return { id: this.id, componentType: this.componentType };
+    toData(data?: primitiveObject): ComponentData {
+        return { id: this.id, componentType: this.componentType, data };
     }
 }
 

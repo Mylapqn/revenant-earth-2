@@ -4,18 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "concurrently \"vite --host\" \"dev-fileserver\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "htcrud": "dev-fileserver"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "typescript": "~5.6.2",
+    "htcrud": "github:NotRustyBot/htcrud",
     "vite": "^6.0.1"
   },
   "dependencies": {
     "detect-collisions": "^9.24.0",
-    "htcrud": "github:NotRustyBot/htcrud",
     "pixi.js": "^8.6.2"
   }
 }

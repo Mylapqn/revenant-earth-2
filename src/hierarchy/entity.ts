@@ -1,6 +1,8 @@
+import { Transform } from "../components/transfrom";
 import { game } from "../game";
 import { Component, ComponentData, Constructor } from "./component";
 import { KindedObject } from "./serialise";
+
 
 
 type KnownEvents = {
@@ -17,6 +19,9 @@ export class Entity {
     typeLookup = new Map<Constructor<Component>, Set<Component>>();
     events = new Map<keyof KnownEvents, Set<Function>>();
     componentIndex = 0;
+    transform!: Transform;
+
+    static entityId = 0; //TODO save+load global next entity id
 
     constructor(id: number) {
         this.id = id;
@@ -63,12 +68,27 @@ export class Entity {
         this.components.delete(component.id);
     }
 
+    createComponent(type: Constructor<Component>) {
+        const component = new type(this, this.componentIndex);
+        this.addComponent(component);
+    }
+
+    static create() {
+        const entity = new Entity(this.entityId++);
+        entity.createComponent(Transform);
+    }
+
     static fromData(data: EntityData) {
         const entity = new Entity(data.id);
 
         for (const component of data.component) {
             const comp = Component.fromData(entity, component);
             if (comp) entity.addComponent(comp);
+        }
+
+
+        if (entity.transform == undefined) {
+            entity.createComponent(Transform);
         }
 
         for (const [key, component] of entity.components) {
