@@ -1,11 +1,11 @@
 import { Ellipse } from "detect-collisions";
 import { game } from "./game";
 import { Graphics, Sprite } from "pixi.js";
-import { PixelSprite } from "./pixelRendering/pixelSprite";
 import { Vector, Vectorlike } from "./vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
 import { ISerializable, StateMode } from "./hierarchy/serialise";
+import { Scene } from "./hierarchy/scene";
 
 export class Player implements ISerializable {
     position = new Vector(200, 0);
@@ -21,10 +21,10 @@ export class Player implements ISerializable {
     }
     groundedTimer = 0;
     constructor() {
-        game.stateManager.register(this);
+        game.activeScene.register(this);
         this.pixelLayer = new PixelLayer(64, 64);
         this.pixelLayer.worldSpace = false;
-        
+
         this.graphics = new Graphics();
         this.legGraphics = new Graphics();
         this.legGraphics.position = new Vector(32, 32);
@@ -55,7 +55,7 @@ export class Player implements ISerializable {
         this.sprite.position.set(32, 32);
         //this.pixelLayer.container.pivot.set(32,64);
         //player.scale.set(4);
-        this.sprite.scale.x *= -1
+        this.sprite.scale.x *= -1;
         //game.pixelLayer.container.addChild(this.graphics);
         game.playerContainer.addChild(this.pixelLayer.sprite);
         this.pixelLayer.container.addChild(this.graphics);
@@ -70,10 +70,9 @@ export class Player implements ISerializable {
         if (game.keys[" "] && this.grounded) {
             this.velocity.y = -300;
             this.groundedTimer = 0;
-        };
+        }
 
         if (!this.grounded) this.velocity.y += 1000 * dt;
-
 
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
@@ -84,7 +83,7 @@ export class Player implements ISerializable {
         this.groundedTimer -= dt;
 
         game.collisionSystem.checkOne(this.playerHitbox, (response) => {
-            this.groundedTimer = .1;
+            this.groundedTimer = 0.1;
             this.velocity.x -= response.overlapV.x;
             this.velocity.y = 0;
             this.position.x -= response.overlapV.x;
@@ -144,18 +143,17 @@ export class Player implements ISerializable {
 
         this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y + 5, 1);
         this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
-
     }
 
     serialise(mode: StateMode): false | PlayerData {
         return { kind: "Player", position: this.position, velocity: this.velocity };
     }
 
-    static deserialise(data: PlayerData) {
+    static deserialise(data: PlayerData, scene?: Scene) {
         game.player.position.set(data.position.x, data.position.y);
         game.player.velocity.set(data.velocity.x, data.velocity.y);
+        if (scene) scene.register(game.player);
     }
 }
 
-
-export type PlayerData = { kind: "Player", position: Vectorlike, velocity: Vectorlike };
+export type PlayerData = { kind: "Player"; position: Vectorlike; velocity: Vectorlike };

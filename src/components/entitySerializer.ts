@@ -7,10 +7,16 @@ export class EntitySerializer extends Component implements ISerializable {
     static componentType = "EntitySerializer";
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        game.stateManager.register(this);
+        game.activeScene.register(this);
     }
 
     serialise(mode: StateMode): KindedObject | false {
         return this.entity.toData();
+    }
+
+    unload() {
+        // ??
+        this.entity.emit("unload");
+        this.entity.remove();
     }
 }

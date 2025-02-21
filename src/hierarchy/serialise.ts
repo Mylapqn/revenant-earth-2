@@ -1,14 +1,11 @@
 import { Player, PlayerData } from "../player";
 import { Terrain } from "../terrain";
 import { Entity } from "./entity";
+import { Scene } from "./scene";
 
 export enum StateMode {
-    /** identical replication  */
-    full,
-    /**  */
     scene,
-    /** store essential data only */
-    base,
+    full
 }
 
 export type primitive = string | number | boolean;
@@ -22,11 +19,11 @@ export interface ISerializable {
 }
 
 export class StateManager {
-    handlers = new Map<string, (data: any) => any>();
+    static handlers = new Map<string, (data: any, scene?: Scene) => any>();
     objects = new Set<ISerializable>();
 
-    addHandler(kind: string, handler: (data: any) => any) {
-        this.handlers.set(kind, handler);
+    static addHandler(kind: string, handler: (data: any) => any) {
+        StateManager.handlers.set(kind, handler);
     }
 
     register(obj: ISerializable) {
@@ -49,16 +46,17 @@ export class StateManager {
         return objects;
     }
 
-    deserialise(data: Array<KindedObject>) {
+    deserialise(data: Array<KindedObject>, scene?: Scene) {
         for (const datum of data) {
-            this.handlers.get(datum.kind)?.(datum);
+            StateManager.handlers.get(datum.kind)?.(datum, scene);
         }
     }
 }
 
-export function initHandlers(manager: StateManager) {
-    manager.addHandler("Player", Player.deserialise);
-    manager.addHandler("Terrain", Terrain.deserialise);
-    manager.addHandler("Entity", Entity.deserialise);
+export function initHandlers() {
+    StateManager.addHandler("Player", Player.deserialise);
+    StateManager.addHandler("Terrain", Terrain.deserialise);
+    StateManager.addHandler("Entity", Entity.deserialise);
+    StateManager.addHandler("Scene", Scene.deserialise);
 }
 

@@ -4,8 +4,9 @@ import { game } from "./game";
 import { Ellipse, Polygon, SATVector } from "detect-collisions";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
 import { ISerializable, StateMode } from "./hierarchy/serialise";
+import { ISceneObject, Scene } from "./hierarchy/scene";
 
-export class Terrain implements ISerializable {
+export class Terrain implements ISerializable, ISceneObject {
     graphics: Graphics;
     terrainMesh: TerrainMesh;
     /** contains only loaded nodes */
@@ -19,7 +20,7 @@ export class Terrain implements ISerializable {
     totalWidth = 2000;
 
     constructor() {
-        game.stateManager.register(this);
+        game.activeScene.register(this);
         this.graphics = new Graphics();
         this.terrainMesh = new TerrainMesh();
         this.nodes = [];
@@ -33,8 +34,12 @@ export class Terrain implements ISerializable {
         this.defaultTerrain();
     }
 
-    static deserialise(raw: any) {
-        const data = raw as { kind: string, terrainMesh: Array<Vectorlike>, terrainData: Array<TerrainData> };
+    unload() {
+        game.activeScene.unregister(this);
+    }
+
+    static deserialise(raw: any, scene?: Scene) {
+        const data = raw as { kind: string; terrainMesh: Array<Vectorlike>; terrainData: Array<TerrainData> };
         game.terrain.terrainMesh = new TerrainMesh();
         for (const node of data.terrainMesh) {
             game.terrain.terrainMesh.push(new TerrainNode(node.x, node.y));
@@ -43,10 +48,10 @@ export class Terrain implements ISerializable {
         game.terrain.terrainData = data.terrainData;
 
         game.terrain.considerNodes();
+        if (scene) scene.register(game.terrain);
     }
 
     defaultTerrain() {
-
         let lastHeight = 0;
         for (let index = 0; index < 1000; index++) {
             lastHeight += Math.random() * 5 - 2.5;
@@ -56,18 +61,17 @@ export class Terrain implements ISerializable {
         let index = 0;
         for (const element of this.terrainMesh) {
             index++;
-            if (index > 25 && index < 50) element.add({ x: 0, y: -1000 })
+            if (index > 25 && index < 50) element.add({ x: 0, y: -1000 });
         }
 
         for (let index = 0; index < this.totalWidth; index += this.dataWidth) {
             this.terrainData.push({ pollution: 0, fertility: 0, erosion: 0, moisture: 0 });
         }
 
-
         this.considerNodes();
     }
 
-    serialise(mode: StateMode): false | { kind: string, terrainMesh: Array<Vectorlike>, terrainData: Array<TerrainData> } {
+    serialise(mode: StateMode): false | { kind: string; terrainMesh: Array<Vectorlike>; terrainData: Array<TerrainData> } {
         let nodes = [];
         for (const node of this.terrainMesh) {
             nodes.push({ x: Math.round(node.x), y: Math.round(node.y) });
@@ -110,7 +114,7 @@ export class Terrain implements ISerializable {
         this.draw();
 
         if (game.keys["x"]) {
-            const data = this.getProperties(game.worldMouse.x)
+            const data = this.getProperties(game.worldMouse.x);
             data.fertility = Math.min(1, data.fertility + 0.1);
         }
 
@@ -148,32 +152,32 @@ export class Terrain implements ISerializable {
     }
 
     draw() {
-
         this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
-
 
         for (const node of this.hitbox.points) {
             this.graphics.lineTo(node.x, node.y);
         }
 
-
         this.graphics.fill(0x552211);
-        this.graphics.stroke({ color: 0x889944, alpha: 1, width: 1 })
-
-
+        this.graphics.stroke({ color: 0x889944, alpha: 1, width: 1 });
 
         for (const node of this.hitbox.points) {
-            const x = (Math.round(node.x / this.dataWidth)) * this.dataWidth
+            const x = Math.round(node.x / this.dataWidth) * this.dataWidth;
             const data = this.getProperties(x);
             //this.graphics.rect(node.x, node.y, 10, data.fertility * 100);
             //this.graphics.moveTo(node.x, node.y);
             //this.graphics.lineTo(node.x, node.y + data.fertility * 20);
+            if (data == undefined) continue;
             this.graphics.lineTo(node.x, node.y + data.fertility * 20);
 
-            let r = Math.floor(Math.max(0, Math.min(1, (1 - data.fertility) * 2)) * 255).toString(16).padStart(2, "0");
-            let g = Math.floor(Math.max(0, Math.min(1, (data.fertility) * 2)) * 255).toString(16).padStart(2, "0");
+            let r = Math.floor(Math.max(0, Math.min(1, (1 - data.fertility) * 2)) * 255)
+                .toString(16)
+                .padStart(2, "0");
+            let g = Math.floor(Math.max(0, Math.min(1, data.fertility * 2)) * 255)
+                .toString(16)
+                .padStart(2, "0");
 
-            this.graphics.stroke({ color: `0x${r}${g}00`, alpha: 1, width: 1 })
+            this.graphics.stroke({ color: `0x${r}${g}00`, alpha: 1, width: 1 });
         }
 
         /*for (let index = -20; index < 20; index++) {
@@ -182,19 +186,16 @@ export class Terrain implements ISerializable {
             this.graphics.rect(x, game.player.position.y - 500, this.dataWidth, 1000);
             this.graphics.fill({ color: 0x00ff00, alpha: data.fertility });
         }*/
-
-
     }
 
     changeFixer(affectedNodes: Set<TerrainNode>) {
-
         // when an edge overlaps with another edge, remove the overlap
         let effectAA = new Vector(Infinity, Infinity);
         let effectBB = new Vector(-Infinity, -Infinity);
 
         if (game.keys["p"]) {
             console.log("pressed p");
-        };
+        }
 
         for (const node of affectedNodes) {
             if (node.x < effectAA.x) effectAA.x = node.x;
@@ -203,7 +204,7 @@ export class Terrain implements ISerializable {
             if (node.y > effectBB.y) effectBB.y = node.y;
         }
 
-        this.graphics.rect(effectAA.x, effectAA.y, (effectBB.x - effectAA.x), (effectBB.y - effectAA.y));
+        this.graphics.rect(effectAA.x, effectAA.y, effectBB.x - effectAA.x, effectBB.y - effectAA.y);
         this.graphics.stroke({ color: 0xff0000, width: 1 });
         game.app.render();
         const relevantNodes = new Array<Vector>();
@@ -211,7 +212,6 @@ export class Terrain implements ISerializable {
         const relevantEdges = new Array<Edge<TerrainNode>>();
 
         for (const node of this.terrainMesh) {
-
             if (node.x >= effectAA.x && node.x <= effectBB.x && node.y >= effectAA.y && node.y <= effectBB.y) {
                 relevantNodes.push(node);
                 if (node.next) relevantEdges.push(new Edge(node, node.next));
@@ -226,7 +226,6 @@ export class Terrain implements ISerializable {
                 if (cedge.doesIntersect(redge)) {
                     skip.add(cedge);
                     skip.add(redge);
-                    console.log("intersects");
                     const intersection = cedge.intersection(redge);
                     const node = new TerrainNode(intersection.x, intersection.y);
                     const old = cedge.start.next;
@@ -238,7 +237,7 @@ export class Terrain implements ISerializable {
                     old?.burn();
 
                     this.graphics.circle(intersection.x * 4, intersection.y * 4, 10);
-                    this.graphics.fill({ color: 0x0099ff })
+                    this.graphics.fill({ color: 0x0099ff });
                 }
             }
         }
@@ -262,10 +261,9 @@ export class Terrain implements ISerializable {
     }
 }
 
-
 export type TerrainData = {
-    pollution: number
-    fertility: number
-    erosion: number
-    moisture: number
-}
+    pollution: number;
+    fertility: number;
+    erosion: number;
+    moisture: number;
+};

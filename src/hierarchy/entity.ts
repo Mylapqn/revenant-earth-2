@@ -1,6 +1,8 @@
+import { EntitySerializer } from "../components/entitySerializer";
 import { Transform } from "../components/transfrom";
 import { game } from "../game";
 import { Component, ComponentData, Constructor } from "./component";
+import { Scene } from "./scene";
 import { KindedObject } from "./serialise";
 
 
@@ -8,6 +10,7 @@ import { KindedObject } from "./serialise";
 type KnownEvents = {
     "update": [number],
     "draw": [number],
+    "unload": [],
 };
 
 type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void
@@ -20,6 +23,7 @@ export class Entity {
     events = new Map<keyof KnownEvents, Set<Function>>();
     componentIndex = 0;
     transform!: Transform;
+    scene?: Scene;
 
     static entityId = 0; //TODO save+load global next entity id
 
@@ -73,6 +77,13 @@ export class Entity {
         this.addComponent(component);
     }
 
+
+    remove() {
+        for (const component of this.components.values()) {
+            component.remove();
+        }
+    }
+
     static create() {
         const entity = new Entity(this.entityId++);
         entity.createComponent(Transform);
@@ -98,8 +109,10 @@ export class Entity {
         return entity;
     }
 
-    static deserialise(deserialise: any) {
+    static deserialise(deserialise: any, scene?: Scene) {
         game.robo = Entity.fromData(deserialise as EntityData);
+        const serialiser = game.robo.getComponent(EntitySerializer); // what
+        if (scene && serialiser) scene.register(serialiser); // also what
     }
 
     toData(): KindedObject {
