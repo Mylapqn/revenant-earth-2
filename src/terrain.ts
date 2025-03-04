@@ -125,8 +125,8 @@ export class Terrain implements ISerializable, ISceneObject {
     }
 
     private spread(a: TerrainData, b: TerrainData) {
-        if (a.fertility > 0.5) {
-            const half = (a.fertility - 0.5) / 2;
+        if (a.fertility > 0.01) {
+            const half = (a.fertility - 0.01) * .05;
             b.fertility += half;
             a.fertility -= half;
         }

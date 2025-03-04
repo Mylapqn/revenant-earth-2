@@ -1,7 +1,7 @@
-import { game } from "../game";
-import { Component } from "../hierarchy/component";
-import { Entity } from "../hierarchy/entity";
-import { BasicSprite } from "./spriteComponent";
+import { game } from "../../game";
+import { Component } from "../../hierarchy/component";
+import { Entity } from "../../hierarchy/entity";
+import { BasicSprite } from "./BasicSprite";
 
 export class RoboLogic extends Component {
     static componentType = "RoboLogic";

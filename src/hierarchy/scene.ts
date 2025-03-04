@@ -1,5 +1,5 @@
 import { game } from "../game";
-import { ISerializable, KindedObject, StateManager, StateMode } from "./serialise";
+import { ISerializable, KindedObject, ObjectKind, StateManager, StateMode } from "./serialise";
 
 export interface ISceneObject {
     unload?(): void;
@@ -64,7 +64,7 @@ export class Scene implements ISerializable {
 }
 
 type SceneData = {
-    kind: string;
+    kind: ObjectKind;
     name: string;
     data: Array<KindedObject>;
     active: boolean;

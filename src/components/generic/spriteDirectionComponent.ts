@@ -1,5 +1,5 @@
-import { Component } from "../hierarchy/component";
-import { Entity } from "../hierarchy/entity";
+import { Component } from "../../hierarchy/component";
+import { Entity } from "../../hierarchy/entity";
 
 export class SpriteDirectionComponent extends Component {
     static componentType = "SpriteDirectionComponent";

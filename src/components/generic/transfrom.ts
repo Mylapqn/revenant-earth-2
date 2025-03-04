@@ -1,6 +1,6 @@
-import { Component, ComponentData } from "../hierarchy/component";
-import { Entity } from "../hierarchy/entity";
-import { Vector, Vectorlike } from "../vector";
+import { Component, ComponentData } from "../../hierarchy/component";
+import { Entity } from "../../hierarchy/entity";
+import { Vector, Vectorlike } from "../../vector";
 
 
 

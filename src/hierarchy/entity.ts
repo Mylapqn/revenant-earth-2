@@ -1,5 +1,5 @@
-import { EntitySerializer } from "../components/entitySerializer";
-import { Transform } from "../components/transfrom";
+import { EntitySerializer } from "../components/generic/entitySerializer";
+import { Transform } from "../components/generic/transfrom";
 import { game } from "../game";
 import { Component, ComponentData, Constructor } from "./component";
 import { Scene } from "./scene";
@@ -11,6 +11,7 @@ type KnownEvents = {
     "update": [number],
     "draw": [number],
     "unload": [],
+    "interact":[],
 };
 
 type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void

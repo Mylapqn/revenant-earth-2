@@ -8,7 +8,7 @@ import { Vector, Vectorlike } from "./vector";
 import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
 import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 import { Entity } from "./hierarchy/entity";
-import { initComponents } from "./components/componentIndex";
+import { initComponents } from "./components/generic/componentIndex";
 import { Scene } from "./hierarchy/scene";
 
 export let game: Game;
@@ -23,6 +23,8 @@ export class Game {
 
     terrain!: Terrain;
     robo!: Entity;
+    door!: Entity;
+    tree!: Entity;
     player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
@@ -60,7 +62,7 @@ export class Game {
         window.addEventListener("resize", () => this.resize());
     }
 
-    resize() {}
+    resize() { }
 
     async init() {
         this.stateManager = new StateManager();
@@ -83,6 +85,43 @@ export class Game {
 
         scene2.data = [
             {
+                kind: "Entity",
+                id: 0,
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        id: 0,
+                        data: {
+                            asset: "./door.png",
+                        },
+                    },
+                    {
+                        componentType: "EntitySerializer",
+                        id: 1,
+                    },
+                    {
+                        componentType: "Interactable",
+                        id: 2,
+                    },
+                    {
+                        componentType: "Door",
+                        id: 3,
+                        data: {
+                            target: "Scene",
+                        },
+                    },
+                    {
+                        componentType: "Transform",
+                        id: 4,
+                        data: {
+                            position: { x: 40, y: 20 },
+                            velocity: { x: 10, y: 0 },
+                        }
+                    }
+                ],
+            },
+            
+            {
                 kind: "Player",
                 position: { x: 10, y: 0 },
                 velocity: { x: 0, y: 0 },
@@ -92,6 +131,7 @@ export class Game {
                 terrainMesh: [...s2t],
                 terrainData: [...s2td],
             },
+
         ];
 
         this.pixelFG = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
@@ -147,6 +187,105 @@ export class Game {
             ],
         });
 
+        this.door = Entity.fromData({
+            kind: "Entity",
+            id: 1,
+            component: [
+                {
+                    componentType: "BasicSprite",
+                    id: 0,
+                    data: {
+                        asset: "./door.png",
+                    },
+                },
+                {
+                    componentType: "EntitySerializer",
+                    id: 1,
+                },
+                {
+                    componentType: "Interactable",
+                    id: 2,
+                },
+                {
+                    componentType: "Door",
+                    id: 3,
+                    data: {
+                        target: "Scene 2",
+                    },
+                },
+            ],
+        });
+        this.door.transform.position.x = 100;
+        this.door.transform.position.y = 80;
+
+
+        this.tree = Entity.fromData({
+            kind: "Entity",
+            id: 1,
+            component: [
+                {
+                    componentType: "BasicSprite",
+                    id: 0,
+                    data: {
+                        asset: "./tree.png",
+                    },
+                },
+                {
+                    componentType: "EntitySerializer",
+                    id: 1,
+                },
+                {
+                    componentType: "Interactable",
+                    id: 2,
+                },
+                {
+                    componentType: "Tree",
+                    id: 3,
+                    data: {
+                        growth: 0,
+                        asset: "./tree.png",
+                    },
+                },
+            ],
+        });
+
+        this.tree.transform.position.x = 150;
+        this.tree.transform.position.y = 100;
+
+        this.tree = Entity.fromData({
+            kind: "Entity",
+            id: 1,
+            component: [
+                {
+                    componentType: "BasicSprite",
+                    id: 0,
+                    data: {
+                        asset: "./bush.png",
+                    },
+                },
+                {
+                    componentType: "EntitySerializer",
+                    id: 1,
+                },
+                {
+                    componentType: "Interactable",
+                    id: 2,
+                },
+                {
+                    componentType: "Tree",
+                    id: 3,
+                    data: {
+                        growth: 0,
+                        asset: "./bush.png",
+                    },
+                },
+            ],
+        });
+
+        this.tree.transform.position.x = 300;
+        this.tree.transform.position.y = 100;
+
+
         this.terrain = new Terrain();
 
         this.app.ticker.add(this.update, this);
@@ -157,8 +296,13 @@ export class Game {
 
         this.worldDebugGraphics.clear();
 
-        this.robo.emit("update", dt);
-        this.robo.emit("draw", dt);
+        //@ts-ignore
+        this.activeScene.objects.forEach((obj) => {
+            //@ts-ignore
+            obj.entity?.emit?.("update", dt)
+            //@ts-ignore
+            obj.entity?.emit?.("draw", dt)
+        });
 
         this.pixelFG.sprite.x = (this.mousePos.x - screen.width / 2) / 10;
         this.pixelFG.sprite.y = (this.mousePos.y - screen.height / 2) / 10;
@@ -192,20 +336,21 @@ export class Game {
 
         if (this.keys["ě"]) {
             if (this.activeScene.name != "Scene 2") {
-                this.activeScene.serialise(StateMode.full);
-                this.activeScene.unload();
-                this.activeScene = this.scenes.get("Scene 2")!;
-                this.activeScene.load();
+                this.loadScene("Scene 2");
             }
         }
 
         if (this.keys["+"]) {
             if (this.activeScene.name != "Scene") {
-                this.activeScene.serialise(StateMode.full);
-                this.activeScene.unload();
-                this.activeScene = this.scenes.get("Scene")!;
-                this.activeScene.load();
+                this.loadScene("Scene");
             }
         }
+    }
+
+    loadScene(name: string) {
+        this.activeScene.serialise(StateMode.full);
+        this.activeScene.unload();
+        this.activeScene = this.scenes.get(name)!;
+        this.activeScene.load();
     }
 }

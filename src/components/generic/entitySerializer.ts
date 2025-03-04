@@ -1,7 +1,7 @@
-import { game } from "../game";
-import { Component } from "../hierarchy/component";
-import { Entity } from "../hierarchy/entity";
-import { ISerializable, KindedObject, StateMode } from "../hierarchy/serialise";
+import { game } from "../../game";
+import { Component } from "../../hierarchy/component";
+import { Entity } from "../../hierarchy/entity";
+import { ISerializable, KindedObject, StateMode } from "../../hierarchy/serialise";
 
 export class EntitySerializer extends Component implements ISerializable {
     static componentType = "EntitySerializer";

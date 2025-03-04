@@ -8,21 +8,24 @@ export enum StateMode {
     full
 }
 
+
+export type ObjectKind = "Player" | "Terrain" | "Entity" | "Scene";
+
 export type primitive = string | number | boolean;
 export type primitiveArray = Array<primitive | primitiveObject>;
 export type primitiveObject = { [key: string]: primitive | primitiveObject | primitiveArray };
 
-export type KindedObject = primitiveObject & { kind: string };
+export type KindedObject = primitiveObject & { kind: ObjectKind };
 
 export interface ISerializable {
     serialise(mode: StateMode): KindedObject | false;
 }
 
 export class StateManager {
-    static handlers = new Map<string, (data: any, scene?: Scene) => any>();
+    static handlers = new Map<ObjectKind, (data: any, scene?: Scene) => any>();
     objects = new Set<ISerializable>();
 
-    static addHandler(kind: string, handler: (data: any) => any) {
+    static addHandler(kind: ObjectKind, handler: (data: any) => any) {
         StateManager.handlers.set(kind, handler);
     }
 

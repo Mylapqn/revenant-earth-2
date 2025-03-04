@@ -1,7 +1,7 @@
 import { Assets, Sprite, Texture } from "pixi.js";
-import { Component, ComponentData } from "../hierarchy/component";
-import { Entity } from "../hierarchy/entity";
-import { game } from "../game";
+import { Component, ComponentData } from "../../hierarchy/component";
+import { Entity } from "../../hierarchy/entity";
+import { game } from "../../game";
 import { SpriteDirectionComponent } from "./spriteDirectionComponent";
 
 
@@ -14,7 +14,8 @@ export class BasicSprite extends Component {
 
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        this.entity.on("draw", (dt) => this.draw(dt));
+        this.draw = this.draw.bind(this);
+        this.entity.on("draw", this.draw);
     }
 
     override toData(): ComponentData {
@@ -31,6 +32,12 @@ export class BasicSprite extends Component {
             this.sprite.texture = texture;
             this.sprite.texture.source.scaleMode = 'nearest';
         });
+    }
+
+    override remove() {
+        this.sprite.destroy();
+        this.entity.off("draw", this.draw);
+        super.remove();
     }
 
     override init(): void {
