@@ -6,8 +6,8 @@ import { BasicSprite } from "./BasicSprite";
 export class RoboLogic extends Component {
     static componentType = "RoboLogic";
 
-    constructor(parent: Entity, id: number) {
-        super(parent, id);
+    constructor(parent: Entity) {
+        super(parent);
         this.onEntity("update", (dt) => this.update(dt));
     }
 

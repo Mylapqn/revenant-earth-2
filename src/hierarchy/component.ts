@@ -1,12 +1,12 @@
 import { Callback, Entity, KnownEvents } from "./entity";
 import { primitiveObject } from "./serialise";
 
-export type Constructor<T> = { new(parent: Entity, id: number): T, componentType: string };
+export type Constructor<T> = { new(parent: Entity): T, componentType: string };
 
 export class Component {
     static componentType = "Component";
     static constructors = new Map<string, Constructor<Component>>();
-    id: number;
+    id = -1;
     entity: Entity;
     subscribedEvents = new Set<{ type: keyof KnownEvents, callback: Callback<any> }>();
 
@@ -17,8 +17,7 @@ export class Component {
         return this.entity.transform;
     }
 
-    constructor(entity: Entity, id: number) {
-        this.id = id;
+    constructor(entity: Entity) {
         this.entity = entity;
     }
 
@@ -40,7 +39,7 @@ export class Component {
     static fromData(entity: Entity, data: ComponentData): Component {
         const constructor = this.constructors.get(data.componentType)
         if (constructor === undefined) throw new Error(`Unknown component type: ${data.componentType}`);
-        const component = new constructor(entity, data.id ?? entity.componentIndex++);
+        const component = new constructor(entity);
         component.applyData(data.data);
         return component;
     }

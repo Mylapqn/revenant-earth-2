@@ -10,8 +10,8 @@ export class Tree extends Component {
     nextseed = 3;
     asset: string = "./tree.png";
 
-    constructor(parent: Entity, id: number) {
-        super(parent, id);
+    constructor(parent: Entity) {
+        super(parent);
         this.onEntity("update", (dt) => this.update(dt));
     }
 

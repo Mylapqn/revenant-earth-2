@@ -4,8 +4,8 @@ import { Entity } from "../../hierarchy/entity";
 export class SpriteDirectionComponent extends Component {
     static componentType = "SpriteDirectionComponent";
     direction: number = 0;
-    constructor(entity: Entity, id: number) {
-        super(entity, id);
+    constructor(entity: Entity) {
+        super(entity);
         this.onEntity("update", (dt) => this.update(dt));
     }
 

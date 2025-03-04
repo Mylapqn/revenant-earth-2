@@ -8,8 +8,8 @@ export class Interactable extends Component {
     spriteComponent?: BasicSprite;
     highlighted = false;
 
-    constructor(parent: Entity, id: number) {
-        super(parent, id);
+    constructor(parent: Entity) {
+        super(parent);
         this.onEntity("update", (dt) => this.update(dt));
     }
 

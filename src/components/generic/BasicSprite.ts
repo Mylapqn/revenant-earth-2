@@ -12,8 +12,8 @@ export class BasicSprite extends Component {
     asset!: string;
     directionComponent?: SpriteDirectionComponent;
 
-    constructor(parent: Entity, id: number) {
-        super(parent, id);
+    constructor(parent: Entity) {
+        super(parent);
         this.onEntity("draw", (dt) => this.draw(dt));
     }
 

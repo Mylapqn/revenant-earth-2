@@ -6,8 +6,8 @@ export class Door extends Component {
     static componentType = "Door";
     targetScene: string = "Scene";
 
-    constructor(parent: Entity, id: number) {
-        super(parent, id);
+    constructor(parent: Entity) {
+        super(parent);
         this.onEntity("update", (dt) => this.update(dt));
         this.onEntity("interact", () => {game.loadScene(this.targetScene);});
     }
