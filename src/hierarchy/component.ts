@@ -1,4 +1,4 @@
-import { Entity } from "./entity";
+import { Callback, Entity, KnownEvents } from "./entity";
 import { primitiveObject } from "./serialise";
 
 export type Constructor<T> = { new(parent: Entity, id: number): T, componentType: string };
@@ -8,6 +8,7 @@ export class Component {
     static constructors = new Map<string, Constructor<Component>>();
     id: number;
     entity: Entity;
+    subscribedEvents = new Set<{ type: keyof KnownEvents, callback: Callback<any> }>();
 
     get componentType() { return (this.constructor as typeof Component).componentType; }
     get factory() { return (this.constructor as Constructor<typeof this>); }
@@ -27,6 +28,9 @@ export class Component {
 
     remove() {
         this.entity.removeComponent(this);
+        for (const event of this.subscribedEvents) {
+            this.entity.off(event.type, event.callback);
+        }
     }
 
     static register(constructor: Constructor<Component>) {
@@ -43,6 +47,12 @@ export class Component {
 
     toData(data?: primitiveObject): ComponentData {
         return { id: this.id, componentType: this.componentType, data };
+    }
+
+
+    onEntity<T extends keyof KnownEvents>(event: T, callback: Callback<T>) {
+        this.subscribedEvents.add({ type: event, callback });
+        this.entity.on(event, callback);
     }
 }
 

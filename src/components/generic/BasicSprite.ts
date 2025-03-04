@@ -14,8 +14,7 @@ export class BasicSprite extends Component {
 
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        this.draw = this.draw.bind(this);
-        this.entity.on("draw", this.draw);
+        this.onEntity("draw", (dt) => this.draw(dt));
     }
 
     override toData(): ComponentData {
@@ -36,7 +35,6 @@ export class BasicSprite extends Component {
 
     override remove() {
         this.sprite.destroy();
-        this.entity.off("draw", this.draw);
         super.remove();
     }
 

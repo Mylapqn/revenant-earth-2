@@ -1,23 +1,21 @@
-import { EntitySerializer } from "../components/generic/entitySerializer";
 import { Transform } from "../components/generic/transfrom";
-import { game } from "../game";
 import { Component, ComponentData, Constructor } from "./component";
 import { Scene } from "./scene";
-import { KindedObject } from "./serialise";
+import { ISerializable, KindedObject, StateMode } from "./serialise";
 
 
 
-type KnownEvents = {
+export type KnownEvents = {
     "update": [number],
     "draw": [number],
     "unload": [],
     "interact":[],
 };
 
-type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void
+export type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void
 
 
-export class Entity {
+export class Entity implements ISerializable {
     id: number;
     components = new Map<number, Component>();
     typeLookup = new Map<Constructor<Component>, Set<Component>>();
@@ -63,6 +61,10 @@ export class Entity {
         return this.typeLookup.get(type)?.values().next().value as T | undefined;
     }
 
+    getComponentById(id: number) {
+        return this.components.get(id) as Component | undefined;
+    }
+
     getComponents<T extends Component>(type: Constructor<T>): Set<T> {
         const result = this.typeLookup.get(type) ?? new Set<T>();
         return result as Set<T>;
@@ -78,6 +80,18 @@ export class Entity {
         this.addComponent(component);
     }
 
+    unload(){
+        this.emit("unload");
+        this.remove();
+    }
+
+    update(dt: number) {
+        this.emit("update", dt);
+    }
+
+    draw(dt: number) {
+        this.emit("draw", dt);
+    }
 
     remove() {
         for (const component of this.components.values()) {
@@ -88,9 +102,10 @@ export class Entity {
     static create() {
         const entity = new Entity(this.entityId++);
         entity.createComponent(Transform);
+        return entity;
     }
 
-    static fromData(data: EntityData) {
+    static fromData(data: EntityData, scene?: Scene) {
         const entity = new Entity(data.id);
 
         for (const component of data.component) {
@@ -106,14 +121,18 @@ export class Entity {
         for (const [key, component] of entity.components) {
             component.init();
         }
-
+        scene?.register(entity);
         return entity;
     }
 
     static deserialise(deserialise: any, scene?: Scene) {
-        game.robo = Entity.fromData(deserialise as EntityData);
-        const serialiser = game.robo.getComponent(EntitySerializer); // what
-        if (scene && serialiser) scene.register(serialiser); // also what
+        const entity = Entity.fromData(deserialise as EntityData);
+        scene?.register(entity);
+    }
+
+    serialise(mode: StateMode): KindedObject | false {
+        const data = this.toData();
+        return data;
     }
 
     toData(): KindedObject {

@@ -8,7 +8,7 @@ export class RoboLogic extends Component {
 
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        parent.on("update", (dt) => this.update(dt));
+        this.onEntity("update", (dt) => this.update(dt));
     }
 
     override init(): void {

@@ -22,9 +22,6 @@ export class Game {
     activeScene!: Scene;
 
     terrain!: Terrain;
-    robo!: Entity;
-    door!: Entity;
-    tree!: Entity;
     player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
@@ -96,10 +93,6 @@ export class Game {
                         },
                     },
                     {
-                        componentType: "EntitySerializer",
-                        id: 1,
-                    },
-                    {
                         componentType: "Interactable",
                         id: 2,
                     },
@@ -161,7 +154,7 @@ export class Game {
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
 
-        this.robo = Entity.fromData({
+        Entity.fromData({
             kind: "Entity",
             id: 0,
             component: [
@@ -180,14 +173,10 @@ export class Game {
                     componentType: "RoboLogic",
                     id: 2,
                 },
-                {
-                    componentType: "EntitySerializer",
-                    id: 3,
-                },
             ],
-        });
+        }, this.activeScene);
 
-        this.door = Entity.fromData({
+        const door = Entity.fromData({
             kind: "Entity",
             id: 1,
             component: [
@@ -197,10 +186,6 @@ export class Game {
                     data: {
                         asset: "./door.png",
                     },
-                },
-                {
-                    componentType: "EntitySerializer",
-                    id: 1,
                 },
                 {
                     componentType: "Interactable",
@@ -214,12 +199,12 @@ export class Game {
                     },
                 },
             ],
-        });
-        this.door.transform.position.x = 100;
-        this.door.transform.position.y = 80;
+        }, this.activeScene);
+        door.transform.position.x = 100;
+        door.transform.position.y = 80;
 
 
-        this.tree = Entity.fromData({
+        const tree = Entity.fromData({
             kind: "Entity",
             id: 1,
             component: [
@@ -229,10 +214,6 @@ export class Game {
                     data: {
                         asset: "./tree.png",
                     },
-                },
-                {
-                    componentType: "EntitySerializer",
-                    id: 1,
                 },
                 {
                     componentType: "Interactable",
@@ -247,12 +228,12 @@ export class Game {
                     },
                 },
             ],
-        });
+        }, this.activeScene);
 
-        this.tree.transform.position.x = 150;
-        this.tree.transform.position.y = 100;
+        tree.transform.position.x = 150;
+        tree.transform.position.y = 100;
 
-        this.tree = Entity.fromData({
+        const tree2 = Entity.fromData({
             kind: "Entity",
             id: 1,
             component: [
@@ -262,10 +243,6 @@ export class Game {
                     data: {
                         asset: "./bush.png",
                     },
-                },
-                {
-                    componentType: "EntitySerializer",
-                    id: 1,
                 },
                 {
                     componentType: "Interactable",
@@ -280,10 +257,10 @@ export class Game {
                     },
                 },
             ],
-        });
+        }, this.activeScene);
 
-        this.tree.transform.position.x = 300;
-        this.tree.transform.position.y = 100;
+        tree2.transform.position.x = 300;
+        tree2.transform.position.y = 100;
 
 
         this.terrain = new Terrain();
@@ -296,22 +273,14 @@ export class Game {
 
         this.worldDebugGraphics.clear();
 
-        //@ts-ignore
-        this.activeScene.objects.forEach((obj) => {
-            //@ts-ignore
-            obj.entity?.emit?.("update", dt)
-            //@ts-ignore
-            obj.entity?.emit?.("draw", dt)
-        });
+        this.activeScene.update(dt);
+        this.activeScene.draw(dt);
 
         this.pixelFG.sprite.x = (this.mousePos.x - screen.width / 2) / 10;
         this.pixelFG.sprite.y = (this.mousePos.y - screen.height / 2) / 10;
 
         this.pixelFG2.sprite.x = (this.mousePos.x - screen.width / 2) / -5;
         this.pixelFG2.sprite.y = (this.mousePos.y - screen.height / 2) / -5;
-
-        this.terrain.update();
-        this.player.update(dt);
 
         this.camera.update(dt);
 

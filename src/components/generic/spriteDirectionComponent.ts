@@ -6,7 +6,7 @@ export class SpriteDirectionComponent extends Component {
     direction: number = 0;
     constructor(entity: Entity, id: number) {
         super(entity, id);
-        this.entity.on("update", (dt) => this.update(dt));
+        this.onEntity("update", (dt) => this.update(dt));
     }
 
     update(dt: number) {

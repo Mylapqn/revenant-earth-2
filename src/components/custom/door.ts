@@ -8,8 +8,8 @@ export class Door extends Component {
 
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        parent.on("update", (dt) => this.update(dt));
-        parent.on("interact", () => {game.loadScene(this.targetScene);});
+        this.onEntity("update", (dt) => this.update(dt));
+        this.onEntity("interact", () => {game.loadScene(this.targetScene);});
     }
 
     override init(): void {

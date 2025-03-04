@@ -3,7 +3,7 @@ import { Edge, Vector, Vectorlike } from "./vector";
 import { game } from "./game";
 import { Ellipse, Polygon, SATVector } from "detect-collisions";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
-import { ISerializable, StateMode } from "./hierarchy/serialise";
+import { ISerializable, ObjectKind, StateMode } from "./hierarchy/serialise";
 import { ISceneObject, Scene } from "./hierarchy/scene";
 
 export class Terrain implements ISerializable, ISceneObject {
@@ -71,7 +71,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.considerNodes();
     }
 
-    serialise(mode: StateMode): false | { kind: string; terrainMesh: Array<Vectorlike>; terrainData: Array<TerrainData> } {
+    serialise(mode: StateMode): false | { kind: ObjectKind; terrainMesh: Array<Vectorlike>; terrainData: Array<TerrainData> } {
         let nodes = [];
         for (const node of this.terrainMesh) {
             nodes.push({ x: Math.round(node.x), y: Math.round(node.y) });

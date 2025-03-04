@@ -1,8 +1,11 @@
 import { game } from "../game";
+import { Entity } from "./entity";
 import { ISerializable, KindedObject, ObjectKind, StateManager, StateMode } from "./serialise";
 
 export interface ISceneObject {
     unload?(): void;
+    update?(dt: number): void;
+    draw?(dt: number): void;
 }
 
 export class Scene implements ISerializable {
@@ -38,6 +41,18 @@ export class Scene implements ISerializable {
     unload() {
         for (const obj of this.objects) {
             obj.unload?.();
+        }
+    }
+
+    update(dt: number) {
+        for (const obj of this.objects) {
+            obj.update?.(dt);
+        }
+    }
+
+    draw(dt: number) {
+        for (const obj of this.objects) {
+            obj.draw?.(dt);
         }
     }
 

@@ -12,7 +12,7 @@ export class Transform extends Component {
     constructor(entity: Entity, id: number) {
         super(entity, id);
         this.entity.transform = this;
-        this.entity.on("update", (dt) => this.update(dt));
+        this.onEntity("update", (dt) => this.update(dt));
 
     }
 

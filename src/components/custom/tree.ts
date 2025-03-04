@@ -12,7 +12,7 @@ export class Tree extends Component {
 
     constructor(parent: Entity, id: number) {
         super(parent, id);
-        parent.on("update", (dt) => this.update(dt));
+        this.onEntity("update", (dt) => this.update(dt));
     }
 
     override init(): void {
@@ -56,10 +56,6 @@ export class Tree extends Component {
                         },
                     },
                     {
-                        componentType: "EntitySerializer",
-                        id: 1,
-                    },
-                    {
                         componentType: "Interactable",
                         id: 2,
                     },
@@ -71,7 +67,7 @@ export class Tree extends Component {
                         },
                     },
                 ],
-            });
+            }, game.activeScene);
 
             if (this.asset == "./bush.png")
                 newtree.transform.position.x = this.transform.position.x + (80 * Math.random() - 40) * 6;

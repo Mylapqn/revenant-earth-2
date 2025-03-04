@@ -1,5 +1,4 @@
 import { Component } from "../../hierarchy/component";
-import { EntitySerializer } from "./entitySerializer";
 import { Interactable } from "./interactable";
 import { RoboLogic } from "./roboLogic";
 import { BasicSprite } from "./BasicSprite";
@@ -9,7 +8,6 @@ import { Door } from "../custom/door";
 import { Tree } from "../custom/tree";
 
 export function initComponents(){
-    Component.register(EntitySerializer);
     Component.register(RoboLogic);
     Component.register(BasicSprite);
     Component.register(Transform);
