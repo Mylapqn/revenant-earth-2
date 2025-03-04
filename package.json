@@ -11,12 +11,13 @@
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
-    "typescript": "~5.6.2",
     "htcrud": "github:NotRustyBot/htcrud",
+    "typescript": "~5.6.2",
     "vite": "^6.0.1"
   },
   "dependencies": {
     "detect-collisions": "^9.24.0",
-    "pixi.js": "^8.6.2"
+    "pixi.js": "^8.6.2",
+    "poly-decomp-es": "^0.4.2"
   }
 }

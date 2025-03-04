@@ -10,6 +10,7 @@ import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 import { Entity } from "./hierarchy/entity";
 import { initComponents } from "./components/generic/componentIndex";
 import { Scene } from "./hierarchy/scene";
+import { Interior } from "./environment/interior";
 
 export let game: Game;
 
@@ -34,6 +35,7 @@ export class Game {
     mousePixels = { x: 0, y: 0 };
     collisionSystem!: System;
     pixelScale = 4;
+    interior!: Interior;
 
     get worldMouse(): Vectorlike {
         return new Vector()
@@ -243,6 +245,8 @@ export class Game {
 
 
         this.terrain = new Terrain();
+
+        this.interior = new Interior();
 
         this.app.ticker.add(this.update, this);
     }
