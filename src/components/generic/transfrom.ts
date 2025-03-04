@@ -9,8 +9,8 @@ export class Transform extends Component {
     position = new Vector(0, 0);
     velocity = new Vector(0, 0);
 
-    constructor(entity: Entity, id: number) {
-        super(entity, id);
+    constructor(entity: Entity) {
+        super(entity);
         this.entity.transform = this;
         this.onEntity("update", (dt) => this.update(dt));
 

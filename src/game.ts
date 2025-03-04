@@ -106,11 +106,11 @@ export class Game {
                         data: {
                             position: { x: 40, y: 20 },
                             velocity: { x: 10, y: 0 },
-                        }
-                    }
+                        },
+                    },
                 ],
             },
-            
+
             {
                 kind: "Player",
                 position: { x: 10, y: 0 },
@@ -121,7 +121,6 @@ export class Game {
                 terrainMesh: [...s2t],
                 terrainData: [...s2td],
             },
-
         ];
 
         this.pixelFG = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
@@ -151,98 +150,120 @@ export class Game {
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
 
-        Entity.fromData({
-            kind: "Entity",
-            component: [
-                {
-                    componentType: "SpriteDirectionComponent",
-                },
-                {
-                    componentType: "BasicSprite",
-                    data: {
-                        asset: "./robo.png",
+        Entity.fromData(
+            {
+                kind: "Entity",
+                component: [
+                    {
+                        componentType: "SpriteDirectionComponent",
                     },
-                },
-                {
-                    componentType: "RoboLogic",
-                },
-            ],
-        }, this.activeScene);
-
-        const door = Entity.fromData({
-            kind: "Entity",
-            component: [
-                {
-                    componentType: "BasicSprite",
-                    data: {
-                        asset: "./door.png",
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./robo.png",
+                        },
                     },
-                },
-                {
-                    componentType: "Interactable",
-                },
-                {
-                    componentType: "Door",
-                    data: {
-                        target: "Scene 2",
+                    {
+                        componentType: "RoboLogic",
                     },
-                },
-            ],
-        }, this.activeScene);
-        door.transform.position.x = 100;
-        door.transform.position.y = 80;
+                ],
+            },
+            this.activeScene
+        );
 
-
-        const tree = Entity.fromData({
-            kind: "Entity",
-            component: [
-                {
-                    componentType: "BasicSprite",
-                    data: {
-                        asset: "./tree.png",
+        Entity.fromData(
+            {
+                kind: "Entity",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 100, y: 100 },
+                        },
                     },
-                },
-                {
-                    componentType: "Interactable",
-                },
-                {
-                    componentType: "Tree",
-                    data: {
-                        growth: 0,
-                        asset: "./tree.png",
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./door.png",
+                        },
                     },
-                },
-            ],
-        }, this.activeScene);
-
-        tree.transform.position.x = 150;
-        tree.transform.position.y = 100;
-
-        const tree2 = Entity.fromData({
-            kind: "Entity",
-            component: [
-                {
-                    componentType: "BasicSprite",
-                    data: {
-                        asset: "./bush.png",
+                    {
+                        componentType: "Interactable",
                     },
-                },
-                {
-                    componentType: "Interactable",
-                },
-                {
-                    componentType: "Tree",
-                    data: {
-                        growth: 0,
-                        asset: "./bush.png",
+                    {
+                        componentType: "Door",
+                        data: {
+                            target: "Scene 2",
+                        },
                     },
-                },
-            ],
-        }, this.activeScene);
+                ],
+            },
+            this.activeScene
+        );
 
-        tree2.transform.position.x = 300;
-        tree2.transform.position.y = 100;
 
+        Entity.fromData(
+            {
+                kind: "Entity",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 100, y: 100 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./tree.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Tree",
+                        data: {
+                            growth: 0,
+                            asset: "./tree.png",
+                        },
+                    },
+                ],
+            },
+            this.activeScene
+        );
+
+
+        Entity.fromData(
+            {
+                kind: "Entity",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 300, y: 100 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./bush.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Tree",
+                        data: {
+                            growth: 0,
+                            asset: "./bush.png",
+                        },
+                    },
+                ],
+            },
+            this.activeScene
+        );
 
         this.terrain = new Terrain();
 

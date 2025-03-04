@@ -49,6 +49,7 @@ export class Entity implements ISerializable {
 
     addComponent(component: Component) {
         this.components.set(this.componentIndex, component);
+        component.id = this.componentIndex;
         if (this.typeLookup.has(component.factory) === false) {
             this.typeLookup.set(component.factory, new Set<Component>());
         }
@@ -76,7 +77,7 @@ export class Entity implements ISerializable {
     }
 
     createComponent(type: Constructor<Component>) {
-        const component = new type(this, this.componentIndex);
+        const component = new type(this);
         this.addComponent(component);
     }
 
@@ -107,13 +108,12 @@ export class Entity implements ISerializable {
 
     static fromData(data: EntityData, scene?: Scene) {
         const entity = new Entity(data.id ?? this.entityId++);
-        entity.componentIndex = data.component.reduce((max, c) => Math.max(max, c.id ?? 0), 0);
+        entity.componentIndex = data.component.reduce((max, c) => Math.max(max, c.id ?? -1), -1) + 1;
 
         for (const component of data.component) {
             const comp = Component.fromData(entity, component);
             if (comp) entity.addComponent(comp);
         }
-
 
         if (entity.transform == undefined) {
             entity.createComponent(Transform);
@@ -122,6 +122,7 @@ export class Entity implements ISerializable {
         for (const [key, component] of entity.components) {
             component.init();
         }
+        
         scene?.register(entity);
         return entity;
     }
