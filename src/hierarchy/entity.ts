@@ -106,7 +106,8 @@ export class Entity implements ISerializable {
     }
 
     static fromData(data: EntityData, scene?: Scene) {
-        const entity = new Entity(data.id);
+        const entity = new Entity(data.id ?? this.entityId++);
+        entity.componentIndex = data.component.reduce((max, c) => Math.max(max, c.id ?? 0), 0);
 
         for (const component of data.component) {
             const comp = Component.fromData(entity, component);
@@ -153,6 +154,6 @@ export class Entity implements ISerializable {
 
 type EntityData = {
     kind: "Entity";
-    id: number;
+    id?: number;
     component: Array<ComponentData>;
 }

@@ -46,22 +46,18 @@ export class Tree extends Component {
 
             let newtree = Entity.fromData({
                 kind: "Entity",
-                id: 1,
                 component: [
                     {
                         componentType: "BasicSprite",
-                        id: 0,
                         data: {
                             asset: this.asset,
                         },
                     },
                     {
                         componentType: "Interactable",
-                        id: 2,
                     },
                     {
                         componentType: "Tree",
-                        id: 3,
                         data: {
                             growth: 0,
                         },

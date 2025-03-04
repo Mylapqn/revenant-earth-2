@@ -40,7 +40,7 @@ export class Component {
     static fromData(entity: Entity, data: ComponentData): Component {
         const constructor = this.constructors.get(data.componentType)
         if (constructor === undefined) throw new Error(`Unknown component type: ${data.componentType}`);
-        const component = new constructor(entity, data.id);
+        const component = new constructor(entity, data.id ?? entity.componentIndex++);
         component.applyData(data.data);
         return component;
     }
@@ -57,7 +57,7 @@ export class Component {
 }
 
 export type ComponentData = {
-    id: number;
+    id?: number;
     componentType: string;
     data?: primitiveObject;
 };

@@ -83,29 +83,24 @@ export class Game {
         scene2.data = [
             {
                 kind: "Entity",
-                id: 0,
                 component: [
                     {
                         componentType: "BasicSprite",
-                        id: 0,
                         data: {
                             asset: "./door.png",
                         },
                     },
                     {
                         componentType: "Interactable",
-                        id: 2,
                     },
                     {
                         componentType: "Door",
-                        id: 3,
                         data: {
                             target: "Scene",
                         },
                     },
                     {
                         componentType: "Transform",
-                        id: 4,
                         data: {
                             position: { x: 40, y: 20 },
                             velocity: { x: 10, y: 0 },
@@ -156,44 +151,36 @@ export class Game {
 
         Entity.fromData({
             kind: "Entity",
-            id: 0,
             component: [
                 {
                     componentType: "SpriteDirectionComponent",
-                    id: 0,
                 },
                 {
                     componentType: "BasicSprite",
-                    id: 1,
                     data: {
                         asset: "./robo.png",
                     },
                 },
                 {
                     componentType: "RoboLogic",
-                    id: 2,
                 },
             ],
         }, this.activeScene);
 
         const door = Entity.fromData({
             kind: "Entity",
-            id: 1,
             component: [
                 {
                     componentType: "BasicSprite",
-                    id: 0,
                     data: {
                         asset: "./door.png",
                     },
                 },
                 {
                     componentType: "Interactable",
-                    id: 2,
                 },
                 {
                     componentType: "Door",
-                    id: 3,
                     data: {
                         target: "Scene 2",
                     },
@@ -206,22 +193,18 @@ export class Game {
 
         const tree = Entity.fromData({
             kind: "Entity",
-            id: 1,
             component: [
                 {
                     componentType: "BasicSprite",
-                    id: 0,
                     data: {
                         asset: "./tree.png",
                     },
                 },
                 {
                     componentType: "Interactable",
-                    id: 2,
                 },
                 {
                     componentType: "Tree",
-                    id: 3,
                     data: {
                         growth: 0,
                         asset: "./tree.png",
@@ -235,22 +218,18 @@ export class Game {
 
         const tree2 = Entity.fromData({
             kind: "Entity",
-            id: 1,
             component: [
                 {
                     componentType: "BasicSprite",
-                    id: 0,
                     data: {
                         asset: "./bush.png",
                     },
                 },
                 {
                     componentType: "Interactable",
-                    id: 2,
                 },
                 {
                     componentType: "Tree",
-                    id: 3,
                     data: {
                         growth: 0,
                         asset: "./bush.png",
