@@ -6,6 +6,7 @@ import { SpriteDirectionComponent } from "./spriteDirectionComponent";
 import { Transform } from "./transfrom";
 import { Door } from "../custom/door";
 import { Tree } from "../custom/tree";
+import { HitboxComponent } from "./HitboxComponent";
 
 export function initComponents(){
     Component.register(RoboLogic);
@@ -15,5 +16,6 @@ export function initComponents(){
     Component.register(Interactable);
     Component.register(Door);
     Component.register(Tree);
+    Component.register(HitboxComponent);
     
 }

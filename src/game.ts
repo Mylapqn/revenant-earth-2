@@ -11,6 +11,8 @@ import { Entity } from "./hierarchy/entity";
 import { initComponents } from "./components/generic/componentIndex";
 import { Scene } from "./hierarchy/scene";
 import { Interior } from "./environment/interior";
+import doorHitbox from "./environment/doorHitbox.json";
+import interior from "./environment/hitbox.json";
 
 export let game: Game;
 
@@ -196,6 +198,12 @@ export class Game {
                             target: "Scene 2",
                         },
                     },
+                    {
+                        componentType:"HitboxComponent",
+                        data: {
+                            nodes: doorHitbox,
+                        }
+                    }
                 ],
             },
             this.activeScene

@@ -130,8 +130,8 @@ export class Interior implements ISerializable, ISceneObject {
                 this.graphics.lineTo(node.x, node.y);
             }
 
-            this.graphics.fill(0xff00ff, 0.1);
-            this.graphics.stroke({ color: 0xffffff, alpha: 1, width: 1 });
+            this.graphics.fill(0x141418, 1);
+            this.graphics.stroke({ color: 0x888888, alpha: 1, width: 1 });
         }
 
 
