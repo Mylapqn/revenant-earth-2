@@ -65,17 +65,17 @@ export class HitboxComponent extends Component {
 
         for (const hitbox of this.polygons) {
             this.graphics.moveTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
-            for (const point of hitbox.points) {
-                this.graphics.lineTo(point.x + this.transform.position.x, point.y + this.transform.position.y);
+            for(let i = 0; i < hitbox.points.length; i++) {
+                this.graphics.lineTo(hitbox.points[i].x + this.transform.position.x, hitbox.points[i].y + this.transform.position.y);
             }
             this.graphics.lineTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
             this.graphics.fill(0x000000, 1);
-            this.graphics.stroke({ color: 0xff0000, width: 1 });
+            this.graphics.stroke({ color: 0xff0000, width: 1,alpha:.1 });
         }
 
         this.graphics.moveTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
-        for (const node of this.nodes) {
-            this.graphics.lineTo(node.x + this.transform.position.x, node.y + this.transform.position.y);
+        for(let i = 0; i < this.nodes.length-6; i++) {
+            this.graphics.lineTo(this.nodes[i].x + this.transform.position.x, this.nodes[i].y + this.transform.position.y);
         }
         this.graphics.lineTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
         this.graphics.stroke({ color: 0x00ff00, width: 1 });
@@ -100,13 +100,13 @@ export class HitboxComponent extends Component {
         let aaa = this.nodes.slice(0, leftMostIndex);
         let bbb = this.nodes.slice(leftMostIndex, undefined);
         this.nodes = bbb.concat(aaa);
-        const padding = 100;
+        const padding = 1000;
         return this.nodes.concat([
             new Vector(leftmostNode.x - padding, bottommostNode.y + padding),
             new Vector(rightmostNode.x + padding, bottommostNode.y + padding),
             new Vector(rightmostNode.x + padding, topmostNode.y - padding),
             new Vector(leftmostNode.x - padding, topmostNode.y - padding),
-            new Vector(leftmostNode.x - padding-1, bottommostNode.y + padding),
+            new Vector(leftmostNode.x - padding-.01, bottommostNode.y + padding),
             this.nodes[0],
         ].reverse());
     }
