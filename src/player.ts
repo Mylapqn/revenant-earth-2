@@ -1,5 +1,5 @@
 import { Ellipse } from "detect-collisions";
-import { game } from "./game";
+import { Game, game } from "./game";
 import { Graphics, Sprite } from "pixi.js";
 import { Vector, Vectorlike } from "./vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
@@ -101,8 +101,8 @@ export class Player implements ISerializable {
         }
         //console.log(this.limbSystem.limbGroups[0].passingPhase);
 
-        this.pixelLayer.sprite.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * 4;
-        this.pixelLayer.sprite.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * 4;
+        this.pixelLayer.sprite.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
+        this.pixelLayer.sprite.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();
 
         this.graphics.clear();

@@ -17,6 +17,7 @@ import interior from "./environment/hitbox.json";
 export let game: Game;
 
 export class Game {
+    static pixelScale = 4;
     app: Application;
     keys: { [key: string]: boolean } = {};
     camera!: Camera;
@@ -36,14 +37,13 @@ export class Game {
     mousePos = { x: 0, y: 0 };
     mousePixels = { x: 0, y: 0 };
     collisionSystem!: System;
-    pixelScale = 4;
     interior!: Interior;
 
     get worldMouse(): Vectorlike {
         return new Vector()
             .add(this.mousePixels)
             .add(this.camera.worldPosition)
-            .sub({ x: this.camera.middle.x / 4, y: this.camera.middle.y / 4 });
+            .sub({ x: this.camera.middle.x / Game.pixelScale, y: this.camera.middle.y / Game.pixelScale });
     }
 
     constructor(app: Application) {
@@ -56,8 +56,8 @@ export class Game {
         document.addEventListener("mousemove", (e) => {
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
-            this.mousePixels.x = Math.round(this.mousePos.x / this.pixelScale);
-            this.mousePixels.y = Math.round(this.mousePos.y / this.pixelScale);
+            this.mousePixels.x = Math.round(this.mousePos.x / Game.pixelScale);
+            this.mousePixels.y = Math.round(this.mousePos.y / Game.pixelScale);
         });
 
         window.addEventListener("resize", () => this.resize());
@@ -125,23 +125,23 @@ export class Game {
             },
         ];
 
-        this.pixelFG = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
+        this.pixelFG = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
         //this.app.stage.addChild(this.pixelFG.sprite);
         const fg = new Sprite(await Assets.load("./4.png"));
         fg.texture.source.scaleMode = "nearest";
         fg.scale.set(1);
         this.pixelFG.container.addChild(fg);
 
-        this.pixelLayer = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
+        this.pixelLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
         this.app.stage.addChild(this.pixelLayer.sprite);
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
         this.terrainContainer = this.pixelLayer.container;
         this.app.stage.addChild((this.worldDebugGraphics = new Graphics()));
-        this.worldDebugGraphics.scale.set(4);
+        this.worldDebugGraphics.scale.set(Game.pixelScale);
 
-        this.pixelFG2 = new PixelLayer(this.app.canvas.width / 4, this.app.canvas.height / 4);
+        this.pixelFG2 = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
         //this.app.stage.addChild(this.pixelFG2.sprite);
         const fg2 = new Sprite(await Assets.load("./5.png"));
         fg2.texture.source.scaleMode = "nearest";

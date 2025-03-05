@@ -1,5 +1,5 @@
 import { Container, Graphics, RenderTexture, Sprite } from "pixi.js";
-import { game } from "../game";
+import { Game, game } from "../game";
 import { PixelSprite } from "./pixelSprite";
 
 export class PixelLayer {
@@ -12,7 +12,7 @@ export class PixelLayer {
         this.renderTexture = RenderTexture.create({ width, height, antialias: false, scaleMode: 'nearest' });
         this.sprite = new Sprite();
         this.sprite.texture = this.renderTexture;
-        this.sprite.scale.set(4);
+        this.sprite.scale.set(Game.pixelScale);
         let graphics = new Graphics;
         graphics.circle(200, 50, 10);
         graphics.fill(0xff0000);
@@ -22,7 +22,7 @@ export class PixelLayer {
     render() {
         if (this.worldSpace) {
             this.container.position.set(game.camera.pixelOffset.x, game.camera.pixelOffset.y);
-            this.sprite.position.set(game.camera.offsetRemainder.x * 4, game.camera.offsetRemainder.y * 4);
+            this.sprite.position.set(game.camera.offsetRemainder.x * Game.pixelScale, game.camera.offsetRemainder.y * Game.pixelScale);
         }
 
         game.app.renderer.render({ container: this.container, target: this.renderTexture });

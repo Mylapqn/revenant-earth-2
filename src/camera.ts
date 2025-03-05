@@ -1,4 +1,4 @@
-import { game } from "./game";
+import { Game, game } from "./game";
 import { Vector, Vectorlike } from "./vector";
 
 export class Camera {
@@ -28,17 +28,16 @@ export class Camera {
 
 
     update(dt: number) {
-        const worldScale = 4;
         const targetPosition = new Vector(0, 0);
-        targetPosition.x = game.player.position.x * worldScale;
-        targetPosition.y = game.player.position.y * worldScale;
+        targetPosition.x = game.player.position.x * Game.pixelScale;
+        targetPosition.y = game.player.position.y * Game.pixelScale;
 
         this.position.x = (targetPosition.x + this.position.x * 19) / 20;
         this.position.y = (targetPosition.y + this.position.y * 19) / 20;
 
         this.subpixelOffset = new Vector(-this.position.x + this.middle.x, -this.position.y + this.middle.y);
-        this.pixelOffset = this.subpixelOffset.result().mult(1/4).floor();
-        this.offsetRemainder = this.subpixelOffset.result().mult(1/4).sub(this.pixelOffset);
+        this.pixelOffset = this.subpixelOffset.result().mult(1/Game.pixelScale).floor();
+        this.offsetRemainder = this.subpixelOffset.result().mult(1/Game.pixelScale).sub(this.pixelOffset);
         game.playerContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
         game.terrainContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
         game.worldDebugGraphics.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
