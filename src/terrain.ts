@@ -88,7 +88,7 @@ export class Terrain implements ISerializable, ISceneObject {
                 this.nodes.push(node);
             }
         }
-
+        if(this.nodes.length < 2) return;
         this.nodes.unshift(new TerrainNode(this.nodes[0].x, 1000));
         this.nodes.push(new TerrainNode(this.nodes[this.nodes.length - 1].x, 1000));
         this.hitbox.setPoints(this.nodes.map((node) => new SATVector(node.x, node.y)));
@@ -152,6 +152,7 @@ export class Terrain implements ISerializable, ISceneObject {
     }
 
     draw() {
+        if (this.nodes.length < 2) return;
         this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
 
         for (const node of this.hitbox.points) {
