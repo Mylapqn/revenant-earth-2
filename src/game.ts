@@ -110,7 +110,25 @@ export class Game {
                     },
                 ],
             },
-
+            {
+                kind: "Entity",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 40, y: 0 },
+                            velocity: { x: 10, y: 0 },
+                        },
+                    },
+                    {
+                        componentType: "HitboxComponent",
+                        data: {
+                            nodes: doorHitbox,
+                            interior: true,
+                        }
+                    }
+                ]
+            },
             {
                 kind: "Player",
                 position: { x: 10, y: 0 },
@@ -197,7 +215,7 @@ export class Game {
                         },
                     },
                     {
-                        componentType:"HitboxComponent",
+                        componentType: "HitboxComponent",
                         data: {
                             nodes: doorHitbox,
                         }

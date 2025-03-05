@@ -13,7 +13,9 @@ export class HitboxComponent extends Component {
     static componentType = "HitboxComponent";
     polygons!: Polygon[];
     nodes: Vectorlike[] = [];
+    originalNodes: Vectorlike[] = [];
     graphics: Graphics;
+    isInterior = false;
     directionComponent?: SpriteDirectionComponent;
 
     constructor(entity: Entity) {
@@ -25,17 +27,20 @@ export class HitboxComponent extends Component {
     }
 
     override toData(): ComponentData {
-        const data = { nodes: this.nodes as Vectorlike[] };
+        const data = { nodes: this.originalNodes as Vectorlike[], interior: this.isInterior };
         return super.toData(data);
     }
 
-    override applyData(data: { nodes: Vectorlike[] }): void {
+    override applyData(data: { nodes: Vectorlike[], interior?: boolean }): void {
+        this.isInterior = data.interior ?? false;
         this.nodes = data.nodes.map(node => ({ x: node.x * 10, y: node.y * 10 }));
         //this.nodes = data.nodes;
+        this.originalNodes = data.nodes;
 
         game.pixelLayer.container.addChild(this.graphics);
 
-        this.nodes = this.interiorHitbox();
+        if (this.isInterior)
+            this.nodes = this.interiorHitbox();
 
         let arrayedVerts = this.nodes.map(node => [node.x, node.y] as [number, number]);
         makeCCW(arrayedVerts);
@@ -48,6 +53,7 @@ export class HitboxComponent extends Component {
     }
 
     override remove() {
+        this.graphics.destroy();
         for (const polygon of this.polygons) {
             game.collisionSystem.remove(polygon);
         }
@@ -65,16 +71,16 @@ export class HitboxComponent extends Component {
 
         for (const hitbox of this.polygons) {
             this.graphics.moveTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
-            for(let i = 0; i < hitbox.points.length; i++) {
+            for (let i = 0; i < hitbox.points.length; i++) {
                 this.graphics.lineTo(hitbox.points[i].x + this.transform.position.x, hitbox.points[i].y + this.transform.position.y);
             }
             this.graphics.lineTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
             this.graphics.fill(0x000000, 1);
-            this.graphics.stroke({ color: 0xff0000, width: 1,alpha:.1 });
+            this.graphics.stroke({ color: 0xff0000, width: 1, alpha: .1 });
         }
 
         this.graphics.moveTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
-        for(let i = 0; i < this.nodes.length-6; i++) {
+        for (let i = 0; i < this.nodes.length - (this.isInterior ? 6 : 0); i++) {
             this.graphics.lineTo(this.nodes[i].x + this.transform.position.x, this.nodes[i].y + this.transform.position.y);
         }
         this.graphics.lineTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
@@ -106,7 +112,7 @@ export class HitboxComponent extends Component {
             new Vector(rightmostNode.x + padding, bottommostNode.y + padding),
             new Vector(rightmostNode.x + padding, topmostNode.y - padding),
             new Vector(leftmostNode.x - padding, topmostNode.y - padding),
-            new Vector(leftmostNode.x - padding-.01, bottommostNode.y + padding),
+            new Vector(leftmostNode.x - padding - .01, bottommostNode.y + padding),
             this.nodes[0],
         ].reverse());
     }

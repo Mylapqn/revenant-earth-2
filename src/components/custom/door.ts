@@ -4,12 +4,12 @@ import { Entity } from "../../hierarchy/entity";
 
 export class Door extends Component {
     static componentType = "Door";
-    targetScene: string = "Scene";
+    targetScene: string = "None";
 
     constructor(parent: Entity) {
         super(parent);
         this.onEntity("update", (dt) => this.update(dt));
-        this.onEntity("interact", () => {game.loadScene(this.targetScene);});
+        this.onEntity("interact", () => this.activate());
     }
 
     override init(): void {
@@ -23,6 +23,10 @@ export class Door extends Component {
 
     override applyData(data: { target: string }): void {
         this.targetScene = data.target;
+    }
+
+    activate() {
+        game.loadScene(this.targetScene);
     }
 
     update(dt: number) {
