@@ -1,6 +1,7 @@
 import { Player, PlayerData } from "../player";
 import { Terrain } from "../terrain";
 import { Entity } from "./entity";
+import { ProgressDatabase } from "./progressDatabase";
 import { Scene } from "./scene";
 
 export enum StateMode {
@@ -9,7 +10,7 @@ export enum StateMode {
 }
 
 
-export type ObjectKind = "Player" | "Terrain" | "Entity" | "Scene";
+export type ObjectKind = "Player" | "Terrain" | "Entity" | "Scene" | "ProgressDB";
 
 export type primitive = string | number | boolean;
 export type primitiveArray = Array<primitive | primitiveObject>;
@@ -61,5 +62,6 @@ export function initHandlers() {
     StateManager.addHandler("Terrain", Terrain.deserialise);
     StateManager.addHandler("Entity", Entity.deserialise);
     StateManager.addHandler("Scene", Scene.deserialise);
+    StateManager.addHandler("ProgressDB", ProgressDatabase.deserialise);
 }
 

@@ -35,7 +35,10 @@ export class Scene implements ISerializable {
     }
 
     load() {
+        if (game.activeScene !== this) game.activeScene.unload();
+        game.activeScene = this;
         this.stateManager.deserialise(this.data, this);
+        return this;
     }
 
     unload() {
@@ -57,12 +60,13 @@ export class Scene implements ISerializable {
     }
 
     serialise(mode: StateMode): SceneData | false {
-        this.data = this.stateManager.serialise(StateMode.scene);
+        if (this.isActive) this.data = this.stateManager.serialise(StateMode.scene);
         return {
             kind: "Scene",
             name: this.name,
             data: this.data,
-            active: mode === StateMode.scene,
+            //active: mode === StateMode.scene,
+            active: this === game.activeScene
         };
     }
 
@@ -72,7 +76,6 @@ export class Scene implements ISerializable {
         scene.name = data.name;
         game.scenes.set(data.name, scene);
         if (data.active) {
-            game.activeScene = scene;
             scene.load();
         }
     }

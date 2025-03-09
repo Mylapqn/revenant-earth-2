@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Graphics, Sprite, Ticker } from "pixi.js";
+import { Application, Assets, Color, Container, Graphics, Sprite, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./terrain";
 import { System } from "detect-collisions";
@@ -8,10 +8,12 @@ import { Vector, Vectorlike } from "./vector";
 import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
 import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 import { Entity } from "./hierarchy/entity";
-import { initComponents } from "./components/generic/componentIndex";
 import { Scene } from "./hierarchy/scene";
 import doorHitbox from "./environment/doorHitbox.json";
 import interior from "./environment/hitbox.json";
+import { initComponents } from "./components/componentIndex";
+import { ProgressDatabase } from "./hierarchy/progressDatabase";
+import { ParticleText } from "./hierarchy/particleText";
 
 export let game: Game;
 
@@ -21,6 +23,7 @@ export class Game {
     keys: { [key: string]: boolean } = {};
     camera!: Camera;
     stateManager!: StateManager;
+    progressDatabase!: ProgressDatabase;
     scenes: Map<string, Scene> = new Map<string, Scene>();
     activeScene!: Scene;
 
@@ -65,6 +68,8 @@ export class Game {
 
     async init() {
         this.stateManager = new StateManager();
+        this.progressDatabase = new ProgressDatabase();
+        this.stateManager.register(this.progressDatabase);
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
 
@@ -108,6 +113,35 @@ export class Game {
                             velocity: { x: 10, y: 0 },
                         },
                     },
+
+                ],
+            },
+            {
+                kind: "Entity",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./robo.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Button",
+                        data: {
+                            dbName: "pollutionSpeed"
+                        }
+                    },
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 10, y: 20 },
+                            velocity: { x: 10, y: 0 },
+                        },
+                    },
+
                 ],
             },
             {
@@ -215,9 +249,10 @@ export class Game {
                         },
                     },
                     {
-                        componentType: "HitboxComponent",
+                        componentType: "PollutionComponent",
                         data: {
-                            nodes: doorHitbox,
+                            speed: 1,
+                            dbName: "pollutionSpeed"
                         }
                     }
                 ],
@@ -248,7 +283,7 @@ export class Game {
                     {
                         componentType: "Tree",
                         data: {
-                            growth: 0,
+                            growth: 1,
                             asset: "./tree.png",
                         },
                     },
@@ -280,7 +315,7 @@ export class Game {
                     {
                         componentType: "Tree",
                         data: {
-                            growth: 0,
+                            growth: 1,
                             asset: "./bush.png",
                         },
                     },
@@ -299,8 +334,19 @@ export class Game {
 
         this.worldDebugGraphics.clear();
 
+        for (const particleText of [...ParticleText.list]) {
+            particleText.update(dt);
+        }
         this.activeScene.update(dt);
         this.activeScene.draw(dt);
+
+        for (let x = 0; x < this.terrain.nodes.length; x++) {
+            const node = this.terrain.nodes[x];
+            const data = this.terrain.getProperties(node.x);
+            if (data == undefined) continue;
+            this.worldDebugGraphics.circle(node.x, node.y, data.pollution * 10);
+            this.worldDebugGraphics.fill(new Color({ r: data.pollution * 255, g: data.pollution * 255, b: 0, a: 1 }));
+        }
 
         this.pixelFG.sprite.x = (this.mousePos.x - screen.width / 2) / 10;
         this.pixelFG.sprite.y = (this.mousePos.y - screen.height / 2) / 10;
@@ -326,7 +372,10 @@ export class Game {
         }
 
         if (this.keys["e"]) {
-            htcrudLoad(address).then((data) => this.stateManager.deserialise(data));
+            htcrudLoad(address).then((data) => {
+                this.stateManager.deserialise(data)
+            });
+            this.keys["e"] = false;
         }
 
         if (this.keys["ě"]) {
@@ -344,8 +393,6 @@ export class Game {
 
     loadScene(name: string) {
         this.activeScene.serialise(StateMode.full);
-        this.activeScene.unload();
-        this.activeScene = this.scenes.get(name)!;
-        this.activeScene.load();
+        this.scenes.get(name)!.load();
     }
 }
