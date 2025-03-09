@@ -24,15 +24,5 @@ export class DevSync {
 
     static trigger(data: KindedObject) {
         this.ws.send(JSON.stringify(data));
-        var filePath = 'skit/currentEntity.json';
-        var lineNumber = 1;
-
-        console.log(`%c$open:${filePath}:${lineNumber}`, "color: transparent");
-    
-        // Some integrations use a special console command
-        console.debug(`@devtools-open ${filePath}:${lineNumber}`);
-        
-        // For VS Code with Chrome Debugger extension
-        console.log(`devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=localhost:9229/${filePath}:${lineNumber}`);
     }
 }
