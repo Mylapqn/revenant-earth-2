@@ -14,6 +14,9 @@ import interior from "./environment/hitbox.json";
 import { initComponents } from "./components/componentIndex";
 import { ProgressDatabase } from "./hierarchy/progressDatabase";
 import { ParticleText } from "./hierarchy/particleText";
+import { DevSync } from "./devsync";
+import { HitboxComponent } from "./components/generic/HitboxComponent";
+import { BasicSprite } from "./components/generic/BasicSprite";
 
 export let game: Game;
 
@@ -62,9 +65,19 @@ export class Game {
         });
 
         window.addEventListener("resize", () => this.resize());
+
+        document.addEventListener("contextmenu", (e) => e.preventDefault());
+        document.addEventListener("click", (e) => {
+            [];
+            if (this.keys["control"]) {
+                const nearest = this.nearestEntity(this.worldMouse);
+
+                if (nearest) DevSync.trigger(nearest.toData());
+            }
+        });
     }
 
-    resize() { }
+    resize() {}
 
     async init() {
         this.stateManager = new StateManager();
@@ -113,7 +126,6 @@ export class Game {
                             velocity: { x: 10, y: 0 },
                         },
                     },
-
                 ],
             },
             {
@@ -131,8 +143,8 @@ export class Game {
                     {
                         componentType: "Button",
                         data: {
-                            dbName: "pollutionSpeed"
-                        }
+                            dbName: "pollutionSpeed",
+                        },
                     },
                     {
                         componentType: "Transform",
@@ -141,7 +153,6 @@ export class Game {
                             velocity: { x: 10, y: 0 },
                         },
                     },
-
                 ],
             },
             {
@@ -159,9 +170,9 @@ export class Game {
                         data: {
                             nodes: doorHitbox,
                             interior: true,
-                        }
-                    }
-                ]
+                        },
+                    },
+                ],
             },
             {
                 kind: "Player",
@@ -252,14 +263,13 @@ export class Game {
                         componentType: "PollutionComponent",
                         data: {
                             speed: 1,
-                            dbName: "pollutionSpeed"
-                        }
-                    }
+                            dbName: "pollutionSpeed",
+                        },
+                    },
                 ],
             },
             this.activeScene
         );
-
 
         Entity.fromData(
             {
@@ -291,7 +301,6 @@ export class Game {
             },
             this.activeScene
         );
-
 
         Entity.fromData(
             {
@@ -373,7 +382,7 @@ export class Game {
 
         if (this.keys["e"]) {
             htcrudLoad(address).then((data) => {
-                this.stateManager.deserialise(data)
+                this.stateManager.deserialise(data);
             });
             this.keys["e"] = false;
         }
@@ -389,10 +398,43 @@ export class Game {
                 this.loadScene("Scene");
             }
         }
+
+        if (this.keys["control"]) {
+            const nearest = this.nearestEntity(this.worldMouse);
+            if (nearest) {
+                this.worldDebugGraphics.moveTo(nearest.transform.position.x, nearest.transform.position.y);
+                this.worldDebugGraphics.lineTo(this.worldMouse.x, this.worldMouse.y);
+                this.worldDebugGraphics.stroke({color: 0x999999, width: 0.25});
+                const sprite = nearest.getComponent(BasicSprite);
+                if (sprite) {
+                    this.worldDebugGraphics.rect(sprite.sprite.bounds.x + nearest.transform.position.x, sprite.sprite.bounds.y + nearest.transform.position.y,  sprite.sprite.bounds.width, sprite.sprite.bounds.height);
+                    this.worldDebugGraphics.stroke(0x999999);
+                }
+                const hitbox = nearest.getComponent(HitboxComponent);
+                if (hitbox) {
+                }
+            }
+        }
     }
 
     loadScene(name: string) {
         this.activeScene.serialise(StateMode.full);
         this.scenes.get(name)!.load();
+    }
+
+    nearestEntity(position: Vectorlike) {
+        let nearest = undefined;
+        let nearestDistance = Infinity;
+        for (const entity of game.activeScene.objects) {
+            if (entity instanceof Entity) {
+                const distance = entity.transform.position.distanceSquared(position);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearest = entity;
+                }
+            }
+        }
+
+        return nearest;
     }
 }

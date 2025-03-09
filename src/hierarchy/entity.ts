@@ -3,17 +3,14 @@ import { Component, ComponentData, Constructor } from "./component";
 import { Scene } from "./scene";
 import { ISerializable, KindedObject, StateMode } from "./serialise";
 
-
-
 export type KnownEvents = {
-    "update": [number],
-    "draw": [number],
-    "unload": [],
-    "interact":[],
+    update: [number];
+    draw: [number];
+    unload: [];
+    interact: [];
 };
 
-export type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void
-
+export type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void;
 
 export class Entity implements ISerializable {
     id: number;
@@ -81,7 +78,7 @@ export class Entity implements ISerializable {
         this.addComponent(component);
     }
 
-    unload(){
+    unload() {
         this.emit("unload");
         this.remove();
     }
@@ -122,9 +119,26 @@ export class Entity implements ISerializable {
         for (const [key, component] of entity.components) {
             component.init();
         }
-        
+
         scene?.register(entity);
         return entity;
+    }
+
+    applyData(data: EntityData) {
+        for (const datum of data.component) {
+            if (datum.id == undefined) {
+                this.addComponent(Component.fromData(this, datum));
+                continue;
+            }
+
+            if (this.getComponentById(datum.id) == undefined) {
+                this.addComponent(Component.fromData(this, datum));
+                continue;
+            }
+
+            const component = this.getComponentById(datum.id);
+            if (component) component.applyData(datum.data);
+        }
     }
 
     static deserialise(deserialise: any, scene?: Scene) {
@@ -141,7 +155,7 @@ export class Entity implements ISerializable {
         const data: EntityData = {
             kind: "Entity",
             id: this.id,
-            component: []
+            component: [],
         };
 
         for (const [key, component] of this.components) {
@@ -152,9 +166,8 @@ export class Entity implements ISerializable {
     }
 }
 
-
 type EntityData = {
     kind: "Entity";
     id?: number;
     component: Array<ComponentData>;
-}
+};

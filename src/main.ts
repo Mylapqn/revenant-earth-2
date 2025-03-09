@@ -1,6 +1,7 @@
 import { Application } from 'pixi.js';
 import { Game } from './game';
 import './style.css'
+import { DevSync } from './devsync';
 
 async function init() {
     const app = new Application();
@@ -9,9 +10,9 @@ async function init() {
 
     const game = new Game(app);
     await game.init();
+    DevSync.init();
 }
 
 init();
-
 
 

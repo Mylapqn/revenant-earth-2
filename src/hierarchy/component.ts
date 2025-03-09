@@ -21,6 +21,7 @@ export class Component {
         this.entity = entity;
     }
 
+    /** callled once all components on a given entity have been created */
     init() { }
 
     applyData(data?: primitiveObject) { }

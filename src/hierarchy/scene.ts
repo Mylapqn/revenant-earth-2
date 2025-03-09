@@ -26,6 +26,14 @@ export class Scene implements ISerializable {
         game.stateManager.register(this);
     }
 
+    findEntity(id: number) {
+        for (const obj of this.objects) {
+            if (obj instanceof Entity) {
+                if (obj.id === id) return obj;
+            }
+        }
+    }
+
     register(obj: ISerializable) {
         this.stateManager.register(obj);
     }
