@@ -1,3 +1,4 @@
+import { DevSync } from "../../devsync";
 import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";

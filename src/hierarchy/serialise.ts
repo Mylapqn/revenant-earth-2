@@ -6,7 +6,7 @@ import { Scene } from "./scene";
 
 export enum StateMode {
     scene,
-    full
+    full,
 }
 
 
@@ -64,4 +64,3 @@ export function initHandlers() {
     StateManager.addHandler("Scene", Scene.deserialise);
     StateManager.addHandler("ProgressDB", ProgressDatabase.deserialise);
 }
-
