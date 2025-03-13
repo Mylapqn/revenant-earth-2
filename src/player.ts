@@ -64,10 +64,10 @@ export class Player implements ISerializable {
     }
 
     update(dt: number) {
-        if (game.keys["d"] && this.velocity.x < 40) this.velocity.x += 300 * dt;
-        else if (game.keys["a"] && this.velocity.x > -40) this.velocity.x -= 300 * dt;
+        if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;
+        else if (game.input.key("a") && this.velocity.x > -40) this.velocity.x -= 300 * dt;
         else if (this.grounded) this.velocity.x *= 0.9;
-        if (game.keys[" "] && this.grounded) {
+        if (game.input.key(" ") && this.grounded) {
             this.velocity.y = -300;
             this.groundedTimer = 0;
         }
@@ -100,7 +100,6 @@ export class Player implements ISerializable {
             limb.origin.y = -offset;
         }
         //console.log(this.limbSystem.limbGroups[0].passingPhase);
-
         this.pixelLayer.sprite.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
         this.pixelLayer.sprite.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();

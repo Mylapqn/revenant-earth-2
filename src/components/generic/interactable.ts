@@ -35,8 +35,8 @@ export class Interactable extends Component {
                 this.spriteComponent.sprite.tint = 0xffffff;
             }
         }
-        if (this.highlighted && game.keys["f"]) {
-            game.keys["f"] = false; //FOR TESTING ONLY
+        if (this.highlighted && game.input.keyDown("f")) {
+            //game.keys["f"] = false; //FOR TESTING ONLY
             this.entity.emit("interact");
         }
     }

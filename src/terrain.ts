@@ -113,7 +113,7 @@ export class Terrain implements ISerializable, ISceneObject {
 
         this.draw();
 
-        if (game.keys["x"]) {
+        if (game.input.key("x")) {
             const data = this.getProperties(game.worldMouse.x);
             data.fertility = Math.min(1, data.fertility + 0.1);
         }
@@ -199,7 +199,7 @@ export class Terrain implements ISerializable, ISceneObject {
         let effectAA = new Vector(Infinity, Infinity);
         let effectBB = new Vector(-Infinity, -Infinity);
 
-        if (game.keys["p"]) {
+        if (game.input.keyDown("p")) {
             console.log("pressed p");
         }
 

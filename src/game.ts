@@ -17,18 +17,22 @@ import { ParticleText } from "./hierarchy/particleText";
 import { DevSync } from "./devsync";
 import { HitboxComponent } from "./components/generic/HitboxComponent";
 import { BasicSprite } from "./components/generic/BasicSprite";
+import { HackingMinigame } from "./hacking-minigame/hacking";
+import { Input } from "./input";
 
 export let game: Game;
 
 export class Game {
     static pixelScale = 4;
     app: Application;
-    keys: { [key: string]: boolean } = {};
+    input: Input;
     camera!: Camera;
     stateManager!: StateManager;
     progressDatabase!: ProgressDatabase;
     scenes: Map<string, Scene> = new Map<string, Scene>();
     activeScene!: Scene;
+
+    hacking?: HackingMinigame;
 
     terrain!: Terrain;
     player!: Player;
@@ -39,13 +43,11 @@ export class Game {
     pixelFG2!: PixelLayer;
     worldDebugGraphics!: Graphics;
 
-    mousePos = { x: 0, y: 0 };
-    mousePixels = { x: 0, y: 0 };
     collisionSystem!: System;
 
     get worldMouse(): Vectorlike {
         return new Vector()
-            .add(this.mousePixels)
+            .add(this.input.mouse.pixelPosition)
             .add(this.camera.worldPosition)
             .sub({ x: this.camera.middle.x / Game.pixelScale, y: this.camera.middle.y / Game.pixelScale });
     }
@@ -53,23 +55,18 @@ export class Game {
     constructor(app: Application) {
         game = this;
         this.app = app;
-
-        document.addEventListener("keydown", (e) => (this.keys[e.key.toLowerCase()] = true));
-        document.addEventListener("keyup", (e) => delete this.keys[e.key.toLowerCase()]);
-
-        document.addEventListener("mousemove", (e) => {
-            this.mousePos.x = e.clientX;
-            this.mousePos.y = e.clientY;
-            this.mousePixels.x = Math.round(this.mousePos.x / Game.pixelScale);
-            this.mousePixels.y = Math.round(this.mousePos.y / Game.pixelScale);
-        });
+        this.input = new Input();
 
         window.addEventListener("resize", () => this.resize());
+
+        window.addEventListener("beforeunload", (e) => {
+            if (this.input.key("control") && !this.input.key("r")) e.preventDefault();
+        });
 
         document.addEventListener("contextmenu", (e) => e.preventDefault());
         document.addEventListener("click", (e) => {
             [];
-            if (this.keys["control"]) {
+            if (this.input.key("control")) {
                 const nearest = this.nearestEntity(this.worldMouse);
 
                 if (nearest) DevSync.trigger(nearest.toData());
@@ -77,7 +74,7 @@ export class Game {
         });
     }
 
-    resize() {}
+    resize() { }
 
     async init() {
         this.stateManager = new StateManager();
@@ -357,11 +354,11 @@ export class Game {
             this.worldDebugGraphics.fill(new Color({ r: data.pollution * 255, g: data.pollution * 255, b: 0, a: 1 }));
         }
 
-        this.pixelFG.sprite.x = (this.mousePos.x - screen.width / 2) / 10;
-        this.pixelFG.sprite.y = (this.mousePos.y - screen.height / 2) / 10;
+        this.pixelFG.sprite.x = (this.input.mouse.position.x - screen.width / 2) / 10;
+        this.pixelFG.sprite.y = (this.input.mouse.position.y - screen.height / 2) / 10;
 
-        this.pixelFG2.sprite.x = (this.mousePos.x - screen.width / 2) / -5;
-        this.pixelFG2.sprite.y = (this.mousePos.y - screen.height / 2) / -5;
+        this.pixelFG2.sprite.x = (this.input.mouse.position.x - screen.width / 2) / -5;
+        this.pixelFG2.sprite.y = (this.input.mouse.position.y - screen.height / 2) / -5;
 
         this.camera.update(dt);
 
@@ -375,46 +372,58 @@ export class Game {
 
         const address = "http://localhost:3000/state.json";
 
-        if (this.keys["q"]) {
-            let out = this.stateManager.serialise(StateMode.full);
-            htcrudSave(address, out);
+        if (this.input.keyDown("h")) {
+            if (this.hacking) this.hacking = this.hacking.close();
+            else this.hacking = new HackingMinigame();
         }
 
-        if (this.keys["e"]) {
-            htcrudLoad(address).then((data) => {
-                this.stateManager.deserialise(data);
-            });
-            this.keys["e"] = false;
+        if (this.hacking) {
+            this.hacking.update();
         }
-
-        if (this.keys["ě"]) {
-            if (this.activeScene.name != "Scene 2") {
-                this.loadScene("Scene 2");
+        else {
+            if (this.input.keyDown("q")) {
+                let out = this.stateManager.serialise(StateMode.full);
+                htcrudSave(address, out);
             }
-        }
 
-        if (this.keys["+"]) {
-            if (this.activeScene.name != "Scene") {
-                this.loadScene("Scene");
+            if (this.input.keyDown("e")) {
+                htcrudLoad(address).then((data) => {
+                    this.stateManager.deserialise(data);
+                });
             }
-        }
 
-        if (this.keys["control"]) {
-            const nearest = this.nearestEntity(this.worldMouse);
-            if (nearest) {
-                this.worldDebugGraphics.moveTo(nearest.transform.position.x, nearest.transform.position.y);
-                this.worldDebugGraphics.lineTo(this.worldMouse.x, this.worldMouse.y);
-                this.worldDebugGraphics.stroke({color: 0x999999, width: 0.25});
-                const sprite = nearest.getComponent(BasicSprite);
-                if (sprite) {
-                    this.worldDebugGraphics.rect(sprite.sprite.bounds.x + nearest.transform.position.x, sprite.sprite.bounds.y + nearest.transform.position.y,  sprite.sprite.bounds.width, sprite.sprite.bounds.height);
-                    this.worldDebugGraphics.stroke(0x999999);
-                }
-                const hitbox = nearest.getComponent(HitboxComponent);
-                if (hitbox) {
+            if (this.input.keyDown("ě")) {
+                if (this.activeScene.name != "Scene 2") {
+                    this.loadScene("Scene 2");
                 }
             }
+
+            if (this.input.keyDown("+")) {
+                if (this.activeScene.name != "Scene") {
+                    this.loadScene("Scene");
+                }
+            }
+
+            if (this.input.key("control")) {
+                const nearest = this.nearestEntity(this.worldMouse);
+                if (nearest) {
+                    this.worldDebugGraphics.moveTo(nearest.transform.position.x, nearest.transform.position.y);
+                    this.worldDebugGraphics.lineTo(this.worldMouse.x, this.worldMouse.y);
+                    this.worldDebugGraphics.stroke({ color: 0x999999, width: 0.25 });
+                    const sprite = nearest.getComponent(BasicSprite);
+                    if (sprite) {
+                        this.worldDebugGraphics.rect(sprite.sprite.bounds.x + nearest.transform.position.x, sprite.sprite.bounds.y + nearest.transform.position.y, sprite.sprite.bounds.width, sprite.sprite.bounds.height);
+                        this.worldDebugGraphics.stroke(0x999999);
+                    }
+                    const hitbox = nearest.getComponent(HitboxComponent);
+                    if (hitbox) {
+                    }
+                }
+            }
         }
+
+
+        this.input.update();
     }
 
     loadScene(name: string) {
