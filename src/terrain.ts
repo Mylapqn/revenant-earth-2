@@ -137,8 +137,13 @@ export class Terrain implements ISerializable, ISceneObject {
         }
     }
 
-    getProperties(x: number) {
-        const a = this.terrainData[Math.round(x / this.dataWidth)];
+
+    getProperties(x: number | Vectorlike) {
+        if (typeof x === "object") x = x.x;
+        let index = Math.round(x / this.dataWidth);
+        if (index >= this.terrainData.length) index = this.terrainData.length - 1;
+        if (index < 0) index = 0;
+        const a = this.terrainData[index];
         return a;
     }
 
