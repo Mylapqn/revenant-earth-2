@@ -5,6 +5,7 @@ import { Entity } from "../../hierarchy/entity";
 import { BasicSprite } from "../generic/BasicSprite";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../vector";
+import { Prefab } from "../../prefabs";
 
 export class Tree extends Component {
     static componentType = "Tree";
@@ -58,23 +59,7 @@ export class Tree extends Component {
             if (this.asset == "./tree.png")
                 this.nextseed = this.growth + 40;
 
-            let newtree = Entity.fromData({
-                kind: "Entity",
-                component: [
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: this.asset,
-                        },
-                    },
-                    {
-                        componentType: "Tree",
-                        data: {
-                            growth: 1,
-                        },
-                    },
-                ],
-            }, game.activeScene);
+            let newtree = Prefab.Tree({asset: this.asset, scene: this.entity.scene});
             new ParticleText("seed", this.transform.position.result().add(new Vector(0, -40)));
 
             if (this.asset == "./bush.png")
