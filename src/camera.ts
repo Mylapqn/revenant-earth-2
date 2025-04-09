@@ -4,7 +4,7 @@ import { Vector, Vectorlike } from "./vector";
 export class Camera {
     position = new Vector(0, 0);
     
-    subpixelOffset = new Vector(0, 0); 
+    screenPixelOffset = new Vector(0, 0); 
     pixelOffset = new Vector(0, 0);
     offsetRemainder = new Vector(0, 0);
 
@@ -35,12 +35,12 @@ export class Camera {
         this.position.x = (targetPosition.x + this.position.x * 19) / 20;
         this.position.y = (targetPosition.y + this.position.y * 19) / 20;
 
-        this.subpixelOffset = new Vector(-this.position.x + this.middle.x, -this.position.y + this.middle.y);
-        this.pixelOffset = this.subpixelOffset.result().mult(1/Game.pixelScale).floor();
-        this.offsetRemainder = this.subpixelOffset.result().mult(1/Game.pixelScale).sub(this.pixelOffset);
-        game.playerContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
-        game.terrainContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
-        game.worldDebugGraphics.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
+        this.screenPixelOffset = new Vector(-this.position.x + this.middle.x, -this.position.y + this.middle.y);
+        this.pixelOffset = this.screenPixelOffset.result().mult(1/Game.pixelScale).floor();
+        this.offsetRemainder = this.screenPixelOffset.result().mult(1/Game.pixelScale).sub(this.pixelOffset);
+        game.playerContainer.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
+        //game.terrainContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
+        game.worldDebugGraphics.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
 
     }
 }

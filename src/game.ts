@@ -19,11 +19,15 @@ import { HitboxComponent } from "./components/generic/HitboxComponent";
 import { BasicSprite } from "./components/generic/BasicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input } from "./input";
+import { TimedShader } from "./shaders/timedShader";
 
 export let game: Game;
 
 export class Game {
     static pixelScale = 4;
+
+    elapsedTime = 0;
+
     app: Application;
     input: Input;
     camera!: Camera;
@@ -39,8 +43,7 @@ export class Game {
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
     playerContainer!: Container;
-    pixelFG!: PixelLayer;
-    pixelFG2!: PixelLayer;
+    foliageContainer!: Container;
     worldDebugGraphics!: Graphics;
 
     collisionSystem!: System;
@@ -183,28 +186,16 @@ export class Game {
             },
         ];
 
-        this.pixelFG = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
-        //this.app.stage.addChild(this.pixelFG.sprite);
-        const fg = new Sprite(await Assets.load("./4.png"));
-        fg.texture.source.scaleMode = "nearest";
-        fg.scale.set(1);
-        this.pixelFG.container.addChild(fg);
-
         this.pixelLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
         this.app.stage.addChild(this.pixelLayer.sprite);
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
-        this.terrainContainer = this.pixelLayer.container;
+        this.pixelLayer.container.addChild((this.terrainContainer = new Container()));
+        this.pixelLayer.container.addChild((this.foliageContainer = new Container()));
         this.app.stage.addChild((this.worldDebugGraphics = new Graphics()));
         this.worldDebugGraphics.scale.set(Game.pixelScale);
 
-        this.pixelFG2 = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
-        //this.app.stage.addChild(this.pixelFG2.sprite);
-        const fg2 = new Sprite(await Assets.load("./5.png"));
-        fg2.texture.source.scaleMode = "nearest";
-        fg2.scale.set(1);
-        this.pixelFG2.container.addChild(fg2);
 
         this.player = new Player();
         this.player.sprite.texture = await Assets.load("./char.png");
@@ -337,6 +328,8 @@ export class Game {
 
     update(ticker: Ticker) {
         const dt = ticker.deltaMS / 1000;
+        this.elapsedTime += dt;
+        TimedShader.update(this.elapsedTime);
 
         this.worldDebugGraphics.clear();
 
@@ -354,21 +347,13 @@ export class Game {
             this.worldDebugGraphics.fill(new Color({ r: data.pollution * 255, g: data.pollution * 255, b: 0, a: 1 }));
         }
 
-        this.pixelFG.sprite.x = (this.input.mouse.position.x - screen.width / 2) / 10;
-        this.pixelFG.sprite.y = (this.input.mouse.position.y - screen.height / 2) / 10;
-
-        this.pixelFG2.sprite.x = (this.input.mouse.position.x - screen.width / 2) / -5;
-        this.pixelFG2.sprite.y = (this.input.mouse.position.y - screen.height / 2) / -5;
-
         this.camera.update(dt);
 
         this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
         this.worldDebugGraphics.stroke(0x999999);
 
         this.pixelLayer.render();
-        this.pixelFG.render();
-        this.pixelFG2.render();
-        this.app.render();
+        
 
         const address = "http://localhost:3000/state.json";
 

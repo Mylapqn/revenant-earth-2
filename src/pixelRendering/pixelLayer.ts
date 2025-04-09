@@ -28,4 +28,7 @@ export class PixelLayer {
         game.app.renderer.render({ container: this.container, target: this.renderTexture });
         this.renderTexture.update();
     }
+    addChild(child: Container) {
+        this.container.addChild(child);
+    }
 }

@@ -1,4 +1,4 @@
-import { Color } from "pixi.js";
+import { Assets, Color, Texture } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
@@ -6,6 +6,7 @@ import { BasicSprite } from "../generic/BasicSprite";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../vector";
 import { Prefab } from "../../prefabs";
+import { FoliageMesh } from "../../shaders/foliageMesh";
 
 export class Tree extends Component {
     static componentType = "Tree";
@@ -14,6 +15,7 @@ export class Tree extends Component {
     spriteComponent?: BasicSprite;
     nextseed = 3;
     asset: string = "./tree.png";
+    shadedMesh ?: FoliageMesh;
 
     constructor(parent: Entity) {
         super(parent);
@@ -23,6 +25,14 @@ export class Tree extends Component {
     override init(): void {
         this.spriteComponent = this.entity.getComponent(BasicSprite);
         this.spriteComponent?.sprite.anchor.set(0.5, 1);
+        Assets.load("./tree.png").then((texture: Texture) => {
+            console.log(texture);
+            this.shadedMesh = new FoliageMesh(texture);
+            game.pixelLayer.addChild(this.shadedMesh);
+            //sm.scale.set(10);
+            this.shadedMesh.position.set(this.transform.position.x, this.transform.position.y);
+            this.shadedMesh.pivot.set(0.5, 1);
+        });
     }
 
     override toData(): ComponentData {
