@@ -20,6 +20,7 @@ import { BasicSprite } from "./components/generic/BasicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input } from "./input";
 import { TimedShader } from "./shaders/timedShader";
+import { Atmo } from "./atmo";
 
 export let game: Game;
 
@@ -39,6 +40,7 @@ export class Game {
     hacking?: HackingMinigame;
 
     terrain!: Terrain;
+    atmo!: Atmo;
     player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
@@ -322,6 +324,8 @@ export class Game {
         );
 
         this.terrain = new Terrain();
+
+        this.atmo = new Atmo();
 
         this.app.ticker.add(this.update, this);
     }
