@@ -20,6 +20,8 @@ import { BasicSprite } from "./components/generic/BasicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input } from "./input";
 import { TimedShader } from "./shaders/timedShader";
+import { Tooltip } from "./tooltip";
+import { Prefab } from "./hierarchy/prefabs";
 
 export let game: Game;
 
@@ -47,6 +49,7 @@ export class Game {
     worldDebugGraphics!: Graphics;
 
     collisionSystem!: System;
+    tooltip!: Tooltip;
 
     get worldMouse(): Vectorlike {
         return new Vector()
@@ -259,69 +262,12 @@ export class Game {
             this.activeScene
         );
 
-        Entity.fromData(
-            {
-                kind: "Entity",
-                component: [
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 100, y: 100 },
-                        },
-                    },
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./tree.png",
-                        },
-                    },
-                    {
-                        componentType: "Interactable",
-                    },
-                    {
-                        componentType: "Tree",
-                        data: {
-                            growth: 1,
-                            asset: "./tree.png",
-                        },
-                    },
-                ],
-            },
-            this.activeScene
-        );
+        Prefab.Tree({ scene: this.activeScene, x: 100, y: 100, asset: "./tree.png" });
+        Prefab.Tree({ scene: this.activeScene, x: 300, y: 100, asset: "./bush.png" });
 
-        Entity.fromData(
-            {
-                kind: "Entity",
-                component: [
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 300, y: 100 },
-                        },
-                    },
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./bush.png",
-                        },
-                    },
-                    {
-                        componentType: "Interactable",
-                    },
-                    {
-                        componentType: "Tree",
-                        data: {
-                            growth: 1,
-                            asset: "./bush.png",
-                        },
-                    },
-                ],
-            },
-            this.activeScene
-        );
 
         this.terrain = new Terrain();
+        this.tooltip = new Tooltip();
 
         this.app.ticker.add(this.update, this);
     }
@@ -330,6 +276,8 @@ export class Game {
         const dt = ticker.deltaMS / 1000;
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);
+
+        this.tooltip.update(dt);
 
         this.worldDebugGraphics.clear();
 
@@ -353,7 +301,7 @@ export class Game {
         this.worldDebugGraphics.stroke(0x999999);
 
         this.pixelLayer.render();
-        
+
 
         const address = "http://localhost:3000/state.json";
 

@@ -4,6 +4,7 @@ export class TimedShader extends Shader {
     constructor(options: ShaderWithResources) {
         if (!options.resources) options.resources = {};
         options.resources.timeGroup = { uTime: { type: "f32", value: 0 } };
+        options.resources.randomGroup = { uRandom: { type: "f32", value: Math.random() } };
         super(options);
         TimedShader.list.push(this);
     }

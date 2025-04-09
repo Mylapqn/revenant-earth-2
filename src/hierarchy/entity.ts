@@ -8,6 +8,8 @@ export type KnownEvents = {
     draw: [number];
     unload: [];
     interact: [];
+    hoverOn: [];
+    hoverOff: [];
 };
 
 export type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void;

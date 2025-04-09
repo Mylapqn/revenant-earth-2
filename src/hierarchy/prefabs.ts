@@ -1,6 +1,6 @@
-import { game } from "./game";
-import { Entity } from "./hierarchy/entity";
-import { Scene } from "./hierarchy/scene";
+import { game } from "../game";
+import { Entity } from "./entity";
+import { Scene } from "./scene";
 
 export type PrefabParams = {
     position?: { x: number; y: number };
@@ -16,10 +16,7 @@ export class Prefab {
                 kind: "Entity",
                 component: [
                     {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: params.asset,
-                        },
+                        componentType: "ShaderMeshComponent",
                     },
                     {
                         componentType: "Tree",
@@ -27,6 +24,9 @@ export class Prefab {
                             growth: 1,
                         },
                     },
+                    {
+                        componentType:"TooltipComponent"
+                    }
                 ],
             },
             params.scene ?? game.activeScene

@@ -8,6 +8,7 @@ export class Interactable extends Component {
     spriteComponent?: BasicSprite;
     highlighted = false;
 
+
     constructor(parent: Entity) {
         super(parent);
         this.onEntity("update", (dt) => this.update(dt));
@@ -21,10 +22,14 @@ export class Interactable extends Component {
         let x = Math.abs(game.player.position.x - this.transform.position.x);
         let y = Math.abs(game.player.position.y - this.transform.position.y);
         if (x < 20 && y < 40) {
-            this.highlighted = true;
+            if(!this.highlighted){
+                this.highlighted = true;
+            }
         }
         else {
-            this.highlighted = false;
+            if(this.highlighted){
+                this.highlighted = false;
+            }
         }
 
         if (this.spriteComponent) {
