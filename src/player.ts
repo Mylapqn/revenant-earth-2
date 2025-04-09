@@ -6,6 +6,7 @@ import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
 import { ISerializable, StateMode } from "./hierarchy/serialise";
 import { Scene } from "./hierarchy/scene";
+import { Atmo } from "./atmo";
 
 export class Player implements ISerializable {
     position = new Vector(200, 0);
@@ -64,6 +65,8 @@ export class Player implements ISerializable {
     }
 
     update(dt: number) {
+        console.log(Atmo.displayValues(game.atmo.getProperties(this.position)));
+
         if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;
         else if (game.input.key("a") && this.velocity.x > -40) this.velocity.x -= 300 * dt;
         else if (this.grounded) this.velocity.x *= 0.9;
