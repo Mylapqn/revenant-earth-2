@@ -358,10 +358,10 @@ export class Game {
                     }
                 }
                 let text = "";
-                text+="TERRAIN\n";
-                Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 text+="ATMO\n";
                 Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
+                text+="TERRAIN\n";
+                Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 this.tooltip.hover(text)
             }
         }
