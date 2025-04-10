@@ -58,6 +58,7 @@ export class Tree extends Component {
         }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
         let tdata = game.terrain.getProperties(this.transform.position.x);
+        let adata = game.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
             this.tooltipComponent.tooltipData.set("treeHealth", parseFloat(this.health.toFixed(2)).toString());
             this.tooltipComponent.tooltipData.set("treeGrowth", parseFloat(this.growth.toFixed(2)).toString());
@@ -79,6 +80,7 @@ export class Tree extends Component {
         if (tdata.fertility > 0) {
             this.growth += dt * this.health * tdata.fertility * 2;
             tdata.fertility -= dt * this.health * .1;
+            adata.co2 -= dt * this.health * tdata.fertility * 1;
         }
         if (this.nextseed < this.growth) {
             if (this.asset == "./bush.png")

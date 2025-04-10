@@ -29,3 +29,7 @@ export function lerp(a: number, b: number, t: number) {
 export function clamp(n: number) {
     return Math.min(1, Math.max(0, n));
 }
+
+export function displayNumber(n: number, digits = 2) {
+    return parseFloat(n.toFixed(digits)).toString();
+}

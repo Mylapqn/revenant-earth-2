@@ -23,6 +23,7 @@ import { TimedShader } from "./shaders/timedShader";
 import { Tooltip } from "./tooltip";
 import { Prefab } from "./hierarchy/prefabs";
 import { Atmo } from "./atmo";
+import { displayNumber } from "./utils";
 
 export let game: Game;
 
@@ -356,6 +357,12 @@ export class Game {
                     if (hitbox) {
                     }
                 }
+                let text = "";
+                text+="TERRAIN\n";
+                Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
+                text+="ATMO\n";
+                Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
+                this.tooltip.hover(text)
             }
         }
 
