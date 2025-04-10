@@ -40,7 +40,7 @@ export class Atmo implements ISerializable, ISceneObject {
 
     updateProperties() {
         for (let index = 0; index < this.atmoData.length; index++) {
-            this.process(this.atmoData[index]);
+            this.process(this.atmoData[index], index * this.dataWidth);
         }
 
         for (let index = 0; index < this.atmoData.length - 1; index++) {
@@ -61,10 +61,15 @@ export class Atmo implements ISerializable, ISceneObject {
         temp *= 0.01;
         a.temp -= temp;
         b.temp += temp;
+
+        let pollution = a.pollution - b.pollution;
+        pollution *= 0.1;
+        a.pollution -= pollution;
+        b.pollution += pollution;
     }
 
     heatCapacity = 400;
-    private process(a: AtmoData) {
+    private process(a: AtmoData, position: number) {
         const influx = 340;
         const absorb = 0.7;
         const SB = 5.67 * 10 ** -8;
@@ -79,6 +84,26 @@ export class Atmo implements ISerializable, ISceneObject {
 
         const radiateWatts = a.temp ** 4 * SB;
         a.temp -= radiateWatts / this.heatCapacity;
+
+
+        // Pollution
+        const groundPollutionCost = 1000;
+        const dw = this.dataWidth / game.terrain.dataWidth;
+        for (let index = 0; index < dw; index++) {
+            const groundData = game.terrain.getProperties(position + index * game.terrain.dataWidth);
+            const pollDiff = a.pollution - groundData.pollution;
+            const spreadRate = 0.1;
+
+            if (pollDiff > 0) { // air to ground
+                groundData.pollution += (pollDiff * spreadRate) / groundPollutionCost;
+                a.pollution -= pollDiff * spreadRate;
+            }
+
+            if (pollDiff < -0.5) { // ground to air
+                groundData.pollution += (pollDiff * spreadRate) / groundPollutionCost * 0.1;
+                a.pollution -= pollDiff * spreadRate * 0.1;
+            }
+        }
     }
 
     static displayValues(a: AtmoData) {
@@ -127,7 +152,7 @@ export class Atmo implements ISerializable, ISceneObject {
         a.pollution -= grams / 1000;
         return grams;
     }
-    
+
     static deserialise(raw: any, scene?: Scene) {
         const data = raw as { kind: string; atmoData: Array<AtmoData> };
         game.atmo.atmoData = data.atmoData;
