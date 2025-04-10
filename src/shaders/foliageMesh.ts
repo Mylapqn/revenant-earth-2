@@ -32,12 +32,12 @@ export class FoliageMesh extends Mesh {
         this.scale.set(1);
         //console.log(game.app.renderer.globalUniforms.bindGroup);
     }
-    resize(width: number, height: number) {
+    resize(width: number, height: number, anchorX: number = .5, anchorY: number = 1) {
         this.geometry.positions = new Float32Array([
-            -width / 2, -height,
-            -width / 2, 0,
-            width / 2, 0,
-            width / 2, -height]);
+            -width * anchorX, -height * anchorY,
+            -width * anchorX, height * (1 - anchorY),
+            width * (1 - anchorX), height * (1 - anchorY),
+            width * (1 - anchorX), -height * anchorY]);
     }
 }
 

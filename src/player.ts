@@ -65,7 +65,7 @@ export class Player implements ISerializable {
     }
 
     update(dt: number) {
-        console.log(Atmo.displayValues(game.atmo.getProperties(this.position)));
+        //console.log(Atmo.displayValues(game.atmo.getProperties(this.position)));
 
         if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;
         else if (game.input.key("a") && this.velocity.x > -40) this.velocity.x -= 300 * dt;

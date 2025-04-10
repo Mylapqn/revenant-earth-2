@@ -28,7 +28,7 @@ void main() {
     float strength = (uv.y - 1.f) * .1f;
     strength = mapRange(uv.y, .9,0.,0.,1.,true);
     strength = pow(strength,1.5)*.1;
-    float sin = sin(uv.y * 1.2f - uTime * 5.f + uRandom*10.);
+    float sin = sin(uv.y * 1.2f - uTime * 2.f + uRandom*10.);
     uv.x += sin * strength;
     color = texture(uSampler, uv)*uColor;
     //color+=.2;
