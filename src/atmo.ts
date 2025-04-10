@@ -85,25 +85,6 @@ export class Atmo implements ISerializable, ISceneObject {
         const radiateWatts = a.temp ** 4 * SB;
         a.temp -= radiateWatts / this.heatCapacity;
 
-
-        // Pollution
-        const groundPollutionCost = 1000;
-        const dw = this.dataWidth / game.terrain.dataWidth;
-        for (let index = 0; index < dw; index++) {
-            const groundData = game.terrain.getProperties(position + index * game.terrain.dataWidth);
-            const pollDiff = a.pollution - groundData.pollution;
-            const spreadRate = 0.1;
-
-            if (pollDiff > 0) { // air to ground
-                groundData.pollution += (pollDiff * spreadRate) / groundPollutionCost;
-                a.pollution -= pollDiff * spreadRate;
-            }
-
-            if (pollDiff < -0.5) { // ground to air
-                groundData.pollution += (pollDiff * spreadRate) / groundPollutionCost * 0.1;
-                a.pollution -= pollDiff * spreadRate * 0.1;
-            }
-        }
     }
 
     static displayValues(a: AtmoData) {

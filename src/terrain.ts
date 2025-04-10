@@ -130,6 +130,7 @@ export class Terrain implements ISerializable, ISceneObject {
             b.fertility += half;
             a.fertility -= half;
         }
+        
         if (a.pollution > 0.5 && b.pollution < a.pollution) {
             const half = (a.pollution) * .005;
             b.pollution += half;
