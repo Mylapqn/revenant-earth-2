@@ -63,10 +63,10 @@ export class Atmo implements ISerializable, ISceneObject {
         b.temp += temp;
     }
 
+    heatCapacity = 400;
     private process(a: AtmoData) {
         const influx = 340;
         const absorb = 0.7;
-        const heatCapacity = 400;
         const SB = 5.67 * 10 ** -8;
 
         let addWatts = influx * absorb;
@@ -75,10 +75,10 @@ export class Atmo implements ISerializable, ISceneObject {
             addWatts += co2Watts;
         }
 
-        a.temp += addWatts / heatCapacity;
+        a.temp += addWatts / this.heatCapacity;
 
         const radiateWatts = a.temp ** 4 * SB;
-        a.temp -= radiateWatts / heatCapacity;
+        a.temp -= radiateWatts / this.heatCapacity;
     }
 
     static displayValues(a: AtmoData) {
@@ -97,6 +97,37 @@ export class Atmo implements ISerializable, ISceneObject {
         return a;
     }
 
+    generateHeat(x: number | Vectorlike, joules: number) {
+        const a = this.getProperties(x);
+        a.temp += joules / this.heatCapacity;
+    }
+
+    generateCO2(x: number | Vectorlike, grams: number) {
+        const a = this.getProperties(x);
+        a.co2 += grams / 1000; // lole
+    }
+
+    generatePollution(x: number | Vectorlike, grams: number) {
+        const a = this.getProperties(x);
+        a.pollution += grams / 1000;
+    }
+
+    captureCO2(x: number | Vectorlike, filterRate: number, limit = 280) {
+        const a = this.getProperties(x);
+        if (a.co2 < limit) return 0;
+        const grams = a.co2 * filterRate;
+        a.co2 -= grams / 1000;
+        return grams;
+    }
+
+    capturePollution(x: number | Vectorlike, filterRate: number, limit = 0) {
+        const a = this.getProperties(x);
+        if (a.pollution < limit) return 0;
+        const grams = a.pollution * filterRate;
+        a.pollution -= grams / 1000;
+        return grams;
+    }
+    
     static deserialise(raw: any, scene?: Scene) {
         const data = raw as { kind: string; atmoData: Array<AtmoData> };
         game.atmo.atmoData = data.atmoData;

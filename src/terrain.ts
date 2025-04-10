@@ -147,6 +147,63 @@ export class Terrain implements ISerializable, ISceneObject {
         return a;
     }
 
+
+    erode(x: number | Vectorlike, value: number) {
+        const a = this.getProperties(x);
+        a.erosion += value;
+        if(a.erosion > 1) a.erosion = 1;
+    }
+
+    fixErosion(x: number | Vectorlike, value: number) {
+        const a = this.getProperties(x);
+        a.erosion -= value;
+        if(a.erosion < 0) a.erosion = 0;
+    }
+
+    addMoisture(x: number | Vectorlike, value: number) {
+        const a = this.getProperties(x);
+        a.moisture += value;
+        if(a.moisture > 1) a.moisture = 1;
+    }
+
+    fixMoisture(x: number | Vectorlike, value: number) {
+        const a = this.getProperties(x);
+        a.moisture -= value;
+        if(a.moisture < 0) a.moisture = 0;
+    }
+
+    addFertility(x: number | Vectorlike, grams: number, limit = 1) {
+        const a = this.getProperties(x);
+        a.fertility += grams / 1000;
+        if(a.fertility > limit) {
+            const remaining = a.fertility - limit;
+            a.fertility = limit;
+            return remaining;
+        }
+        return 0;
+    }
+
+    consumeFertility(x: number | Vectorlike, filterRate: number, limit = 0) {
+        const a = this.getProperties(x);
+        if (a.fertility < limit) return 0;
+        const grams = a.fertility * filterRate;
+        a.fertility -= grams / 1000;
+        return grams;
+    }
+
+    generatePollution(x: number | Vectorlike, grams: number) {
+        const a = this.getProperties(x);
+        a.pollution += grams / 1000;
+    }
+
+    capturePollution(x: number | Vectorlike, filterRate: number, limit = 0) {
+        const a = this.getProperties(x);
+        if (a.pollution < limit) return 0;
+        const grams = a.pollution * filterRate;
+        a.pollution -= grams / 1000;
+        return grams;
+    }
+
     updateProperties() {
         for (let index = 0; index < this.terrainData.length - 1; index++) {
             const a = this.terrainData[index];
