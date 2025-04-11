@@ -6,9 +6,18 @@ import { Vectorlike } from "./vector";
 export class Atmo implements ISerializable, ISceneObject {
     atmoData: Array<AtmoData> = [];
     dataWidth = 100;
+    waterLevel = 0;
 
     updateTimer = 0;
     updateRate = 0;
+
+    co2 = 500;
+    temp = 300;
+
+    get celsius() {
+        return this.temp - 273;
+    }
+
     constructor() {
         game.activeScene.register(this);
         this.defaultAtmo(100);
@@ -16,7 +25,7 @@ export class Atmo implements ISerializable, ISceneObject {
 
     defaultAtmo(width: number) {
         for (let index = 0; index < width; index++) {
-            this.atmoData.push({ temp: 340, co2: 280, pollution: 0 });
+            this.atmoData.push({ pollution: 0 });
         }
     }
 
@@ -38,6 +47,16 @@ export class Atmo implements ISerializable, ISceneObject {
         return { kind: "Atmo", atmoData: this.atmoData };
     }
 
+    energyMove: Record<string, number> = {};
+
+    energy(value: number, source?: string) {
+        this.temp += value / this.heatCapacity;
+        if (source) {
+            if (!this.energyMove[source]) this.energyMove[source] = 0;
+            this.energyMove[source] += value;
+        }
+    }
+
     updateProperties() {
         for (let index = 0; index < this.atmoData.length; index++) {
             this.process(this.atmoData[index], index * this.dataWidth);
@@ -54,65 +73,44 @@ export class Atmo implements ISerializable, ISceneObject {
             const b = this.atmoData[index - 1];
             this.spread(a, b);
         }
+
+        this.processGlobal();
+
+        console.log(`temp: ${this.celsius}, co2: ${this.co2}`);
+        console.log(this.energyMove);
+        this.energyMove = {};
+        
     }
 
     private spread(a: AtmoData, b: AtmoData) {
-        let temp = a.temp - b.temp;
-        temp *= 0.01;
-        a.temp -= temp;
-        b.temp += temp;
-
         let pollution = a.pollution - b.pollution;
         pollution *= 0.1;
         a.pollution -= pollution;
         b.pollution += pollution;
     }
 
-    heatCapacity = 400;
-    private process(a: AtmoData, position: number) {
+    get heatCapacity() {
+        return 400; //* this.atmoData.length;
+    }
+
+    processGlobal() {
         const influx = 340;
         const absorb = 0.7;
         const SB = 5.67 * 10 ** -8;
 
         let addWatts = influx * absorb;
-        const co2Watts = co2ToWatts(a.co2);
+        const co2Watts = co2ToWatts(this.co2);
         if (!isNaN(co2Watts) && co2Watts > 0) {
-            addWatts += co2Watts;
+            this.energy(co2Watts, "co2");
         }
 
-        a.temp += addWatts / this.heatCapacity;
+        this.energy(addWatts, "influx");
 
-        const radiateWatts = a.temp ** 4 * SB;
-        a.temp -= radiateWatts / this.heatCapacity;
-
-
-        // Pollution
-        const groundPollutionCost = 1000;
-        const dw = this.dataWidth / game.terrain.dataWidth;
-        for (let index = 0; index < dw; index++) {
-            const groundData = game.terrain.getProperties(position + index * game.terrain.dataWidth);
-            const pollDiff = a.pollution - groundData.pollution;
-            const spreadRate = 0.1;
-
-            if (pollDiff > 0) { // air to ground
-                groundData.pollution += (pollDiff * spreadRate) / groundPollutionCost;
-                a.pollution -= pollDiff * spreadRate;
-            }
-
-            if (pollDiff < -0.5) { // ground to air
-                groundData.pollution += (pollDiff * spreadRate) / groundPollutionCost * 0.1;
-                a.pollution -= pollDiff * spreadRate * 0.1;
-            }
-        }
+        const radiateWatts = this.temp ** 4 * SB;
+        this.energy(-radiateWatts, "radiate");
     }
 
-    static displayValues(a: AtmoData) {
-        return {
-            celsius: a.temp - 273.15,
-            co2Ppm: a.co2,
-            pollution: a.pollution,
-        };
-    }
+    private process(a: AtmoData, position: number) {}
 
     getProperties(x: number | Vectorlike) {
         if (typeof x === "object") x = x.x;
@@ -122,14 +120,12 @@ export class Atmo implements ISerializable, ISceneObject {
         return a;
     }
 
-    generateHeat(x: number | Vectorlike, joules: number) {
-        const a = this.getProperties(x);
-        a.temp += joules / this.heatCapacity;
+    generateHeat(joules: number) {
+        this.temp += joules / this.heatCapacity;
     }
 
-    generateCO2(x: number | Vectorlike, grams: number) {
-        const a = this.getProperties(x);
-        a.co2 += grams / 1000; // lole
+    generateCO2(grams: number) {
+        this.co2 += grams / 1000; // lole
     }
 
     generatePollution(x: number | Vectorlike, grams: number) {
@@ -137,11 +133,10 @@ export class Atmo implements ISerializable, ISceneObject {
         a.pollution += grams / 1000;
     }
 
-    captureCO2(x: number | Vectorlike, filterRate: number, limit = 280) {
-        const a = this.getProperties(x);
-        if (a.co2 < limit) return 0;
-        const grams = a.co2 * filterRate;
-        a.co2 -= grams / 1000;
+    captureCO2(filterRate: number, limit = 280) {
+        if (this.co2 < limit) return 0;
+        const grams = this.co2 * filterRate;
+        this.co2 -= grams / 1000;
         return grams;
     }
 
@@ -161,8 +156,6 @@ export class Atmo implements ISerializable, ISceneObject {
 }
 
 export type AtmoData = {
-    temp: number;
-    co2: number;
     pollution: number;
 };
 

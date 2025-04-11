@@ -65,7 +65,7 @@ export class Terrain implements ISerializable, ISceneObject {
         }
 
         for (let index = 0; index < this.totalWidth; index += this.dataWidth) {
-            this.terrainData.push({ pollution: 0, fertility: 0, erosion: 0, moisture: 0 });
+            this.terrainData.push({ pollution: 0, fertility: 0, erosion: 0.9, moisture: 0.3 });
         }
 
         this.considerNodes();
@@ -88,7 +88,7 @@ export class Terrain implements ISerializable, ISceneObject {
                 this.nodes.push(node);
             }
         }
-        if(this.nodes.length < 2) return;
+        if (this.nodes.length < 2) return;
         this.nodes.unshift(new TerrainNode(this.nodes[0].x, 1000));
         this.nodes.push(new TerrainNode(this.nodes[this.nodes.length - 1].x, 1000));
         this.hitbox.setPoints(this.nodes.map((node) => new SATVector(node.x, node.y)));
@@ -126,17 +126,17 @@ export class Terrain implements ISerializable, ISceneObject {
 
     private spread(a: TerrainData, b: TerrainData) {
         if (a.fertility > 0.01) {
-            const half = (a.fertility - 0.01) * .05;
+            const half = (a.fertility - 0.01) * 0.05;
             b.fertility += half;
             a.fertility -= half;
         }
+
         if (a.pollution > 0.5 && b.pollution < a.pollution) {
-            const half = (a.pollution) * .005;
+            const half = a.pollution * 0.005;
             b.pollution += half;
             a.pollution -= half;
         }
     }
-
 
     getProperties(x: number | Vectorlike) {
         if (typeof x === "object") x = x.x;
@@ -147,35 +147,34 @@ export class Terrain implements ISerializable, ISceneObject {
         return a;
     }
 
-
     erode(x: number | Vectorlike, value: number) {
         const a = this.getProperties(x);
         a.erosion += value;
-        if(a.erosion > 1) a.erosion = 1;
+        if (a.erosion > 1) a.erosion = 1;
     }
 
     fixErosion(x: number | Vectorlike, value: number) {
         const a = this.getProperties(x);
         a.erosion -= value;
-        if(a.erosion < 0) a.erosion = 0;
+        if (a.erosion < 0) a.erosion = 0;
     }
 
     addMoisture(x: number | Vectorlike, value: number) {
         const a = this.getProperties(x);
         a.moisture += value;
-        if(a.moisture > 1) a.moisture = 1;
+        if (a.moisture > 1) a.moisture = 1;
     }
 
-    fixMoisture(x: number | Vectorlike, value: number) {
+    removeMoisture(x: number | Vectorlike, value: number) {
         const a = this.getProperties(x);
         a.moisture -= value;
-        if(a.moisture < 0) a.moisture = 0;
+        if (a.moisture < 0) a.moisture = 0;
     }
 
     addFertility(x: number | Vectorlike, grams: number, limit = 1) {
         const a = this.getProperties(x);
         a.fertility += grams / 1000;
-        if(a.fertility > limit) {
+        if (a.fertility > limit) {
             const remaining = a.fertility - limit;
             a.fertility = limit;
             return remaining;
@@ -216,6 +215,34 @@ export class Terrain implements ISerializable, ISceneObject {
             const b = this.terrainData[index - 1];
             this.spread(a, b);
         }
+
+        for (const data of this.terrainData) {
+            this.processChunk(data);
+        }
+    }
+
+    processChunk(a: TerrainData) {
+        const minWK = 0.1;
+        const maxWK = 0.9;
+        const waterkeep = (1 - a.erosion) * (maxWK - minWK) + minWK;
+        let evaporated = 0;
+
+        if (a.moisture > waterkeep) {
+            // in water
+            evaporated = 0.000001 * game.atmo.celsius;
+        }
+        // has water
+        evaporated += a.moisture * 0.00000001 * game.atmo.celsius;
+
+        if (a.moisture - evaporated < 0) {
+            evaporated = a.moisture;
+        }
+
+        a.moisture -= evaporated;
+        game.atmo.waterLevel += evaporated;
+        // energy to evaporate
+        const energy = evaporated * 10000;
+        game.atmo.energy(-energy, "evaporation");
     }
 
     draw() {
