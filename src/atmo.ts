@@ -76,8 +76,8 @@ export class Atmo implements ISerializable, ISceneObject {
 
         this.processGlobal();
 
-        console.log(`temp: ${this.celsius}, co2: ${this.co2}`);
-        console.log(this.energyMove);
+        //console.log(`temp: ${this.celsius}, co2: ${this.co2}`);
+        //console.log(this.energyMove);
         this.energyMove = {};
         
     }

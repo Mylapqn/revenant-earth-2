@@ -19,12 +19,13 @@ export class Tree extends Component {
     health = 1;
     shaderMeshComponent!: ShaderMeshComponent;
     tooltipComponent?: TooltipComponent
-    nextseed = 20;
+    nextseed = 1;
+    seedProgress = 0;
     graphics: Graphics;
-    secondsPerDraw = 1;
+    secondsPerDraw = .5;
     timeSinceDraw = 1000;
     randomSeed = 0;
-    species: PlantSpecies = new PlantSpecies("Default", { co2: 0, nutrients: 0, biomass: 0, water: 0, erosion: 0 }, { pollution: 0, water: 0 });
+    species: PlantSpecies = new PlantSpecies("Default", { co2: 0, nutrients: 0, biomass: 0, water: 0, erosion: 0, maxGrowth: 0 }, { pollution: 0, pollutionDamage: 0, water: 0 }, { initialBranches: 0, lengthPerGrowth: 0, leaves: false });
 
     constructor(parent: Entity) {
         super(parent);
@@ -62,16 +63,19 @@ export class Tree extends Component {
         let tdata = game.terrain.getProperties(this.transform.position.x);
         let adata = game.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
+            this.tooltipComponent.tooltipName = this.species.name;
             this.tooltipComponent.tooltipData.set("treeHealth", parseFloat(this.health.toFixed(2)).toString());
             this.tooltipComponent.tooltipData.set("treeGrowth", parseFloat(this.growth.toFixed(2)).toString());
             //pollution fertility
             this.tooltipComponent.tooltipData.set("pollution", parseFloat(tdata.pollution.toFixed(2)).toString());
             this.tooltipComponent.tooltipData.set("fertility", parseFloat(tdata.fertility.toFixed(2)).toString());
-            this.tooltipComponent.tooltipData.set("species", this.species.name);
+            //seed
+            this.tooltipComponent.tooltipData.set("seedProgress", parseFloat(this.seedProgress.toFixed(2)).toString());
+            //this.tooltipComponent.tooltipData.set("species", this.species.name);
         }
         if (tdata == undefined) return;
         if (tdata.pollution > 0) {
-            this.health = Math.max(0, this.health - dt * tdata.pollution * .1);
+            this.health = Math.max(0, this.health - dt * tdata.pollution * .1 * this.species.statsPerTime.pollutionDamage);
             if (this.health > .1) {
                 tdata.pollution = Math.max(0, tdata.pollution - dt * this.species.statsPerTime.pollution * .1);
             }
@@ -80,14 +84,27 @@ export class Tree extends Component {
         if (this.health < 1) {
             this.health = Math.min(1, this.health + dt * .01);
         }
-        if (tdata.fertility > 0) {
-            let addedGrowth = dt * this.health * tdata.fertility * 2;
+        if (tdata.fertility > 0 && tdata.moisture > 0 && this.growth < this.species.statsPerGrowth.maxGrowth) {
+            let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * 2;
             this.growth += addedGrowth;
             tdata.fertility -= addedGrowth * this.species.statsPerGrowth.nutrients;
-            adata.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
+            game.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
+            tdata.erosion -= addedGrowth * this.species.statsPerGrowth.erosion * .1;
+            tdata.erosion = Math.max(0, tdata.erosion);
+            tdata.moisture -= addedGrowth * this.species.statsPerGrowth.water * .1;
         }
-        if (this.nextseed < this.growth) {
-            this.nextseed = this.growth + 1;
+        if (this.health > 0) {
+            let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .1;
+            if (tdata.moisture < requiredMoisture) {
+                this.health -= requiredMoisture - tdata.moisture;
+                tdata.moisture = 0;
+            }
+            else if (this.growth >= this.species.statsPerGrowth.maxGrowth) {
+                this.seedProgress += dt * this.health;
+            }
+        }
+        if (this.seedProgress > this.nextseed) {
+            this.nextseed *= 2;
             let newtree = Prefab.Tree({ species: this.species.name, scene: this.entity.scene });
             new ParticleText("seed", this.transform.position.result().add(new Vector(0, -40)));
             newtree.transform.position.x = this.transform.position.x + (80 * Math.random() - 40) * 10;
@@ -103,15 +120,17 @@ export class Tree extends Component {
         let thickness = options.thickness;
         let pos = options.position;
         let growth = options.growth;
-        const color = CustomColor.randomAroundHSL(random, 20, 5, 0.3, 0.1, 0.3, 0.1).toPixi();
-
+        const color = this.species.generatorData.leaves ? CustomColor.randomAroundHSL(random, 20, 5, 0.3, 0.1, 0.3, 0.1).toPixi() : CustomColor.randomAroundHSL(random, 130 * this.health, 10, 0.4 * this.health + .3, 0.2, 0.3, 0.05).toPixi();
         for (let i = 0; i < growth; i++) {
             let remainingGrowth = growth - i;
             let radius = remainingGrowth * .2 + 1 * thickness;
-            if (i > growth * .2 && remainingGrowth > 2 && random.float() < .4) {
-                let angleOffset = (Math.random() - .5) * .6 * Math.PI;
+            const newRandom = random.child();
+            if (remainingGrowth > 2 && newRandom.float() < .4) {
+                let angleOffset = (newRandom.float() - .5) * .6 * Math.PI;
                 thickness = Math.max(2, thickness);
-                this.branch({ angle: angle + angleOffset, length: length, position: pos.result(), random: random, thickness: thickness / 2, growth: remainingGrowth * .5 });
+                if (i > growth * .2) {
+                    this.branch({ angle: angle + angleOffset, length: length, position: pos.result(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * .5 });
+                }
                 angle -= angleOffset;
                 thickness /= 2;
             }
@@ -119,26 +138,30 @@ export class Tree extends Component {
             //move angle towards default
             angle = lerp(angle, -Math.PI / 2, .15);
             this.graphics.moveTo(pos.x, pos.y);
-            pos.add(Vector.fromAngle(angle).mult(length));
+            const lengthMult = Math.min(1, remainingGrowth);
+            pos.add(Vector.fromAngle(angle).mult(length * lengthMult));
             this.graphics.lineTo(pos.x, pos.y);
             this.graphics.stroke({ color: color, width: radius });
             this.graphics.circle(pos.x, pos.y, radius / 2);
             this.graphics.fill(color);
         }
+        const leavesRandom = random.child();
         if (growth > 1 && this.species.generatorData.leaves) {
-            const offset = 5;
-            this.graphics.circle(pos.x, pos.y + offset, (2 + growth * .3) * this.health);
-            this.graphics.circle(pos.x, pos.y - offset, (2 + growth * .3) * this.health);
-            this.graphics.circle(pos.x + offset, pos.y, (2 + growth * .3) * this.health);
-            this.graphics.circle(pos.x - offset, pos.y, (2 + growth * .3) * this.health);
-            const color = CustomColor.randomAroundHSL(random, 130 * this.health, 10, 0.4 * this.health + .3, 0.2, 0.3, 0.05).toPixi();
+            const offset = 5 + growth * .08;
+            for (let i = 0; i < 3 + growth * 2; i++) {
+                const xOff = leavesRandom.range(-offset, offset);
+                const yOff = leavesRandom.range(-offset, offset);
+                if (leavesRandom.float() < this.health)
+                    this.graphics.circle(pos.x + xOff, pos.y + yOff, 2.5 * this.health);
+            }
+            const color = CustomColor.randomAroundHSL(leavesRandom, 130 * this.health, 10, 0.4 * this.health + .3, 0.2, 0.3, 0.05).toPixi();
             this.graphics.fill(color);
         }
     }
 
     drawTree() {
         this.graphics.clear();
-        const branchAmount = Math.max(1, Math.min(this.growth*5, this.species.generatorData.initialBranches));
+        const branchAmount = Math.max(1, Math.min(this.growth * 5, this.species.generatorData.initialBranches));
         let x = 0;
         const random = new RandomGenerator(this.randomSeed);
         for (let i = 0; i < branchAmount; i++) {
@@ -147,7 +170,7 @@ export class Tree extends Component {
                 angle: -Math.PI / 2,
                 length: this.species.generatorData.lengthPerGrowth,
                 position: new Vector(x, 0),
-                random: random,
+                random: random.child(),
                 thickness: 1
             });
             x = random.int(-10, 10);

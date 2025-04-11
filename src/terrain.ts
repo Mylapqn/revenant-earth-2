@@ -116,6 +116,7 @@ export class Terrain implements ISerializable, ISceneObject {
         if (game.input.key("x")) {
             const data = this.getProperties(game.worldMouse.x);
             data.fertility = Math.min(1, data.fertility + 0.1);
+            //data.moisture = Math.min(1, data.moisture + 0.1);
         }
 
         this.updateProperties();

@@ -20,6 +20,9 @@ export class RandomGenerator {
         t ^= t + Math.imul(t ^ t >>> 7, t | 61);
         return ((t ^ t >>> 14) >>> 0) / 4294967296;
     }
+    child() {
+        return new RandomGenerator(this.float()*10000);
+    }
 }
 
 export function lerp(a: number, b: number, t: number) {

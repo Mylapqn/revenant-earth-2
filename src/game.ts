@@ -99,14 +99,14 @@ export class Game {
         initHandlers();
         initComponents();
 
-        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1 },
-            { pollution: 1, water: 0 }, {
+        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1, maxGrowth: 50 },
+            { pollution: 1, water: 1, pollutionDamage: 1 }, {
             initialBranches: 1,
             lengthPerGrowth: 4,
             leaves: true
         });
-        new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: 1, erosion: 4 },
-            { pollution: 0, water: 0 },
+        new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: .1, erosion: 4, maxGrowth: 7 },
+            { pollution: 0, water: .1, pollutionDamage: .5 },
             {
                 initialBranches: 8,
                 lengthPerGrowth: 2,
@@ -390,6 +390,8 @@ export class Game {
                 }
                 let text = "";
                 text += "ATMO\n";
+                text += "CO2: " + displayNumber(this.atmo.co2, 2) + "\n";
+                text += "TEMP: " + displayNumber(this.atmo.temp, 2) + "\n";
                 Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 text += "TERRAIN\n";
                 Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
@@ -399,7 +401,7 @@ export class Game {
                 this.tooltip.hover("SEED:" + this.selectedSeed);
                 if (this.input.mouse.getButtonUp(MouseButton.Left)) {
                     let tree = Prefab.Tree({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
-                    tree.getComponent(Tree)!.growth = 5;
+                    tree.getComponent(Tree)!.growth = 2;
                     this.selectedSeed = undefined;
                 }
                 if (this.input.mouse.getButtonUp(MouseButton.Right)) {
