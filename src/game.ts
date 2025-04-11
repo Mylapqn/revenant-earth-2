@@ -18,12 +18,14 @@ import { DevSync } from "./devsync";
 import { HitboxComponent } from "./components/generic/HitboxComponent";
 import { BasicSprite } from "./components/generic/BasicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
-import { Input } from "./input";
+import { Input, MouseButton } from "./input";
 import { TimedShader } from "./shaders/timedShader";
 import { Tooltip } from "./tooltip";
 import { Prefab } from "./hierarchy/prefabs";
 import { Atmo } from "./atmo";
 import { displayNumber } from "./utils";
+import { PlantSpecies } from "./plants/plantSpecies";
+import { Tree } from "./components/custom/tree";
 
 export let game: Game;
 
@@ -53,6 +55,8 @@ export class Game {
 
     collisionSystem!: System;
     tooltip!: Tooltip;
+
+    selectedSeed?: string;
 
     get worldMouse(): Vectorlike {
         return new Vector()
@@ -94,6 +98,22 @@ export class Game {
 
         initHandlers();
         initComponents();
+
+        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1 },
+            { pollution: 1, water: 0 }, {
+            initialBranches: 1,
+            lengthPerGrowth: 4,
+            leaves: true
+        });
+        new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: 1, erosion: 4 },
+            { pollution: 0, water: 0 },
+            {
+                initialBranches: 8,
+                lengthPerGrowth: 2,
+                leaves: false
+            }
+        );
+
         this.collisionSystem = new System();
         this.camera = new Camera();
         const bg = new Sprite(await Assets.load("./bg.png"));
@@ -265,8 +285,8 @@ export class Game {
             this.activeScene
         );
 
-        Prefab.Tree({ scene: this.activeScene, x: 100, y: 100, asset: "./tree.png" });
-        Prefab.Tree({ scene: this.activeScene, x: 300, y: 100, asset: "./bush.png" });
+        Prefab.Tree({ scene: this.activeScene, x: 100, y: 100, species: "Tree" });
+        Prefab.Tree({ scene: this.activeScene, x: 300, y: 100, species: "Tree" });
 
 
         this.terrain = new Terrain();
@@ -319,6 +339,17 @@ export class Game {
             this.hacking.update();
         }
         else {
+            if (this.input.keyDown("t")) {
+                if (!this.selectedSeed) {
+                    this.selectedSeed = "Tree";
+                }
+                else {
+                    const array = Array.from(PlantSpecies.species.keys());
+                    let index = array.indexOf(this.selectedSeed) + 1;
+                    if (index == array.length) index = 0;
+                    this.selectedSeed = array[index];
+                }
+            }
             if (this.input.keyDown("q")) {
                 let out = this.stateManager.serialise(StateMode.full);
                 htcrudSave(address, out);
@@ -358,11 +389,22 @@ export class Game {
                     }
                 }
                 let text = "";
-                text+="ATMO\n";
+                text += "ATMO\n";
                 Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                text+="TERRAIN\n";
+                text += "TERRAIN\n";
                 Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 this.tooltip.hover(text)
+            }
+            if (this.selectedSeed) {
+                this.tooltip.hover("SEED:" + this.selectedSeed);
+                if (this.input.mouse.getButtonUp(MouseButton.Left)) {
+                    let tree = Prefab.Tree({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
+                    tree.getComponent(Tree)!.growth = 5;
+                    this.selectedSeed = undefined;
+                }
+                if (this.input.mouse.getButtonUp(MouseButton.Right)) {
+                    this.selectedSeed = undefined;
+                }
             }
         }
 

@@ -1,1 +1,36 @@
-{"kind":"Entity","id":0,"component":[{"id":0,"componentType":"SpriteDirectionComponent"},{"id":1,"componentType":"BasicSprite","data":{"asset":"./robo.png"}},{"id":2,"componentType":"RoboLogic"},{"id":3,"componentType":"Transform","data":{"position":{"x":291.1803260503338,"y":84.72372660196471},"velocity":{"x":-0.134274227721221,"y":0.006329063120659839}}}]}
+{
+    "kind": "Entity",
+    "id": 3,
+    "component": [
+        {
+            "id": 0,
+            "componentType": "ShaderMeshComponent"
+        },
+        {
+            "id": 1,
+            "componentType": "Tree",
+            "data": {
+                "growth": 150,
+                "asset": "./tree.png"
+            }
+        },
+        {
+            "id": 2,
+            "componentType": "TooltipComponent"
+        },
+        {
+            "id": 3,
+            "componentType": "Transform",
+            "data": {
+                "position": {
+                    "x": 300,
+                    "y": 100
+                },
+                "velocity": {
+                    "x": 0,
+                    "y": 0
+                }
+            }
+        }
+    ]
+}
