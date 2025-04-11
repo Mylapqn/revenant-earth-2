@@ -13,10 +13,6 @@ export class PixelLayer {
         this.sprite = new Sprite();
         this.sprite.texture = this.renderTexture;
         this.sprite.scale.set(Game.pixelScale);
-        let graphics = new Graphics;
-        graphics.circle(200, 50, 10);
-        graphics.fill(0xff0000);
-        this.container.addChild(graphics);
     }
 
     render() {

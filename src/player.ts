@@ -7,6 +7,7 @@ import { LimbSystem } from "./limbs/limbSystem";
 import { ISerializable, StateMode } from "./hierarchy/serialise";
 import { Scene } from "./hierarchy/scene";
 import { Atmo } from "./atmo";
+import { UIProgressBar } from "./ui/progressBar";
 
 export class Player implements ISerializable {
     position = new Vector(200, 0);
@@ -21,7 +22,22 @@ export class Player implements ISerializable {
         return this.groundedTimer > 0;
     }
     groundedTimer = 0;
+
+    health = 100;
+    oxygen = 100;
+
+    statsDisplay: HTMLDivElement;
+    healthBar: UIProgressBar;
+    oxygenBar: UIProgressBar;
+
     constructor() {
+        this.statsDisplay = document.createElement("div");
+        document.body.appendChild(this.statsDisplay);
+        this.statsDisplay.classList.add("stats");
+
+        this.healthBar = new UIProgressBar("Health", this.statsDisplay);
+        this.oxygenBar = new UIProgressBar("Oxygen", this.statsDisplay);
+
         game.activeScene.register(this);
         this.pixelLayer = new PixelLayer(64, 64);
         this.pixelLayer.worldSpace = false;
@@ -65,6 +81,20 @@ export class Player implements ISerializable {
     }
 
     update(dt: number) {
+
+        const tdata = game.terrain.getProperties(this.position.x);
+        const adata = game.atmo.getProperties(this.position.x);
+
+        this.oxygen -= (tdata.pollution - .5) * dt * 100;
+        this.oxygen = Math.max(0, Math.min(100, this.oxygen));
+
+        if (this.oxygen <= 0) this.health -= dt * 10 * tdata.pollution;
+
+        this.health = Math.max(0, Math.min(100, this.health));
+
+
+        this.healthBar.progress = (this.health / 100);
+        this.oxygenBar.progress = (this.oxygen / 100);
         //console.log(Atmo.displayValues(game.atmo.getProperties(this.position)));
 
         if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;

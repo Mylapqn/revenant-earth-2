@@ -222,7 +222,6 @@ export class Game {
         this.app.stage.addChild((this.worldDebugGraphics = new Graphics()));
         this.worldDebugGraphics.scale.set(Game.pixelScale);
 
-
         this.player = new Player();
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
@@ -312,13 +311,16 @@ export class Game {
         this.activeScene.update(dt);
         this.activeScene.draw(dt);
 
-        for (let x = 0; x < this.terrain.nodes.length; x++) {
-            const node = this.terrain.nodes[x];
-            const data = this.terrain.getProperties(node.x);
-            if (data == undefined) continue;
-            this.worldDebugGraphics.circle(node.x, node.y, data.pollution * 10);
-            this.worldDebugGraphics.fill(new Color({ r: data.pollution * 255, g: data.pollution * 255, b: 0, a: 1 }));
+        if (this.input.key("control")) {
+            for (let x = 0; x < this.terrain.nodes.length; x++) {
+                const node = this.terrain.nodes[x];
+                const data = this.terrain.getProperties(node.x);
+                if (data == undefined) continue;
+                this.worldDebugGraphics.circle(node.x, node.y, data.pollution * 10);
+                this.worldDebugGraphics.fill(new Color({ r: data.pollution * 255, g: data.pollution * 255, b: 0, a: 1 }));
+            }
         }
+
 
         this.camera.update(dt);
 

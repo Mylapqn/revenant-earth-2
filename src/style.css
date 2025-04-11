@@ -99,3 +99,37 @@ body {
     display: none;
     z-index: 2;
 }
+
+.stats {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: "monogramextended";
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    padding: 10px 15px; 
+    line-height: 24px;
+    text-shadow: black 2px 2px 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.progressBar {
+    display: flex;
+    align-items: center;
+}
+
+.progressBar .bar {
+    background-color: rgba(0, 0, 0, 0.214);
+    width: 200px;
+    height: 16px;
+    margin-left: 5px;
+}
+
+.progressBar .fill {
+    height: 100%;
+    background-color: rgb(98, 149, 216);
+    border-right: 2px solid white;
+}
