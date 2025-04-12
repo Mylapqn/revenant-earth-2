@@ -2,7 +2,7 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
-import { Vector } from "../../vector";
+import { Vector } from "../../utils/vector";
 
 export class Button extends Component {
     static componentType = "Button";

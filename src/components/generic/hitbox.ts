@@ -2,21 +2,21 @@ import { Assets, Graphics, Sprite, Texture } from "pixi.js";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
-import { SpriteDirectionComponent } from "./spriteDirectionComponent";
+import { SpriteDirection } from "./spriteDirection";
 import { Polygon, SATVector } from "detect-collisions";
-import { Vector, Vectorlike } from "../../vector";
+import { Vector, Vectorlike } from "../../utils/vector";
 import { decomp, makeCCW, quickDecomp } from "poly-decomp-es";
 
 
 
-export class HitboxComponent extends Component {
-    static componentType = "HitboxComponent";
+export class Hitbox extends Component {
+    static componentType = "Hitbox";
     polygons!: Polygon[];
     nodes: Vectorlike[] = [];
     originalNodes: Vectorlike[] = [];
     graphics: Graphics;
     isInterior = false;
-    directionComponent?: SpriteDirectionComponent;
+    directionComponent?: SpriteDirection;
 
     constructor(entity: Entity) {
         super(entity);
@@ -61,7 +61,7 @@ export class HitboxComponent extends Component {
     }
 
     override init(): void {
-        this.directionComponent = this.entity.getComponent(SpriteDirectionComponent);
+        this.directionComponent = this.entity.getComponent(SpriteDirection);
     }
 
     draw(dt: number) {

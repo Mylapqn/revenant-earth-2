@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import { Game } from './game';
 import './style.css'
-import { DevSync } from './devsync';
+import { DevSync } from './dev/devsync';
 
 async function init() {
     const app = new Application();

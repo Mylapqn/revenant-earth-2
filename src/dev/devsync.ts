@@ -1,6 +1,6 @@
-import { game } from "./game";
-import { Entity } from "./hierarchy/entity";
-import { KindedObject } from "./hierarchy/serialise";
+import { game } from "../game";
+import { Entity } from "../hierarchy/entity";
+import { KindedObject } from "../hierarchy/serialise";
 
 export class DevSync {
     static ws: WebSocket;

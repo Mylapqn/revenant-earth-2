@@ -2,23 +2,23 @@ import { Assets, Color, Graphics, Texture } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { BasicSprite } from "../generic/BasicSprite";
+import { BasicSprite } from "../generic/basicSprite";
 import { ParticleText } from "../../hierarchy/particleText";
-import { Vector } from "../../vector";
+import { Vector } from "../../utils/vector";
 import { Prefab } from "../../hierarchy/prefabs";
 import { FoliageMesh } from "../../shaders/foliageMesh";
-import { TooltipComponent } from "../generic/tooltipComponent";
-import { ShaderMeshComponent } from "../generic/ShaderMeshComponent";
-import { lerp, RandomGenerator } from "../../utils";
-import { CustomColor } from "../../color";
+import { EntityTooltip } from "../generic/entityTooltip";
+import { ShaderMesh } from "../generic/shaderMesh";
+import { lerp, RandomGenerator } from "../../utils/utils";
+import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 
-export class Tree extends Component {
-    static componentType = "Tree";
+export class Plant extends Component {
+    static componentType = "Plant";
     growth = 0;
     health = 1;
-    shaderMeshComponent!: ShaderMeshComponent;
-    tooltipComponent?: TooltipComponent
+    shaderMeshComponent!: ShaderMesh;
+    tooltipComponent?: EntityTooltip
     nextseed = 1;
     seedProgress = 0;
     graphics: Graphics;
@@ -35,9 +35,9 @@ export class Tree extends Component {
     }
 
     override init(): void {
-        this.tooltipComponent = this.entity.getComponent(TooltipComponent);
+        this.tooltipComponent = this.entity.getComponent(EntityTooltip);
         if (this.tooltipComponent) this.tooltipComponent.tooltipName = "Tree";
-        this.shaderMeshComponent = this.entity.getComponent(ShaderMeshComponent)!;
+        this.shaderMeshComponent = this.entity.getComponent(ShaderMesh)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
         this.drawTree();
     }

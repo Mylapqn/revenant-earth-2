@@ -1,8 +1,8 @@
-import { TooltipComponent } from "./components/generic/tooltipComponent";
-import { game } from "./game";
-import { Entity } from "./hierarchy/entity";
+import { EntityTooltip } from "../components/generic/entityTooltip";
+import { game } from "../game";
+import { Entity } from "../hierarchy/entity";
 
-export class Tooltip {
+export class UITooltip {
     htmlElement: HTMLDivElement;
     enabled: boolean = false;
     hoveredEntity?: Entity = undefined;
@@ -17,7 +17,7 @@ export class Tooltip {
         this.timeSinceLastUpdate += dt;
         if (this.timeSinceLastUpdate > this.timePerEntityUpdate) {
             this.timeSinceLastUpdate %= this.timePerEntityUpdate;
-            this.hover(this.hoveredEntity?.getComponent(TooltipComponent)?.getTooltip());
+            this.hover(this.hoveredEntity?.getComponent(EntityTooltip)?.getTooltip());
         }
         this.htmlElement.style.left = `${game.input.mouse.position.x + 10}px`;
         this.htmlElement.style.top = `${game.input.mouse.position.y + 10}px`;
@@ -26,7 +26,7 @@ export class Tooltip {
     hoverEntity(entity: Entity, hover: boolean) {
         if (hover) {
             this.hoveredEntity = entity;
-            this.hover(entity.getComponent(TooltipComponent)?.getTooltip());
+            this.hover(entity.getComponent(EntityTooltip)?.getTooltip());
 
         }
         else if (this.hoveredEntity == entity) {

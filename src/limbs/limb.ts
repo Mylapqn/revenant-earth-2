@@ -1,4 +1,4 @@
-import { Vector } from "../vector";
+import { Vector } from "../utils/vector";
 import { LimbGroup } from "./limbGroup";
 
 export class Limb {

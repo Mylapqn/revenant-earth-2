@@ -1,15 +1,15 @@
 import { Component } from "../hierarchy/component";
 import { Button } from "./custom/button";
 import { Door } from "./custom/door";
-import { Tree } from "./custom/tree";
-import { BasicSprite } from "./generic/BasicSprite";
-import { HitboxComponent } from "./generic/HitboxComponent";
+import { Plant } from "./custom/plant";
+import { BasicSprite } from "./generic/basicSprite";
+import { Hitbox } from "./generic/hitbox";
 import { Interactable } from "./generic/interactable";
-import { PollutionComponent } from "./generic/PollutionComponent";
+import { Pollution } from "./generic/pollution";
 import { RoboLogic } from "./generic/roboLogic";
-import { ShaderMeshComponent } from "./generic/ShaderMeshComponent";
-import { SpriteDirectionComponent } from "./generic/spriteDirectionComponent";
-import { TooltipComponent } from "./generic/tooltipComponent";
+import { ShaderMesh } from "./generic/shaderMesh";
+import { SpriteDirection } from "./generic/spriteDirection";
+import { EntityTooltip } from "./generic/entityTooltip";
 import { Transform } from "./generic/transfrom";
 
 
@@ -17,14 +17,14 @@ export function initComponents(){
     Component.register(RoboLogic);
     Component.register(BasicSprite);
     Component.register(Transform);
-    Component.register(SpriteDirectionComponent);
+    Component.register(SpriteDirection);
     Component.register(Interactable);
     Component.register(Door);
-    Component.register(Tree);
-    Component.register(HitboxComponent);
-    Component.register(PollutionComponent);
+    Component.register(Plant);
+    Component.register(Hitbox);
+    Component.register(Pollution);
     Component.register(Button);
-    Component.register(TooltipComponent);
-    Component.register(ShaderMeshComponent);
+    Component.register(EntityTooltip);
+    Component.register(ShaderMesh);
     
 }

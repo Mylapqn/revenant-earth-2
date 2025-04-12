@@ -1,5 +1,5 @@
 import { game } from "../game";
-import { Vector } from "../vector";
+import { Vector } from "../utils/vector";
 import { Limb } from "./limb";
 import { LimbSystem } from "./limbSystem";
 

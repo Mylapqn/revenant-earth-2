@@ -1,4 +1,4 @@
-import { Vector } from "../vector";
+import { Vector } from "../utils/vector";
 import { Limb } from "./limb";
 import { LimbGroup } from "./limbGroup";
 

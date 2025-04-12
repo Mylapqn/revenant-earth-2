@@ -1,4 +1,5 @@
-import { Vector } from "./vector";
+import { Vector } from "../utils/vector";
+
 
 export class TerrainNode extends Vector {
     next: TerrainNode | null = null;

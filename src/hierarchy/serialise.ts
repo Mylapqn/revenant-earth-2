@@ -1,6 +1,6 @@
-import { Atmo } from "../atmo";
+import { Atmo } from "../world/atmo";
 import { Player, PlayerData } from "../player";
-import { Terrain } from "../terrain";
+import { Terrain } from "../world/terrain";
 import { Entity } from "./entity";
 import { ProgressDatabase } from "./progressDatabase";
 import { Scene } from "./scene";

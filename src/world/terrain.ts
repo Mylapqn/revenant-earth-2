@@ -1,10 +1,11 @@
 import { Graphics } from "pixi.js";
-import { Edge, Vector, Vectorlike } from "./vector";
-import { game } from "./game";
+import { Edge, Vector, Vectorlike } from "../utils/vector";
+import { game } from "../game";
 import { Ellipse, Polygon, SATVector } from "detect-collisions";
+
+import { ISerializable, ObjectKind, StateMode } from "../hierarchy/serialise";
+import { ISceneObject, Scene } from "../hierarchy/scene";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
-import { ISerializable, ObjectKind, StateMode } from "./hierarchy/serialise";
-import { ISceneObject, Scene } from "./hierarchy/scene";
 
 export class Terrain implements ISerializable, ISceneObject {
     graphics: Graphics;

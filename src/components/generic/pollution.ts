@@ -2,11 +2,11 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
-import { Terrain } from "../../terrain";
-import { Vector } from "../../vector";
+import { Terrain } from "../../world/terrain";
+import { Vector } from "../../utils/vector";
 
-export class PollutionComponent extends Component {
-    static componentType = "PollutionComponent";
+export class Pollution extends Component {
+    static componentType = "Pollution";
     speed = 2;
     dbName = "degault";
     totalPolluted = 0;

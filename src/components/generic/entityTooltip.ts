@@ -2,15 +2,15 @@ import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { MouseButton } from "../../input";
-import { BasicSprite } from "./BasicSprite";
+import { BasicSprite } from "./basicSprite";
 import { Interactable } from "./interactable";
-import { ShaderMeshComponent } from "./ShaderMeshComponent";
+import { ShaderMesh } from "./shaderMesh";
 
-export class TooltipComponent extends Component {
-    static componentType = "TooltipComponent";
+export class EntityTooltip extends Component {
+    static componentType = "EntityTooltip";
     interactableComponent?: Interactable;
     spriteComponent?: BasicSprite;
-    shaderMeshComponent?: ShaderMeshComponent;
+    shaderMeshComponent?: ShaderMesh;
     highlighted = false;
     tooltipData = new Map<string, string>();
     tooltipName = "entity name";
@@ -25,7 +25,7 @@ export class TooltipComponent extends Component {
     override init(): void {
         this.interactableComponent = this.entity.getComponent(Interactable);
         this.spriteComponent = this.entity.getComponent(BasicSprite);
-        this.shaderMeshComponent = this.entity.getComponent(ShaderMeshComponent);
+        this.shaderMeshComponent = this.entity.getComponent(ShaderMesh);
     }
 
     update(dt: number) {

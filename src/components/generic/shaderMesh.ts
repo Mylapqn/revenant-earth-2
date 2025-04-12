@@ -2,19 +2,19 @@ import { Assets, Container, RenderTexture, Sprite, Texture } from "pixi.js";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { Game, game } from "../../game";
-import { SpriteDirectionComponent } from "./spriteDirectionComponent";
+import { SpriteDirection } from "./spriteDirection";
 import { FoliageMesh } from "../../shaders/foliageMesh";
-import { TooltipComponent } from "./tooltipComponent";
+import { EntityTooltip } from "./entityTooltip";
 
 
 
-export class ShaderMeshComponent extends Component {
-    static componentType = "ShaderMeshComponent";
+export class ShaderMesh extends Component {
+    static componentType = "ShaderMesh";
     topContainer: Container;
     container: Container;
     renderMesh: FoliageMesh;
     renderTexture: RenderTexture;
-    directionComponent?: SpriteDirectionComponent;
+    directionComponent?: SpriteDirection;
 
     constructor(parent: Entity) {
         super(parent);
@@ -36,7 +36,7 @@ export class ShaderMeshComponent extends Component {
     }
 
     override init(): void {
-        this.directionComponent = this.entity.getComponent(SpriteDirectionComponent);
+        this.directionComponent = this.entity.getComponent(SpriteDirection);
     }
 
     //Doesn't draw automatically, expensive

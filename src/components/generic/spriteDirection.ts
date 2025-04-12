@@ -1,8 +1,8 @@
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 
-export class SpriteDirectionComponent extends Component {
-    static componentType = "SpriteDirectionComponent";
+export class SpriteDirection extends Component {
+    static componentType = "SpriteDirection";
     direction: number = 0;
     constructor(entity: Entity) {
         super(entity);

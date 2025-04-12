@@ -1,10 +1,10 @@
 import { Application, Assets, Color, Container, Graphics, Sprite, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
-import { Terrain } from "./terrain";
+import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
 import { Player } from "./player";
 import { Camera } from "./camera";
-import { Vector, Vectorlike } from "./vector";
+import { Vector, Vectorlike } from "./utils/vector";
 import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
 import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 import { Entity } from "./hierarchy/entity";
@@ -14,18 +14,18 @@ import interior from "./environment/hitbox.json";
 import { initComponents } from "./components/componentIndex";
 import { ProgressDatabase } from "./hierarchy/progressDatabase";
 import { ParticleText } from "./hierarchy/particleText";
-import { DevSync } from "./devsync";
-import { HitboxComponent } from "./components/generic/HitboxComponent";
-import { BasicSprite } from "./components/generic/BasicSprite";
+import { DevSync } from "./dev/devsync";
+import { Hitbox } from "./components/generic/hitbox";
+import { BasicSprite } from "./components/generic/basicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input, MouseButton } from "./input";
 import { TimedShader } from "./shaders/timedShader";
-import { Tooltip } from "./tooltip";
+import { UITooltip } from "./ui/tooltip";
 import { Prefab } from "./hierarchy/prefabs";
-import { Atmo } from "./atmo";
-import { displayNumber } from "./utils";
+import { Atmo } from "./world/atmo";
+import { displayNumber } from "./utils/utils";
 import { PlantSpecies } from "./plants/plantSpecies";
-import { Tree } from "./components/custom/tree";
+import { Plant } from "./components/custom/plant";
 
 export let game: Game;
 
@@ -54,7 +54,7 @@ export class Game {
     worldDebugGraphics!: Graphics;
 
     collisionSystem!: System;
-    tooltip!: Tooltip;
+    tooltip!: UITooltip;
 
     selectedSeed?: string;
 
@@ -192,7 +192,7 @@ export class Game {
                         },
                     },
                     {
-                        componentType: "HitboxComponent",
+                        componentType: "Hitbox",
                         data: {
                             nodes: doorHitbox,
                             interior: true,
@@ -231,7 +231,7 @@ export class Game {
                 kind: "Entity",
                 component: [
                     {
-                        componentType: "SpriteDirectionComponent",
+                        componentType: "SpriteDirection",
                     },
                     {
                         componentType: "BasicSprite",
@@ -273,7 +273,7 @@ export class Game {
                         },
                     },
                     {
-                        componentType: "PollutionComponent",
+                        componentType: "Pollution",
                         data: {
                             speed: 1,
                             dbName: "pollutionSpeed",
@@ -289,7 +289,7 @@ export class Game {
 
 
         this.terrain = new Terrain();
-        this.tooltip = new Tooltip();
+        this.tooltip = new UITooltip();
 
         this.atmo = new Atmo();
 
@@ -386,7 +386,7 @@ export class Game {
                         this.worldDebugGraphics.rect(sprite.sprite.bounds.x + nearest.transform.position.x, sprite.sprite.bounds.y + nearest.transform.position.y, sprite.sprite.bounds.width, sprite.sprite.bounds.height);
                         this.worldDebugGraphics.stroke(0x999999);
                     }
-                    const hitbox = nearest.getComponent(HitboxComponent);
+                    const hitbox = nearest.getComponent(Hitbox);
                     if (hitbox) {
                     }
                 }
@@ -403,7 +403,7 @@ export class Game {
                 this.tooltip.hover("SEED:" + this.selectedSeed);
                 if (this.input.mouse.getButtonUp(MouseButton.Left)) {
                     let tree = Prefab.Tree({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
-                    tree.getComponent(Tree)!.growth = 2;
+                    tree.getComponent(Plant)!.growth = 2;
                     this.selectedSeed = undefined;
                 }
                 if (this.input.mouse.getButtonUp(MouseButton.Right)) {

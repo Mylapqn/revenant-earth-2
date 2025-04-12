@@ -16,17 +16,17 @@ export class Prefab {
                 kind: "Entity",
                 component: [
                     {
-                        componentType: "ShaderMeshComponent",
+                        componentType: "ShaderMesh",
                     },
                     {
-                        componentType: "Tree",
+                        componentType: "Plant",
                         data: {
                             species: params.species,
                             growth: 1,
                         },
                     },
                     {
-                        componentType:"TooltipComponent"
+                        componentType:"EntityTooltip"
                     }
                 ],
             },

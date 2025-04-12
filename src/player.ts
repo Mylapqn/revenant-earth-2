@@ -1,12 +1,12 @@
 import { Ellipse } from "detect-collisions";
 import { Game, game } from "./game";
 import { Graphics, Sprite } from "pixi.js";
-import { Vector, Vectorlike } from "./vector";
+import { Vector, Vectorlike } from "./utils/vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
 import { ISerializable, StateMode } from "./hierarchy/serialise";
 import { Scene } from "./hierarchy/scene";
-import { Atmo } from "./atmo";
+import { Atmo } from "./world/atmo";
 import { UIProgressBar } from "./ui/progressBar";
 
 export class Player implements ISerializable {

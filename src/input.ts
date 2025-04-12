@@ -1,5 +1,5 @@
 import { Game } from "./game";
-import { Vector } from "./vector";
+import { Vector } from "./utils/vector";
 
 export class Input {
     mouse: Mouse;

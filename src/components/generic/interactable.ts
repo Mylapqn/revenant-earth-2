@@ -1,7 +1,7 @@
 import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { BasicSprite } from "./BasicSprite";
+import { BasicSprite } from "./basicSprite";
 
 export class Interactable extends Component {
     static componentType = "Interactable";

@@ -1,5 +1,5 @@
 import { Game, game } from "./game";
-import { Vector, Vectorlike } from "./vector";
+import { Vector, Vectorlike } from "./utils/vector";
 
 export class Camera {
     position = new Vector(0, 0);

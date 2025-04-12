@@ -1,7 +1,7 @@
-import { game } from "./game";
-import { ISceneObject, Scene } from "./hierarchy/scene";
-import { ISerializable, StateMode, KindedObject } from "./hierarchy/serialise";
-import { Vectorlike } from "./vector";
+import { game } from "../game";
+import { ISceneObject, Scene } from "../hierarchy/scene";
+import { ISerializable, StateMode, KindedObject } from "../hierarchy/serialise";
+import { Vectorlike } from "../utils/vector";
 
 export class Atmo implements ISerializable, ISceneObject {
     atmoData: Array<AtmoData> = [];

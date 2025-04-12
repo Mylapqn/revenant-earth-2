@@ -2,7 +2,7 @@ import { Assets, Sprite, Texture } from "pixi.js";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
-import { SpriteDirectionComponent } from "./spriteDirectionComponent";
+import { SpriteDirection } from "./spriteDirection";
 
 
 
@@ -10,7 +10,7 @@ export class BasicSprite extends Component {
     static componentType = "BasicSprite";
     sprite!: Sprite;
     asset!: string;
-    directionComponent?: SpriteDirectionComponent;
+    directionComponent?: SpriteDirection;
 
     constructor(parent: Entity) {
         super(parent);
@@ -39,7 +39,7 @@ export class BasicSprite extends Component {
     }
 
     override init(): void {
-        this.directionComponent = this.entity.getComponent(SpriteDirectionComponent);
+        this.directionComponent = this.entity.getComponent(SpriteDirection);
     }
 
     draw(dt: number) {

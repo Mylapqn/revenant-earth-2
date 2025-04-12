@@ -1,5 +1,5 @@
 import { Text } from "pixi.js";
-import { Vector } from "../vector";
+import { Vector } from "../utils/vector";
 import { game } from "../game";
 
 
