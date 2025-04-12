@@ -1,6 +1,6 @@
 export class RandomGenerator {
     seed: number = 0;
-    constructor(seed: number) {
+    constructor(seed: number = Math.random()*1000) {
         this.seed = seed;
     }
     float() {

@@ -9,7 +9,7 @@ import { Prefab } from "../../hierarchy/prefabs";
 import { FoliageMesh } from "../../shaders/foliageMesh";
 import { EntityTooltip } from "../generic/entityTooltip";
 import { ShaderMesh } from "../generic/shaderMesh";
-import { lerp, RandomGenerator } from "../../utils/utils";
+import { clamp, lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 
@@ -25,7 +25,8 @@ export class Plant extends Component {
     secondsPerDraw = .5;
     timeSinceDraw = 1000;
     randomSeed = 0;
-    species: PlantSpecies = new PlantSpecies("Default", { co2: 0, nutrients: 0, biomass: 0, water: 0, erosion: 0, maxGrowth: 0 }, { pollution: 0, pollutionDamage: 0, water: 0 }, { initialBranches: 0, lengthPerGrowth: 0, leaves: false });
+    dead = false;
+    species!: PlantSpecies;
 
     constructor(parent: Entity) {
         super(parent);
@@ -53,13 +54,18 @@ export class Plant extends Component {
         if (data.species) this.species = PlantSpecies.species.get(data.species)!;
     }
 
-    update(dt: number) {
-        this.timeSinceDraw += dt;
-        if (this.timeSinceDraw > this.secondsPerDraw && this.health > 0.01) {
+    update(realDt: number) {
+        const plantSimulationSpeed = 100;
+
+        const dt = realDt * plantSimulationSpeed;
+
+        this.timeSinceDraw += realDt;
+        if (this.timeSinceDraw > this.secondsPerDraw && !this.dead) {
             this.timeSinceDraw = 0;
             this.drawTree();
         }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
+        if (this.dead) return;
         let tdata = game.terrain.getProperties(this.transform.position.x);
         let adata = game.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
@@ -75,32 +81,32 @@ export class Plant extends Component {
         }
         if (tdata == undefined) return;
         if (tdata.pollution > 0) {
-            this.health = Math.max(0, this.health - dt * tdata.pollution * .1 * this.species.statsPerTime.pollutionDamage);
+            this.damage(dt * tdata.pollution * .01 * this.species.statsPerTime.pollutionDamage, "ground pollution");
             if (this.health > .1) {
-                tdata.pollution = Math.max(0, tdata.pollution - dt * this.species.statsPerTime.pollution * .1);
+                tdata.pollution = Math.max(0, tdata.pollution - dt * this.species.statsPerTime.pollution * .01);
             }
             this.shaderMeshComponent.renderMesh.tint = new Color({ r: 255, g: this.health * 255, b: this.health * 255, a: 1 });
         }
         if (this.health < 1) {
-            this.health = Math.min(1, this.health + dt * .01);
+            this.health = Math.min(1, this.health + dt * .001);
         }
-        if (tdata.fertility > 0 && tdata.moisture > 0 && this.growth < this.species.statsPerGrowth.maxGrowth) {
-            let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * 2;
+        if (tdata.fertility > 0 && tdata.moisture > .1 && this.health > .1 && this.growth < this.species.statsPerGrowth.maxGrowth) {
+            let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * .2;
             this.growth += addedGrowth;
-            tdata.fertility -= addedGrowth * this.species.statsPerGrowth.nutrients;
+            tdata.fertility -= addedGrowth * this.species.statsPerGrowth.nutrients * .1;
             game.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
             tdata.erosion -= addedGrowth * this.species.statsPerGrowth.erosion * .1;
             tdata.erosion = Math.max(0, tdata.erosion);
             tdata.moisture -= addedGrowth * this.species.statsPerGrowth.water * .1;
         }
         if (this.health > 0) {
-            let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .1;
+            let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .005;
             if (tdata.moisture < requiredMoisture) {
-                this.health -= requiredMoisture - tdata.moisture;
+                this.damage(requiredMoisture - tdata.moisture, "lack of water");
                 tdata.moisture = 0;
             }
             else if (this.growth >= this.species.statsPerGrowth.maxGrowth) {
-                this.seedProgress += dt * this.health;
+                this.seedProgress += dt * this.health * .1;
             }
         }
         if (this.seedProgress > this.nextseed) {
@@ -111,6 +117,18 @@ export class Plant extends Component {
             newtree.transform.position.y = this.transform.position.y;
         }
         //this.shaderMeshComponent.renderMesh.scale.set(Math.sqrt(this.growth) * .3);
+    }
+
+    damage(amount: number, reason: string) {
+        amount = Math.min(.9, amount);
+        this.health = Math.max(0, this.health - amount);
+        if (this.health <= 0 && !this.dead) {
+            this.dead = true;
+            this.drawTree();
+            new ParticleText("died from " + reason, this.transform.position.result().add(new Vector(0, -40)));
+            this.tooltipComponent?.tooltipData.clear();
+            this.tooltipComponent?.tooltipData.set("status", "died from " + reason);
+        }
     }
 
     branch(options: BranchOptions) {

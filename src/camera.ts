@@ -23,7 +23,14 @@ export class Camera {
     }
 
     get worldPosition(): Vectorlike {
-        return this.position.result().mult(1/4);
+        return this.position.result().mult(1/Game.pixelScale);
+    }
+
+    get pixelScreen() {
+        return {
+            x: this.screen.x / Game.pixelScale,
+            y: this.screen.y / Game.pixelScale
+        }
     }
 
 

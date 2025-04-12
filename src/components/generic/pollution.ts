@@ -33,7 +33,7 @@ export class Pollution extends Component {
 
     update(dt: number) {
         const pollute = this.speed*dt;
-        game.terrain.terrainData[Math.round(this.transform.position.x / game.terrain.dataWidth)].pollution += pollute;
+        game.atmo.atmoData[Math.round(this.transform.position.x / game.terrain.dataWidth)].pollution += pollute;
         this.totalPolluted += pollute;
         if(this.totalPolluted >this.nextText){
             this.nextText+=1;

@@ -30,7 +30,7 @@ export class Atmo implements ISerializable, ISceneObject {
     }
 
     unload?(): void {
-        throw new Error("Method not implemented.");
+        game.activeScene.unregister(this);
     }
 
     update(dt: number): void {

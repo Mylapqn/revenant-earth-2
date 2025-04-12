@@ -26,6 +26,7 @@ import { Atmo } from "./world/atmo";
 import { displayNumber } from "./utils/utils";
 import { PlantSpecies } from "./plants/plantSpecies";
 import { Plant } from "./components/custom/plant";
+import { Weather } from "./world/weather";
 
 export let game: Game;
 
@@ -46,12 +47,15 @@ export class Game {
 
     terrain!: Terrain;
     atmo!: Atmo;
+    weather!: Weather;
+    
     player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
     playerContainer!: Container;
     foliageContainer!: Container;
     worldDebugGraphics!: Graphics;
+    weatherContainer!: Container;
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -106,7 +110,7 @@ export class Game {
             leaves: true
         });
         new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: .1, erosion: 4, maxGrowth: 7 },
-            { pollution: 0, water: .1, pollutionDamage: .5 },
+            { pollution: 0, water: 3, pollutionDamage: .5 },
             {
                 initialBranches: 8,
                 lengthPerGrowth: 2,
@@ -219,6 +223,7 @@ export class Game {
         this.app.stage.addChild((this.playerContainer = new Container()));
         this.pixelLayer.container.addChild((this.terrainContainer = new Container()));
         this.pixelLayer.container.addChild((this.foliageContainer = new Container()));
+        this.pixelLayer.container.addChild((this.weatherContainer = new Container()));
         this.app.stage.addChild((this.worldDebugGraphics = new Graphics()));
         this.worldDebugGraphics.scale.set(Game.pixelScale);
 
@@ -287,11 +292,11 @@ export class Game {
         Prefab.Tree({ scene: this.activeScene, x: 100, y: 100, species: "Tree" });
         Prefab.Tree({ scene: this.activeScene, x: 300, y: 100, species: "Tree" });
 
-
-        this.terrain = new Terrain();
         this.tooltip = new UITooltip();
 
+        this.terrain = new Terrain();
         this.atmo = new Atmo();
+        this.weather = new Weather();
 
         this.app.ticker.add(this.update, this);
     }
@@ -393,10 +398,12 @@ export class Game {
                 let text = "";
                 text += "ATMO\n";
                 text += "CO2: " + displayNumber(this.atmo.co2, 2) + "\n";
-                text += "TEMP: " + displayNumber(this.atmo.temp, 2) + "\n";
+                text += "TEMP: " + displayNumber(this.atmo.celsius, 2) + "\n";
                 Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 text += "TERRAIN\n";
                 Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
+                text += "WEATHER\n";
+                Object.entries(this.weather.weatherData).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 this.tooltip.hover(text)
             }
             if (this.selectedSeed) {
