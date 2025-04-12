@@ -4,6 +4,7 @@ import { ISceneObject, Scene } from "../hierarchy/scene";
 import { ISerializable, KindedObject, StateMode } from "../hierarchy/serialise";
 import { Vector } from "../utils/vector";
 import { RandomGenerator } from "../utils/utils";
+import { CloudMesh } from "./cloudMesh";
 
 export class Weather implements ISerializable, ISceneObject {
     weatherData: WeatherData = {
@@ -14,8 +15,12 @@ export class Weather implements ISerializable, ISceneObject {
     rainRenderer: RainRenderer = new RainRenderer();
     random: RandomGenerator = new RandomGenerator();
 
+    cloudMesh: CloudMesh;
+
     constructor() {
         game.activeScene.register(this);
+        this.cloudMesh = new CloudMesh(Texture.WHITE);
+        game.bgLayer.container.addChild(this.cloudMesh);
     }
     serialise(mode: StateMode): KindedObject | false {
         return { kind: "Weather", weatherData: this.weatherData };
@@ -29,7 +34,7 @@ export class Weather implements ISerializable, ISceneObject {
         game.activeScene.unregister(this);
     }
     update(dt: number): void {
-        if(this.weatherData.rainThreshold === 0) this.weatherData.rainThreshold = this.random.range(10, 40);
+        if (this.weatherData.rainThreshold === 0) this.weatherData.rainThreshold = this.random.range(10, 40);
         if (this.weatherData.rainIntensity > 0) {
             const rainMult = this.weatherData.rainBuildup / this.weatherData.rainThreshold + .1;
             this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity;
@@ -50,6 +55,7 @@ export class Weather implements ISerializable, ISceneObject {
     }
     draw(dt: number): void {
         this.rainRenderer.draw(dt);
+        this.cloudMesh.setUniform("uClouds", 1 - (this.weatherData.rainBuildup / this.weatherData.rainThreshold));
     }
 }
 
@@ -72,7 +78,7 @@ class RainRenderer {
         for (const raindrop of [...this.raindrops]) {
             const dir = Vector.fromAngle(raindrop.angle)
             raindrop.position.add(dir.mult(dt * rainSpeed));
-            raindrop.graphics.scale.y = dt * rainSpeed*2;
+            raindrop.graphics.scale.y = dt * rainSpeed * 2;
 
             raindrop.graphics.position.set(raindrop.position.x, raindrop.position.y);
             if (raindrop.position.y > game.camera.worldPosition.y + game.camera.pixelScreen.y / 2) {
@@ -92,9 +98,9 @@ class RainParticle {
         this.position = position;
         this.graphics = new Sprite(Texture.WHITE);
         game.weatherContainer.addChild(this.graphics);
-        this.graphics.alpha = .5;
+        this.graphics.alpha = .8;
         this.graphics.scale.set(1, 20);
-        this.graphics.tint = 0x8899aa;
+        this.graphics.tint = 0x6699aa;
         this.graphics.rotation = this.angle + Math.PI / 2;
     }
 }

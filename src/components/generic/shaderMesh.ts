@@ -3,12 +3,12 @@ import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { Game, game } from "../../game";
 import { SpriteDirection } from "./spriteDirection";
-import { FoliageMesh } from "../../shaders/foliageMesh";
+import { FoliageMesh } from "../../plants/foliageMesh";
 import { EntityTooltip } from "./entityTooltip";
 
 
 
-export class ShaderMesh extends Component {
+export class ShaderMeshRenderer extends Component {
     static componentType = "ShaderMesh";
     topContainer: Container;
     container: Container;

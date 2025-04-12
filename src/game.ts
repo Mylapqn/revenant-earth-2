@@ -1,4 +1,4 @@
-import { Application, Assets, Color, Container, Graphics, Sprite, Ticker } from "pixi.js";
+import { Application, Assets, Color, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -20,13 +20,14 @@ import { BasicSprite } from "./components/generic/basicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input, MouseButton } from "./input";
 import { TimedShader } from "./shaders/timedShader";
-import { UITooltip } from "./ui/tooltip";
+import { TooltipPanel, UITooltip } from "./ui/tooltip";
 import { Prefab } from "./hierarchy/prefabs";
 import { Atmo } from "./world/atmo";
 import { displayNumber } from "./utils/utils";
 import { PlantSpecies } from "./plants/plantSpecies";
 import { Plant } from "./components/custom/plant";
 import { Weather } from "./world/weather";
+import { CloudMesh } from "./world/cloudMesh";
 
 export let game: Game;
 
@@ -48,7 +49,7 @@ export class Game {
     terrain!: Terrain;
     atmo!: Atmo;
     weather!: Weather;
-    
+
     player!: Player;
     pixelLayer!: PixelLayer;
     terrainContainer!: Container;
@@ -56,6 +57,8 @@ export class Game {
     foliageContainer!: Container;
     worldDebugGraphics!: Graphics;
     weatherContainer!: Container;
+
+    bgLayer!: PixelLayer;
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -122,7 +125,7 @@ export class Game {
         this.camera = new Camera();
         const bg = new Sprite(await Assets.load("./bg.png"));
         bg.scale.set(1);
-        this.app.stage.addChild(bg);
+        //this.app.stage.addChild(bg);
 
         const scene2 = new Scene();
         scene2.name = "Scene 2";
@@ -216,8 +219,15 @@ export class Game {
             },
         ];
 
+        this.bgLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale,0);
+        this.app.stage.addChild(this.bgLayer.sprite);
+        const a = new Sprite(await Assets.load("./tree.png"));
+        a.scale.set(1);
+        this.bgLayer.container.addChild(a);
+
         this.pixelLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
         this.app.stage.addChild(this.pixelLayer.sprite);
+
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
@@ -333,6 +343,7 @@ export class Game {
         this.worldDebugGraphics.stroke(0x999999);
 
         this.pixelLayer.render();
+        this.bgLayer.render();
 
 
         const address = "http://localhost:3000/state.json";
@@ -395,19 +406,22 @@ export class Game {
                     if (hitbox) {
                     }
                 }
+                const columns:TooltipPanel[] = [];
                 let text = "";
-                text += "ATMO\n";
                 text += "CO2: " + displayNumber(this.atmo.co2, 2) + "\n";
                 text += "TEMP: " + displayNumber(this.atmo.celsius, 2) + "\n";
                 Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                text += "TERRAIN\n";
+                columns.push({title:"Atmo",text:text});
+                text = "";
                 Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                text += "WEATHER\n";
+                columns.push({title:"Terrain",text:text});
+                text = "";
                 Object.entries(this.weather.weatherData).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                this.tooltip.hover(text)
+                columns.push({title:"Weather",text:text});
+                this.tooltip.hover({ title: "Debug data"},{columns: columns })
             }
             if (this.selectedSeed) {
-                this.tooltip.hover("SEED:" + this.selectedSeed);
+                this.tooltip.hover({ text: "SEED: " + this.selectedSeed });
                 if (this.input.mouse.getButtonUp(MouseButton.Left)) {
                     let tree = Prefab.Tree({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
                     tree.getComponent(Plant)!.growth = 2;

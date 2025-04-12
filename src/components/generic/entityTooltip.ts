@@ -4,13 +4,13 @@ import { Entity } from "../../hierarchy/entity";
 import { MouseButton } from "../../input";
 import { BasicSprite } from "./basicSprite";
 import { Interactable } from "./interactable";
-import { ShaderMesh } from "./shaderMesh";
+import { ShaderMeshRenderer } from "./shaderMesh";
 
 export class EntityTooltip extends Component {
     static componentType = "EntityTooltip";
     interactableComponent?: Interactable;
     spriteComponent?: BasicSprite;
-    shaderMeshComponent?: ShaderMesh;
+    shaderMeshComponent?: ShaderMeshRenderer;
     highlighted = false;
     tooltipData = new Map<string, string>();
     tooltipName = "entity name";
@@ -25,7 +25,7 @@ export class EntityTooltip extends Component {
     override init(): void {
         this.interactableComponent = this.entity.getComponent(Interactable);
         this.spriteComponent = this.entity.getComponent(BasicSprite);
-        this.shaderMeshComponent = this.entity.getComponent(ShaderMesh);
+        this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer);
     }
 
     update(dt: number) {
@@ -73,7 +73,7 @@ export class EntityTooltip extends Component {
     getTooltip() {
         let tooltipText = "";
         this.tooltipData.forEach((value, key) => tooltipText += `${key}: ${value}\n`);
-        return this.tooltipName + "\n" + tooltipText;
+        return {title: this.tooltipName, text: tooltipText}; //this.tooltipName + "\n" + tooltipText;
     }
 
 }

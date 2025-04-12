@@ -7,7 +7,7 @@ import { Hitbox } from "./generic/hitbox";
 import { Interactable } from "./generic/interactable";
 import { Pollution } from "./generic/pollution";
 import { RoboLogic } from "./generic/roboLogic";
-import { ShaderMesh } from "./generic/shaderMesh";
+import { ShaderMeshRenderer } from "./generic/shaderMesh";
 import { SpriteDirection } from "./generic/spriteDirection";
 import { EntityTooltip } from "./generic/entityTooltip";
 import { Transform } from "./generic/transfrom";
@@ -25,6 +25,6 @@ export function initComponents(){
     Component.register(Pollution);
     Component.register(Button);
     Component.register(EntityTooltip);
-    Component.register(ShaderMesh);
+    Component.register(ShaderMeshRenderer);
     
 }

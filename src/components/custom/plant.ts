@@ -6,9 +6,9 @@ import { BasicSprite } from "../generic/basicSprite";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../utils/vector";
 import { Prefab } from "../../hierarchy/prefabs";
-import { FoliageMesh } from "../../shaders/foliageMesh";
+import { FoliageMesh } from "../../plants/foliageMesh";
 import { EntityTooltip } from "../generic/entityTooltip";
-import { ShaderMesh } from "../generic/shaderMesh";
+import { ShaderMeshRenderer } from "../generic/shaderMesh";
 import { clamp, lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
@@ -17,7 +17,7 @@ export class Plant extends Component {
     static componentType = "Plant";
     growth = 0;
     health = 1;
-    shaderMeshComponent!: ShaderMesh;
+    shaderMeshComponent!: ShaderMeshRenderer;
     tooltipComponent?: EntityTooltip
     nextseed = 1;
     seedProgress = 0;
@@ -38,7 +38,7 @@ export class Plant extends Component {
     override init(): void {
         this.tooltipComponent = this.entity.getComponent(EntityTooltip);
         if (this.tooltipComponent) this.tooltipComponent.tooltipName = "Tree";
-        this.shaderMeshComponent = this.entity.getComponent(ShaderMesh)!;
+        this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
         this.drawTree();
     }
@@ -55,7 +55,7 @@ export class Plant extends Component {
     }
 
     update(realDt: number) {
-        const plantSimulationSpeed = 100;
+        const plantSimulationSpeed = 10;
 
         const dt = realDt * plantSimulationSpeed;
 

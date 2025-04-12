@@ -33,6 +33,13 @@ export class Camera {
         }
     }
 
+    getPixelOffset(depth:number): {offset: Vectorlike; remainder: Vectorlike} {
+        const screenPixelOffset = this.screenPixelOffset.mult(depth);
+        const pixelOffset = screenPixelOffset.result().mult(1/Game.pixelScale).floor();
+        const offsetRemainder = screenPixelOffset.result().mult(1/Game.pixelScale).sub(pixelOffset);
+        return { offset: pixelOffset, remainder: offsetRemainder };
+    }
+
 
     update(dt: number) {
         const targetPosition = new Vector(0, 0);

@@ -4,6 +4,7 @@
     --hacking-color: rgb(23, 238, 62);
     --hacking-color-muted: rgba(12, 189, 33, 0.5);
 }
+
 body {
     width: 100%;
     height: 100vh;
@@ -38,7 +39,7 @@ body {
     display: flex;
     background-color: rgb(20, 20, 20);
     margin-bottom: 10px;
-    padding:10px;
+    padding: 10px;
     flex-wrap: wrap;
 }
 
@@ -63,13 +64,14 @@ body {
 
 .hacking button:hover {
     background-color: var(--hacking-color-muted);
-    color:white;
+    color: white;
 }
+
 .buttonBorderless button {
     border: none;
-    margin:0;
+    margin: 0;
     background: transparent;
-    color:white;
+    color: white;
 }
 
 #hackingTooltip {
@@ -89,15 +91,50 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    font-family: "monogramextended";
-    font-size: 32px;
-    color: rgb(255, 255, 255);
-    background-color: rgb(0, 0, 0);
-    padding: 10px 15px; 
-    line-height: 24px;
-    text-shadow: black 2px 2px 10px;
     display: none;
     z-index: 2;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+#tooltip .panel {
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    background-color: #1F2730;
+    font-weight: normal;
+    text-transform: uppercase;
+    padding: 15px 20px;
+    line-height: 1.6em;
+    display: flex;
+    flex-direction: column;
+}
+
+#tooltip .panel h1 {
+    font-size: 16px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+#tooltip .panel p {
+    margin: 0;
+    text-transform: none;
+}
+
+#tooltip .panel.columns {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+}
+
+#tooltip .panel.columns .panel {
+    flex-grow: 1;
+    flex-shrink: 0;
+    min-width: 150px;
+}
+
+#tooltip .panel.title {
+    background-color: #0C68D6;
 }
 
 .stats {
@@ -108,7 +145,7 @@ body {
     font-size: 32px;
     color: rgb(255, 255, 255);
     background-color: transparent;
-    padding: 10px 15px; 
+    padding: 10px 15px;
     line-height: 24px;
     text-shadow: black 2px 2px 10px;
     display: flex;
