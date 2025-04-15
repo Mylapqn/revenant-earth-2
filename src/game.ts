@@ -97,6 +97,7 @@ export class Game {
     resize() { }
 
     async init() {
+        await Assets.load("./font/monogram.ttf");
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
         this.stateManager.register(this.progressDatabase);
@@ -106,7 +107,7 @@ export class Game {
         initHandlers();
         initComponents();
 
-        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1, maxGrowth: 50 },
+        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: .01, erosion: 1, maxGrowth: 50 },
             { pollution: 1, water: 1, pollutionDamage: 1 }, {
             initialBranches: 1,
             lengthPerGrowth: 4,
@@ -219,7 +220,7 @@ export class Game {
             },
         ];
 
-        this.bgLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale,0);
+        this.bgLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale, 0);
         this.app.stage.addChild(this.bgLayer.sprite);
         const a = new Sprite(await Assets.load("./tree.png"));
         a.scale.set(1);
@@ -406,19 +407,19 @@ export class Game {
                     if (hitbox) {
                     }
                 }
-                const columns:TooltipPanel[] = [];
+                const columns: TooltipPanel[] = [];
                 let text = "";
                 text += "CO2: " + displayNumber(this.atmo.co2, 2) + "\n";
                 text += "TEMP: " + displayNumber(this.atmo.celsius, 2) + "\n";
                 Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                columns.push({title:"Atmo",text:text});
+                columns.push({ title: "Atmo", text: text });
                 text = "";
                 Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                columns.push({title:"Terrain",text:text});
+                columns.push({ title: "Terrain", text: text });
                 text = "";
                 Object.entries(this.weather.weatherData).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                columns.push({title:"Weather",text:text});
-                this.tooltip.hover({ title: "Debug data"},{columns: columns })
+                columns.push({ title: "Weather", text: text });
+                this.tooltip.hover({ title: "Debug data" }, { text: "X: " + Math.floor(this.worldMouse.x) + " // Y: " + Math.floor(this.worldMouse.y),highlight:true }, { columns: columns })
             }
             if (this.selectedSeed) {
                 this.tooltip.hover({ text: "SEED: " + this.selectedSeed });

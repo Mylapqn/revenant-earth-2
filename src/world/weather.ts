@@ -50,7 +50,7 @@ export class Weather implements ISerializable, ISceneObject {
             this.weatherData.rainIntensity = this.random.range(.2, 2);
         }
         else {
-            this.weatherData.rainBuildup += dt * game.atmo.temp * .005;
+            this.weatherData.rainBuildup += dt * game.atmo.temp * .002;
         }
     }
     draw(dt: number): void {

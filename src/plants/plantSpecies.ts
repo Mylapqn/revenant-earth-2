@@ -1,10 +1,20 @@
+import { Plant } from "../components/custom/plant";
+import { Constructor } from "../hierarchy/component";
+import { TreeGenerator } from "./generators/treeGenerator";
+import { PlantGenerator } from "./plantGenerator";
+
+export type GeneratorConstructor<T> = { new(plant: Plant): T };
+
+
 export class PlantSpecies {
     name = "Species name";
-    statsPerGrowth:PlantStatsPerGrowth;
-    statsPerTime:PlantStatsPerTime;
-    generatorData:PlantGeneratorData;
-    constructor(name: string, statsPerGrowth: PlantStatsPerGrowth, statsPerTime: PlantStatsPerTime, generatorData: PlantGeneratorData) {
+    statsPerGrowth: PlantStatsPerGrowth;
+    statsPerTime: PlantStatsPerTime;
+    generatorData: PlantGeneratorData;
+    generatorConstructor: GeneratorConstructor<PlantGenerator>;
+    constructor(name: string, statsPerGrowth: PlantStatsPerGrowth, statsPerTime: PlantStatsPerTime, generatorData: PlantGeneratorData, generator?: GeneratorConstructor<PlantGenerator>) {
         this.name = name;
+        this.generatorConstructor = TreeGenerator;
         this.statsPerGrowth = statsPerGrowth;
         this.statsPerTime = statsPerTime;
         this.generatorData = generatorData;
@@ -13,6 +23,6 @@ export class PlantSpecies {
     static species: Map<string, PlantSpecies> = new Map<string, PlantSpecies>();
 }
 
-export type PlantStatsPerGrowth = { co2: number; nutrients: number; biomass: number; water: number; erosion: number,maxGrowth: number };
+export type PlantStatsPerGrowth = { co2: number; nutrients: number; biomass: number; water: number; erosion: number, maxGrowth: number };
 export type PlantStatsPerTime = { pollution: number; water: number; pollutionDamage: number };
 export type PlantGeneratorData = { initialBranches: number; lengthPerGrowth: number; leaves: boolean };

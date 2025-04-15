@@ -17,7 +17,7 @@ export class ParticleText {
         this.graphics.style.fill = 0x333300;
         this.graphics.style.fontSize = 16;
         this.graphics.resolution = 3;
-        this.graphics.style.fontFamily = "monogramextended";
+        this.graphics.style.fontFamily = "monogram";
         this.graphics.style.align = "center";
         game.pixelLayer.container.addChild(this.graphics);
         this.position = position.result();

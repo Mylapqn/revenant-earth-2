@@ -62,9 +62,6 @@ export class UITooltip {
                 //Complex layout
                 this.processPanel(this.parentElement, panel);
             }
-            if (true) {
-                console.log("as");
-            }
         }
         else {
             this.enabled = false;
@@ -87,6 +84,9 @@ export class UITooltip {
             for (const column of data.columns) {
                 this.processPanel(panelElement, column);
             }
+        }
+        if(data.highlight){
+            panelElement.classList.add("highlight");
         }
         return panelElement;
     }

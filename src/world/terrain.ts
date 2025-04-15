@@ -30,7 +30,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.hitbox = game.collisionSystem.createPolygon({ x: 0, y: 0 }, [
             { x: 0, y: 0 },
             { x: 0, y: 1 },
-        ]);
+        ], { userData: { terrain: true } });
 
         this.defaultTerrain();
     }
@@ -271,7 +271,7 @@ export class Terrain implements ISerializable, ISceneObject {
             //this.graphics.moveTo(node.x, node.y);
             //this.graphics.lineTo(node.x, node.y + data.fertility * 20);
             if (data == undefined) continue;
-            this.graphics.lineTo(node.x, node.y + data.fertility * 20);
+            this.graphics.lineTo(node.x, node.y + data.moisture * 20);
 
             let r = Math.floor(Math.max(0, Math.min(1, (1 - data.fertility) * 2)) * 255)
                 .toString(16)
@@ -279,8 +279,12 @@ export class Terrain implements ISerializable, ISceneObject {
             let g = Math.floor(Math.max(0, Math.min(1, data.fertility * 2)) * 255)
                 .toString(16)
                 .padStart(2, "0");
+            let b = Math.floor(Math.max(0, Math.min(1, data.moisture * 2)) * 255)
+                .toString(16)
+                .padStart(2, "0");
+            b = "00";
 
-            this.graphics.stroke({ color: `0x${r}${g}00`, alpha: 1, width: 1 });
+            this.graphics.stroke({ color: `0x${r}${g}${b}`, alpha: 1, width: 1 });
         }
 
         /*for (let index = -20; index < 20; index++) {

@@ -12,6 +12,7 @@ import { ShaderMeshRenderer } from "../generic/shaderMesh";
 import { clamp, lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
+import { PlantGenerator } from "../../plants/plantGenerator";
 
 export class Plant extends Component {
     static componentType = "Plant";
@@ -27,6 +28,7 @@ export class Plant extends Component {
     randomSeed = 0;
     dead = false;
     species!: PlantSpecies;
+    generator!: PlantGenerator;
 
     constructor(parent: Entity) {
         super(parent);
@@ -36,11 +38,14 @@ export class Plant extends Component {
     }
 
     override init(): void {
+        if (this.species.generatorConstructor === undefined) throw new Error("co se doje?");
+        this.generator = new this.species.generatorConstructor(this);
         this.tooltipComponent = this.entity.getComponent(EntityTooltip);
         if (this.tooltipComponent) this.tooltipComponent.tooltipName = "Tree";
         this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
-        this.drawTree();
+
+        this.drawPlant();
     }
 
     override toData(): ComponentData {
@@ -62,7 +67,7 @@ export class Plant extends Component {
         this.timeSinceDraw += realDt;
         if (this.timeSinceDraw > this.secondsPerDraw && !this.dead) {
             this.timeSinceDraw = 0;
-            this.drawTree();
+            this.drawPlant();
         }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
         if (this.dead) return;
@@ -100,7 +105,7 @@ export class Plant extends Component {
             tdata.moisture -= addedGrowth * this.species.statsPerGrowth.water * .1;
         }
         if (this.health > 0) {
-            let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .005;
+            let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .05;
             if (tdata.moisture < requiredMoisture) {
                 this.damage(requiredMoisture - tdata.moisture, "lack of water");
                 tdata.moisture = 0;
@@ -124,7 +129,7 @@ export class Plant extends Component {
         this.health = Math.max(0, this.health - amount);
         if (this.health <= 0 && !this.dead) {
             this.dead = true;
-            this.drawTree();
+            this.drawPlant();
             new ParticleText("died from " + reason, this.transform.position.result().add(new Vector(0, -40)));
             this.tooltipComponent?.tooltipData.clear();
             this.tooltipComponent?.tooltipData.set("status", "died from " + reason);
@@ -177,7 +182,11 @@ export class Plant extends Component {
         }
     }
 
-    drawTree() {
+    drawPlant() {
+        let hit = game.collisionSystem.raycast(this.entity.transform.position.result().add({ x: 0, y: -50 }), this.entity.transform.position.result().add({ x: 0, y: 100 }), (body) => { return body.userData?.terrain });
+        if (hit) {
+            this.entity.transform.position.y = hit.point.y;
+        }
         this.graphics.clear();
         const branchAmount = Math.max(1, Math.min(this.growth * 5, this.species.generatorData.initialBranches));
         let x = 0;
