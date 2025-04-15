@@ -147,10 +147,10 @@ body {
 
 .stats {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
-    font-family: "monogram";
-    font-size: 32px;
+    font-family: "Chakra Petch";
+    font-size: 16px;
     color: rgb(255, 255, 255);
     background-color: transparent;
     padding: 10px 15px;

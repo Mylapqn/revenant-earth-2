@@ -19,7 +19,10 @@ export class UITooltip {
         if (this.timeSinceLastUpdate > this.timePerEntityUpdate) {
             this.timeSinceLastUpdate %= this.timePerEntityUpdate;
             if (this.hoveredEntity) {
-                this.hover(this.hoveredEntity.getComponent(EntityTooltip)!.getTooltip());
+                const component = this.hoveredEntity.getComponent(EntityTooltip);
+                if (component) {
+                    this.hover(component.getTooltip());
+                }
             }
             else {
                 this.hover();
@@ -32,7 +35,10 @@ export class UITooltip {
     hoverEntity(entity: Entity, hover: boolean) {
         if (hover) {
             this.hoveredEntity = entity;
-            this.hover(entity.getComponent(EntityTooltip)!.getTooltip());
+            const component = this.hoveredEntity.getComponent(EntityTooltip);
+            if (component) {
+                this.hover(component.getTooltip());
+            }
 
         }
         else if (this.hoveredEntity == entity) {
@@ -85,7 +91,7 @@ export class UITooltip {
                 this.processPanel(panelElement, column);
             }
         }
-        if(data.highlight){
+        if (data.highlight) {
             panelElement.classList.add("highlight");
         }
         return panelElement;

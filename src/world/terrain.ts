@@ -6,6 +6,7 @@ import { Ellipse, Polygon, SATVector } from "detect-collisions";
 import { ISerializable, ObjectKind, StateMode } from "../hierarchy/serialise";
 import { ISceneObject, Scene } from "../hierarchy/scene";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
+import { Input, MouseButton } from "../input";
 
 export class Terrain implements ISerializable, ISceneObject {
     graphics: Graphics;
@@ -16,7 +17,7 @@ export class Terrain implements ISerializable, ISceneObject {
     hitbox: Polygon;
 
     terrainData = new Array<TerrainData>();
-    readonly dataWidth = 10;
+    readonly dataWidth = 30;
 
     totalWidth = 2000;
 
@@ -85,7 +86,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.nodes = [];
 
         for (const node of this.terrainMesh) {
-            if (node.x > game.player.position.x - 200 && node.x < game.player.position.x + 200) {
+            if (node.x > game.player.position.x - 600 && node.x < game.player.position.x + 600) {
                 this.nodes.push(node);
             }
         }
@@ -102,9 +103,10 @@ export class Terrain implements ISerializable, ISceneObject {
         const editedNodes = new Set<TerrainNode>();
         let prev = this.nodes[0];
         for (const node of this.nodes) {
-            if (node.distance(game.worldMouse) < 20) {
+            if (node.distance(game.worldMouse) < 30 && game.input.mouse.getButton(MouseButton.Left)) {
                 const dir = node.diff(game.worldMouse);
-                node.add(dir.normalize().mult(0.5));
+                const length = dir.length() / 30;
+                node.add(dir.normalize().mult((1 - length)*(1 - length)*10));
                 editedNodes.add(node);
                 editedNodes.add(prev);
                 if (node.next) editedNodes.add(node.next);

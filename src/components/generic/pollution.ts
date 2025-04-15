@@ -32,11 +32,14 @@ export class Pollution extends Component {
     }
 
     update(dt: number) {
-        const pollute = this.speed*dt;
-        game.atmo.atmoData[Math.round(this.transform.position.x / game.terrain.dataWidth)].pollution += pollute;
-        this.totalPolluted += pollute;
-        if(this.totalPolluted >this.nextText){
-            this.nextText+=1;
+        const pollute = this.speed * dt;
+        const adata = game.atmo.atmoData[Math.round(this.transform.position.x / game.terrain.dataWidth)];
+        if (adata.pollution < 1) {
+            adata.pollution += pollute;
+            this.totalPolluted += pollute;
+        }
+        if (this.totalPolluted > this.nextText) {
+            this.nextText += 1;
             new ParticleText("+1 pollution", this.transform.position.result().add(new Vector(0, -40)));
         }
     }

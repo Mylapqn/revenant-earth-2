@@ -107,7 +107,7 @@ export class Game {
         initHandlers();
         initComponents();
 
-        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: .01, erosion: 1, maxGrowth: 50 },
+        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1, maxGrowth: 50 },
             { pollution: 1, water: 1, pollutionDamage: 1 }, {
             initialBranches: 1,
             lengthPerGrowth: 4,
@@ -157,7 +157,7 @@ export class Game {
                         componentType: "Transform",
                         data: {
                             position: { x: 40, y: 20 },
-                            velocity: { x: 10, y: 0 },
+                            velocity: { x: 0, y: 0 },
                         },
                     },
                 ],
@@ -184,7 +184,7 @@ export class Game {
                         componentType: "Transform",
                         data: {
                             position: { x: 10, y: 20 },
-                            velocity: { x: 10, y: 0 },
+                            velocity: { x: 0, y: 0 },
                         },
                     },
                 ],
@@ -196,7 +196,7 @@ export class Game {
                         componentType: "Transform",
                         data: {
                             position: { x: 40, y: 0 },
-                            velocity: { x: 10, y: 0 },
+                            velocity: { x: 0, y: 0 },
                         },
                     },
                     {
@@ -330,10 +330,11 @@ export class Game {
         if (this.input.key("control")) {
             for (let x = 0; x < this.terrain.nodes.length; x++) {
                 const node = this.terrain.nodes[x];
-                const data = this.terrain.getProperties(node.x);
-                if (data == undefined) continue;
-                this.worldDebugGraphics.circle(node.x, node.y, data.pollution * 10);
-                this.worldDebugGraphics.fill(new Color({ r: data.pollution * 255, g: data.pollution * 255, b: 0, a: 1 }));
+                const tdata = this.terrain.getProperties(node.x);
+                const adata = this.atmo.getProperties(node.x);
+                if (tdata == undefined) continue;
+                this.worldDebugGraphics.circle(node.x, node.y, adata.pollution * 10);
+                this.worldDebugGraphics.stroke({width:1,color:new Color({ r: 255, g: 100, b: 0, a: 1 })});
             }
         }
 
@@ -390,6 +391,9 @@ export class Game {
                 if (this.activeScene.name != "Scene") {
                     this.loadScene("Scene");
                 }
+            }
+            if(this.input.keyDown("r")) {
+                this.weather.weatherData.rainBuildup+=2;
             }
 
             if (this.input.key("control")) {

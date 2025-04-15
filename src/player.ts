@@ -10,7 +10,7 @@ import { Atmo } from "./world/atmo";
 import { UIProgressBar } from "./ui/progressBar";
 
 export class Player implements ISerializable {
-    position = new Vector(200, 0);
+    position = new Vector(800, 0);
     sprite: Sprite;
     playerHitbox: Ellipse;
     graphics: Graphics;
@@ -85,10 +85,10 @@ export class Player implements ISerializable {
         const tdata = game.terrain.getProperties(this.position.x);
         const adata = game.atmo.getProperties(this.position.x);
 
-        this.oxygen -= (tdata.pollution - .5) * dt * 100;
+        this.oxygen -= (adata.pollution - .5) * dt * 100;
         this.oxygen = Math.max(0, Math.min(100, this.oxygen));
 
-        if (this.oxygen <= 0) this.health -= dt * 10 * tdata.pollution;
+        if (this.oxygen <= 0) this.health -= dt * 10 * adata.pollution;
 
         this.health = Math.max(0, Math.min(100, this.health));
 

@@ -84,7 +84,7 @@ export class Atmo implements ISerializable, ISceneObject {
 
     private spread(a: AtmoData, b: AtmoData) {
         let pollution = a.pollution - b.pollution;
-        pollution *= 0.1;
+        pollution *= 0.01;
         a.pollution -= pollution;
         b.pollution += pollution;
     }

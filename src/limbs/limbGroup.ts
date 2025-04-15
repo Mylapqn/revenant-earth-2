@@ -18,8 +18,8 @@ export class LimbGroup {
     }
     update(dt: number, moved: Vector) {
         let actualTarget = this.target.result();
-        //This produces wrong results for moving left because it doesn't remember the direction
-        if (moved.x > 10 * dt) actualTarget.x *= -1;
+        //TODO This produces wrong results for moving left because it doesn't remember the direction
+        if (moved.x > 20 * dt) actualTarget.x *= -1;
         let hit = game.collisionSystem.raycast(actualTarget.result().add(this.system.origin).add({ x: 0, y: -5 }), actualTarget.result().add(this.system.origin).add({ x: 0, y: 5 }));
         if (hit) actualTarget.y = hit.point.y - this.system.origin.y;
         //if(hit) console.log(hit.point);

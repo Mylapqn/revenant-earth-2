@@ -46,6 +46,10 @@ export class ShaderMeshRenderer extends Component {
         bounds.maxX += 10;
         bounds.width = bounds.maxX - bounds.minX;
         this.renderTexture.resize(bounds.width, bounds.height);
+        if(this.container.position == null){
+            console.error("Shadermesh has been removed but is updating!");
+            //return;
+        }
         this.container.position.set(-bounds.minX,bounds.height);
         this.renderMesh.resize(bounds.width, bounds.height,-bounds.minX/bounds.width);
         game.app.renderer.render({ container: this.container, target: this.renderTexture });

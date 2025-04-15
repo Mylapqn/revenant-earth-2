@@ -31,8 +31,8 @@ export class Limb {
                 this.end = this.target.result();
             }
             else {
-                this.end.add(moveDir.result().mult(Math.min(moveDist, (80 * dt))));
-                if (this.ratioRemaining > .4) this.end.y -= dt * 40;
+                this.end.add(moveDir.result().mult(Math.min(moveDist, (100 * dt))));
+                if (this.ratioRemaining > .4) this.end.y -= dt * 50;
                 //else this.end.y+=dt*10;
             }
         }

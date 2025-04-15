@@ -44,7 +44,7 @@ export class Camera {
     update(dt: number) {
         const targetPosition = new Vector(0, 0);
         targetPosition.x = game.player.position.x * Game.pixelScale;
-        targetPosition.y = game.player.position.y * Game.pixelScale;
+        targetPosition.y = game.player.position.y * Game.pixelScale - this.screen.y*.2;
 
         this.position.x = (targetPosition.x + this.position.x * 19) / 20;
         this.position.y = (targetPosition.y + this.position.y * 19) / 20;

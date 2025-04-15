@@ -45,16 +45,18 @@ export class Plant extends Component {
         this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
 
+        Plant.list.push(this);
         this.drawPlant();
     }
 
     override toData(): ComponentData {
-        const data = { growth: this.growth, species: this.species.name };
+        const data = { growth: this.growth, species: this.species.name, health: this.health };
         return super.toData(data);
     }
 
-    override applyData(data: { growth: number; species: string }): void {
+    override applyData(data: { growth: number; species: string; health: number }): void {
         this.growth = data.growth;
+        this.health = data.health ?? 1;
         console.log(data.species);
         if (data.species) this.species = PlantSpecies.species.get(data.species)!;
     }
@@ -85,10 +87,10 @@ export class Plant extends Component {
             //this.tooltipComponent.tooltipData.set("species", this.species.name);
         }
         if (tdata == undefined) return;
-        if (tdata.pollution > 0) {
-            this.damage(dt * tdata.pollution * .01 * this.species.statsPerTime.pollutionDamage, "ground pollution");
+        if (adata.pollution > 0) {
+            this.damage(dt * adata.pollution * .02 * this.species.statsPerTime.pollutionDamage, "air pollution");
             if (this.health > .1) {
-                tdata.pollution = Math.max(0, tdata.pollution - dt * this.species.statsPerTime.pollution * .01);
+                adata.pollution = Math.max(0, adata.pollution - dt * this.species.statsPerTime.pollution * .02);
             }
             this.shaderMeshComponent.renderMesh.tint = new Color({ r: 255, g: this.health * 255, b: this.health * 255, a: 1 });
         }
@@ -116,10 +118,20 @@ export class Plant extends Component {
         }
         if (this.seedProgress > this.nextseed) {
             this.nextseed *= 2;
-            let newtree = Prefab.Tree({ species: this.species.name, scene: this.entity.scene });
-            new ParticleText("seed", this.transform.position.result().add(new Vector(0, -40)));
-            newtree.transform.position.x = this.transform.position.x + (80 * Math.random() - 40) * 10;
-            newtree.transform.position.y = this.transform.position.y;
+            let seedPos = this.transform.position.x + (80 * Math.random() - 40) * 10;
+            let seedValid = true;
+            for (const plant of Plant.list) {
+                if (Math.abs(plant.entity.transform.position.x - seedPos) < 5) {
+                    seedValid = false;
+                    break;
+                }
+            }
+            if (seedValid) {
+                let newtree = Prefab.Tree({ species: this.species.name, scene: this.entity.scene });
+                new ParticleText("seed", this.transform.position.result().add(new Vector(0, -40)));
+                newtree.transform.position.x = seedPos;
+                newtree.transform.position.y = this.transform.position.y;
+            }
         }
         //this.shaderMeshComponent.renderMesh.scale.set(Math.sqrt(this.growth) * .3);
     }
@@ -215,6 +227,13 @@ export class Plant extends Component {
         //this.graphics.fill(0x338800);
         this.shaderMeshComponent.draw();
     }
+
+    remove() {
+        Plant.list.splice(Plant.list.indexOf(this), 1);
+        super.remove();
+    }
+
+    static list: Plant[] = [];
 
 }
 
