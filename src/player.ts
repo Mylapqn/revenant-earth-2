@@ -39,8 +39,7 @@ export class Player implements ISerializable {
         this.oxygenBar = new UIProgressBar("Oxygen", this.statsDisplay);
 
         game.activeScene.register(this);
-        this.pixelLayer = new PixelLayer(64, 64);
-        this.pixelLayer.worldSpace = false;
+        this.pixelLayer = new PixelLayer({width:64, height:64,autoRender:true,parent:game.playerContainer,worldSpace:false});
 
         this.graphics = new Graphics();
         this.legGraphics = new Graphics();
@@ -74,7 +73,6 @@ export class Player implements ISerializable {
         //player.scale.set(4);
         this.sprite.scale.x *= -1;
         //game.pixelLayer.container.addChild(this.graphics);
-        game.playerContainer.addChild(this.pixelLayer.sprite);
         this.pixelLayer.container.addChild(this.graphics);
         //this.pixelLayer.container.addChild(this.sprite);
         this.pixelLayer.container.addChild(this.legGraphics);

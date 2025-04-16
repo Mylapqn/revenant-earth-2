@@ -28,13 +28,13 @@ export class Camera {
 
     get pixelScreen() {
         return {
-            x: this.screen.x / Game.pixelScale,
-            y: this.screen.y / Game.pixelScale
+            x: Math.floor(this.screen.x / Game.pixelScale),
+            y: Math.floor(this.screen.y / Game.pixelScale)
         }
     }
 
     getPixelOffset(depth:number): {offset: Vectorlike; remainder: Vectorlike} {
-        const screenPixelOffset = this.screenPixelOffset.mult(depth);
+        const screenPixelOffset = this.screenPixelOffset.result().mult(depth);
         const pixelOffset = screenPixelOffset.result().mult(1/Game.pixelScale).floor();
         const offsetRemainder = screenPixelOffset.result().mult(1/Game.pixelScale).sub(pixelOffset);
         return { offset: pixelOffset, remainder: offsetRemainder };

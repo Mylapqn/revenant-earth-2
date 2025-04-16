@@ -28,6 +28,7 @@ import { PlantSpecies } from "./plants/plantSpecies";
 import { Plant } from "./components/custom/plant";
 import { Weather } from "./world/weather";
 import { CloudMesh } from "./world/cloudMesh";
+import { CustomColor } from "./utils/color";
 
 export let game: Game;
 
@@ -55,10 +56,14 @@ export class Game {
     terrainContainer!: Container;
     playerContainer!: Container;
     foliageContainer!: Container;
+    bgContainer!: Container;
+    mainContainer!: Container;
+    fgContainer!: Container;
     worldDebugGraphics!: Graphics;
     weatherContainer!: Container;
 
     bgLayer!: PixelLayer;
+    bgLayers: PixelLayer[] = [];
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -94,7 +99,11 @@ export class Game {
         });
     }
 
-    resize() { }
+    resize() {
+        for (const layer of PixelLayer.resizeLayers) {
+            layer.resize(game.camera.pixelScreen.x, game.camera.pixelScreen.y);
+        }
+    }
 
     async init() {
         await Assets.load("./font/monogram.ttf");
@@ -122,6 +131,10 @@ export class Game {
             }
         );
 
+
+        this.bgContainer = new Container({ parent: this.app.stage });
+        this.mainContainer = new Container({ parent: this.app.stage });
+        this.fgContainer = new Container({ parent: this.app.stage });
         this.collisionSystem = new System();
         this.camera = new Camera();
         const bg = new Sprite(await Assets.load("./bg.png"));
@@ -220,14 +233,31 @@ export class Game {
             },
         ];
 
-        this.bgLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale, 0);
-        this.app.stage.addChild(this.bgLayer.sprite);
+        this.bgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.bgContainer });
         const a = new Sprite(await Assets.load("./tree.png"));
         a.scale.set(1);
         this.bgLayer.container.addChild(a);
 
-        this.pixelLayer = new PixelLayer(this.app.canvas.width / Game.pixelScale, this.app.canvas.height / Game.pixelScale);
-        this.app.stage.addChild(this.pixelLayer.sprite);
+        const layers = 5;
+        for (let i = 0; i < layers; i++) {
+            const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.bgContainer });
+            this.bgLayers.push(bgl);
+            const bgg = new Graphics({ parent: bgl.container });
+            let y = 100;
+            bgg.moveTo(0,1000);
+            bgg.lineTo(0,y);
+            const width = 256;
+            for (let t = 0; t < width; t++) {
+                y += (Math.random()-.5)*5;
+                bgg.lineTo(t*10,y);
+                
+            }
+            bgg.lineTo(width*1,1000);
+            bgg.fill(new CustomColor(255*i / layers,255*i / layers,255*i / layers));
+        }
+
+
+        this.pixelLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1, parent: this.mainContainer, worldSpace: true });
 
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
@@ -334,7 +364,7 @@ export class Game {
                 const adata = this.atmo.getProperties(node.x);
                 if (tdata == undefined) continue;
                 this.worldDebugGraphics.circle(node.x, node.y, adata.pollution * 10);
-                this.worldDebugGraphics.stroke({width:1,color:new Color({ r: 255, g: 100, b: 0, a: 1 })});
+                this.worldDebugGraphics.stroke({ width: 1, color: new Color({ r: 255, g: 100, b: 0, a: 1 }) });
             }
         }
 
@@ -344,8 +374,9 @@ export class Game {
         this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
         this.worldDebugGraphics.stroke(0x999999);
 
-        this.pixelLayer.render();
-        this.bgLayer.render();
+        for (const layer of PixelLayer.renderLayers) {
+            layer.render();
+        }
 
 
         const address = "http://localhost:3000/state.json";
@@ -392,8 +423,8 @@ export class Game {
                     this.loadScene("Scene");
                 }
             }
-            if(this.input.keyDown("r")) {
-                this.weather.weatherData.rainBuildup+=2;
+            if (this.input.keyDown("r")) {
+                this.weather.weatherData.rainBuildup += 2;
             }
 
             if (this.input.key("control")) {
@@ -423,7 +454,12 @@ export class Game {
                 text = "";
                 Object.entries(this.weather.weatherData).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
                 columns.push({ title: "Weather", text: text });
-                this.tooltip.hover({ title: "Debug data" }, { text: "X: " + Math.floor(this.worldMouse.x) + " // Y: " + Math.floor(this.worldMouse.y),highlight:true }, { columns: columns })
+                this.tooltip.hover(
+                    { title: "Debug data" },
+                    { text: "X: " + Math.floor(this.worldMouse.x) + " // Y: " + Math.floor(this.worldMouse.y), highlight: true },
+                    { text: "" + game.pixelLayer.sprite.x },
+                    { columns: columns }
+                )
             }
             if (this.selectedSeed) {
                 this.tooltip.hover({ text: "SEED: " + this.selectedSeed });
