@@ -11,7 +11,7 @@ const array = [
 export type Uniform = { type: string, value: any };
 export type Uniforms = { [name: string]: Uniform };
 export class ShaderMesh extends Mesh {
-    constructor(texture: Texture, vert: string, frag: string, customUniforms: Uniforms = {}, typ: string = "f32") {
+    constructor(texture: Texture, vert: string, frag: string, customUniforms: Uniforms = {}) {
         const mesh = new MeshGeometry({
             positions: new Float32Array(array),
             uvs: new Float32Array(array),
@@ -26,11 +26,7 @@ export class ShaderMesh extends Mesh {
         });
 
         super({ geometry: mesh, shader: shader as any });
-        this.geometry.positions = new Float32Array([
-            -texture.width / 2, -texture.height,
-            -texture.width / 2, 0,
-            texture.width / 2, 0,
-            texture.width / 2, -texture.height]);
+        this.resize(texture.width, texture.height);
         this.scale.set(1);
         //console.log(game.app.renderer.globalUniforms.bindGroup);
     }

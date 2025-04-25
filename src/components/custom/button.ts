@@ -15,7 +15,7 @@ export class Button extends Component {
     }
 
     override init(): void {
-        game.player.position.set(...this.transform.position.xy());
+        //game.player.position.set(...this.transform.position.xy());
     }
 
     override toData(): ComponentData {

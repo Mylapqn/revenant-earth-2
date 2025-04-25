@@ -106,6 +106,8 @@ export class Vector {
         return "[X: " + this.x.toFixed(3) + " Y: " + this.y.toFixed(3) + "]";
     }
 
+    
+
     /**
      * @param {Vector} v1
      * @param {Vector} v2

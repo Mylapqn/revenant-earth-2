@@ -10,7 +10,7 @@ import { Atmo } from "./world/atmo";
 import { UIProgressBar } from "./ui/progressBar";
 
 export class Player implements ISerializable {
-    position = new Vector(800, 0);
+    position = new Vector(1100, -50);
     sprite: Sprite;
     playerHitbox: Ellipse;
     graphics: Graphics;
@@ -131,8 +131,8 @@ export class Player implements ISerializable {
             limb.origin.y = -offset;
         }
         //console.log(this.limbSystem.limbGroups[0].passingPhase);
-        this.pixelLayer.sprite.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
-        this.pixelLayer.sprite.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
+        this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
+        this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();
 
         this.graphics.clear();

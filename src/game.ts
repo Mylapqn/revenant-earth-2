@@ -233,7 +233,7 @@ export class Game {
             },
         ];
 
-        this.bgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.bgContainer });
+        this.bgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.bgContainer,worldSpace:false });
         const a = new Sprite(await Assets.load("./tree.png"));
         a.scale.set(1);
         this.bgLayer.container.addChild(a);
@@ -243,16 +243,15 @@ export class Game {
             const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.bgContainer });
             this.bgLayers.push(bgl);
             const bgg = new Graphics({ parent: bgl.container });
-            let y = 100;
+            let y = 0;
             bgg.moveTo(0,1000);
             bgg.lineTo(0,y);
             const width = 256;
             for (let t = 0; t < width; t++) {
                 y += (Math.random()-.5)*5;
-                bgg.lineTo(t*10,y);
-                
+                bgg.lineTo(t*5,y);
             }
-            bgg.lineTo(width*1,1000);
+            bgg.lineTo(width*5,1000);
             bgg.fill(new CustomColor(255*i / layers,255*i / layers,255*i / layers));
         }
 
@@ -269,6 +268,8 @@ export class Game {
         this.worldDebugGraphics.scale.set(Game.pixelScale);
 
         this.player = new Player();
+        this.camera.position.set(this.player.position.x*Game.pixelScale, this.player.position.y*Game.pixelScale);
+
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
 

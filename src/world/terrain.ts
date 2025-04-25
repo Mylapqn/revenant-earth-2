@@ -57,13 +57,13 @@ export class Terrain implements ISerializable, ISceneObject {
         let lastHeight = 0;
         for (let index = 0; index < 1000; index++) {
             lastHeight += Math.random() * 5 - 2.5;
-            this.terrainMesh.push(new TerrainNode(20 * index, lastHeight + 100));
+            this.terrainMesh.push(new TerrainNode(20 * index, lastHeight));
         }
 
         let index = 0;
         for (const element of this.terrainMesh) {
             index++;
-            if (index > 25 && index < 50) element.add({ x: 0, y: -1000 });
+            if (index > 25 && index < 50) element.add({ x: 0, y: -100 });
         }
 
         for (let index = 0; index < this.totalWidth; index += this.dataWidth) {
