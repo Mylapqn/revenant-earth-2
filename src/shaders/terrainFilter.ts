@@ -1,6 +1,6 @@
 import { defaultFilterVert, Filter, GlProgram } from "pixi.js";
 import vertex from "./vert.vert?raw";
-import fragment from "./terrain.frag?raw";
+import fragment from "./background.frag?raw";
 
 export class TerrainFilter extends Filter {
     constructor(depth: number) {

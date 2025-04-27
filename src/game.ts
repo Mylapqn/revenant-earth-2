@@ -402,7 +402,7 @@ export class Game {
                     this.selectedSeed = array[index];
                 }
             }
-            if (this.input.keyDown("q")) {
+            /*if (this.input.keyDown("q")) {
                 let out = this.stateManager.serialise(StateMode.full);
                 htcrudSave(address, out);
             }
@@ -411,7 +411,7 @@ export class Game {
                 htcrudLoad(address).then((data) => {
                     this.stateManager.deserialise(data);
                 });
-            }
+            }*/
 
             if (this.input.keyDown("ě")) {
                 if (this.activeScene.name != "Scene 2") {
@@ -426,6 +426,11 @@ export class Game {
             }
             if (this.input.keyDown("r")) {
                 this.weather.weatherData.rainBuildup += 2;
+            }
+            if (this.input.keyDown("q")) {
+                this.terrain.inspectMode ++;
+                if(this.terrain.inspectMode >= Terrain.inspectModes.length) this.terrain.inspectMode = 0;
+                new ParticleText(Terrain.inspectModes[this.terrain.inspectMode], this.player.position);
             }
 
             if (this.input.key("control")) {

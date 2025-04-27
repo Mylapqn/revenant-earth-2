@@ -15,6 +15,7 @@ export class Input {
         window.addEventListener("keyup", e => this.onKeyUp(e));
     }
     onKeyDown(e: KeyboardEvent) {
+        if (e.repeat) return;
         const key = e.key.toLowerCase();
         this.heldKeys.set(key, true);
         this.keysDown.set(key, true);

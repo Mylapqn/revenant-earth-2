@@ -4,9 +4,9 @@ import { PixelSprite } from "./pixelSprite";
 import { TerrainFilter } from "../shaders/terrainFilter";
 import { lerp } from "../utils/utils";
 import { ShaderMesh } from "../shaders/shaderMesh";
-import vertex from "../shaders/vert.vert?raw";
-import terrain from "../shaders/terrain.frag?raw";
-import fragment from "../shaders/frag.frag?raw";
+import vertexShaderDefault from "../shaders/vert.vert?raw";
+import fragmentShaderBackground from "../shaders/background.frag?raw";
+import fragmentShaderDefault from "../shaders/frag.frag?raw";
 
 export type PixelLayerOptions = ({
     autoResize: true;
@@ -53,7 +53,7 @@ export class PixelLayer {
         this.sprite.scale.set(Game.pixelScale);
         this.depth = options.depth ?? 1;
         this.autoRender = options.autoRender ?? true;
-        this.renderMesh = new ShaderMesh(this.renderTexture, vertex, (this.depth < 1 && this.worldSpace) ? terrain : fragment, {
+        this.renderMesh = new ShaderMesh(this.renderTexture, vertexShaderDefault, (this.depth < 1 && this.worldSpace) ? fragmentShaderBackground : fragmentShaderDefault, {
             uDepth: { type: "f32", value: this.depth },
             uPosition: { type: "vec2<f32>", value: new Float32Array([0, 0]) }
         });

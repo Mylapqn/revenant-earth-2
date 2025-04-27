@@ -195,7 +195,7 @@ export class Plant extends Component {
     }
 
     drawPlant() {
-        let hit = game.collisionSystem.raycast(this.entity.transform.position.result().add({ x: 0, y: -50 }), this.entity.transform.position.result().add({ x: 0, y: 100 }), (body) => { return body.userData?.terrain });
+        let hit = game.collisionSystem.raycast(this.entity.transform.position.result().add({ x: 0, y: -200 }), this.entity.transform.position.result().add({ x: 0, y: 200 }), (body) => { return body.userData?.terrain });
         if (hit) {
             this.entity.transform.position.y = hit.point.y;
         }

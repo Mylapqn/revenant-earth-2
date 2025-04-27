@@ -142,14 +142,14 @@ export class Player implements ISerializable {
         this.graphics.position = new Vector(32, 32 - offset);
 
         this.graphics.circle(0, -17, 3);
-        this.graphics.fill(0x4477aa);
+        this.graphics.fill(0x000000);
         this.graphics.moveTo(0, offset);
         this.graphics.lineTo(0, -14);
         this.graphics.moveTo(-1, 0);
         this.graphics.lineTo(-2, -12);
         this.graphics.lineTo(2, -12);
         this.graphics.lineTo(1, 0);
-        this.graphics.stroke({ color: 0x4477aa, width: 2 });
+        this.graphics.stroke({ color: 0x000000, width: 2 });
         this.legGraphics.clear();
         for (const limb of this.limbSystem.limbs) {
             this.legGraphics.moveTo(limb.origin.x, limb.origin.y);
@@ -159,7 +159,7 @@ export class Player implements ISerializable {
             vec.add(limb.target.result().sub(limb.end).normalize(4));
             this.legGraphics.lineTo(vec.x, vec.y);
             //let col = limb.group == this.limbSystem.limbGroups[1] ? 0xff0000 : 0x0000ff;
-            this.legGraphics.stroke({ color: 0x4477aa, width: 2 });
+            this.legGraphics.stroke({ color: 0x000000, width: 2 });
             if (limb.moving) {
                 this.legGraphics.circle(limb.target.x, limb.target.y, 3);
                 this.legGraphics.stroke({ color: 0xffff00, width: 1 });

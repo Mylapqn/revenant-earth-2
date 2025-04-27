@@ -11,7 +11,7 @@ export class Atmo implements ISerializable, ISceneObject {
     updateTimer = 0;
     updateRate = 0;
 
-    co2 = 500;
+    co2 = 600;
     temp = 300;
 
     get celsius() {

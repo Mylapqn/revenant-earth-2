@@ -36,14 +36,16 @@ float snoise(vec2 v) {
     return 130.0f * dot(m, g);
 }
 
-float fractalNoise(vec2 uv, int octaves, float lacunarity) {
+float fractalNoise(vec2 uv, int octaves, float lacunarity, float roughness) {
     float base = 0.5f;
     float scale = 1.f;
+    float contribution = 1.f;
     for(int i = 0; i < octaves; i++) {
-        float result = snoise(uv * scale) - .0f;
+        float result = snoise(uv * scale);
+        result *= .3f*contribution;
+        base += result;
         scale *= lacunarity;
-        result *= .2f;
-        base += result * (float(octaves - i) / float(octaves));
+        contribution *= roughness;
     }
     return base;
 }
@@ -84,11 +86,8 @@ void main() {
     vec2 sunPosition = uSunPosition;
     sunPosition.x /= ratio;
     vec2 originalUV = uv;
-    color = texture(uSampler, uv);
-    color = vec4(1.f);
-    color = vec4(uv, snoise(uv), 1.f);
     uv = perspectiveUV(originalUV, 1.f);
-    float noise1 = fractalNoise(uv, 8, 2.f);
+    float noise1 = fractalNoise(uv, 5, 2.f,.8*(1.-originalUV.y*.5));
     //vec2 puv = perspectiveUV(originalUV,.5f);
     //float noise2 = fractalNoise(puv, 8, 2.f);
     float noise = noise1;
@@ -110,5 +109,6 @@ void main() {
     //if(noise1 < .5) cloudColor += .03;
     color = vec4(mix(sky, cloudColor, noise), 1.f);
     color.rgb = PBRNeutralToneMapping(color.rgb);
+    //color.rgb = vec3(noise1);
     //color = vec4(uClouds,uClouds,uClouds,1.);
 }

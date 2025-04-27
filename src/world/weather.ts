@@ -42,12 +42,10 @@ export class Weather implements ISerializable, ISceneObject {
         if (this.weatherData.rainIntensity > 0) {
             const rainMult = this.weatherData.rainBuildup / this.weatherData.rainThreshold + .1;
             this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity;
-            const pos = game.camera.worldPosition.x + (Math.random() - .5);
+            const pos = game.camera.worldPosition.x + (Math.random() - .5) *game.camera.pixelScreen.x * 1.5;
             if (pos > 0) {
-                const tdata = game.terrain.getProperties(game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5);
-                if (tdata.moisture < 2) {
-                    tdata.moisture += dt * this.weatherData.rainIntensity * rainMult * 10;
-                }
+                game.terrain.addMoisture(pos, dt * this.weatherData.rainIntensity * rainMult);
+                game.atmo.energy(dt * this.weatherData.rainIntensity * rainMult * 10000, "condensation");
             }
             if (this.weatherData.rainBuildup < 0) {
                 this.weatherData.rainBuildup = 0;
