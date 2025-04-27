@@ -1,6 +1,6 @@
 import { Transform } from "../components/generic/transfrom";
 import { Component, ComponentData, Constructor } from "./component";
-import { Scene } from "./scene";
+import { ISceneObject, Scene } from "./scene";
 import { ISerializable, KindedObject, StateMode } from "./serialise";
 
 export type KnownEvents = {
@@ -14,7 +14,7 @@ export type KnownEvents = {
 
 export type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void;
 
-export class Entity implements ISerializable {
+export class Entity implements ISerializable, ISceneObject {
     id: number;
     components = new Map<number, Component>();
     typeLookup = new Map<Constructor<Component>, Set<Component>>();
@@ -94,6 +94,7 @@ export class Entity implements ISerializable {
     }
 
     remove() {
+        this.scene?.unregister(this);
         for (const component of this.components.values()) {
             component.remove();
         }
@@ -123,6 +124,7 @@ export class Entity implements ISerializable {
         }
 
         scene?.register(entity);
+        entity.scene = scene;
         return entity;
     }
 
@@ -146,6 +148,7 @@ export class Entity implements ISerializable {
     static deserialise(deserialise: any, scene?: Scene) {
         const entity = Entity.fromData(deserialise as EntityData);
         scene?.register(entity);
+        if(scene) entity.scene = scene;
     }
 
     serialise(mode: StateMode): KindedObject | false {
