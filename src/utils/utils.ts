@@ -1,3 +1,5 @@
+import { Geometry } from "pixi.js";
+
 export class RandomGenerator {
     seed: number = 0;
     constructor(seed: number = Math.random()*1000) {
@@ -29,10 +31,12 @@ export function lerp(a: number, b: number, t: number) {
     return a + (b - a) * t;
 }
 
-export function clamp(n: number) {
-    return Math.min(1, Math.max(0, n));
+export function clamp(n: number,min = 0,max = 1) {
+    return Math.min(max, Math.max(min, n));
 }
 
 export function displayNumber(n: number, digits = 2) {
     return parseFloat(n.toFixed(digits)).toString();
 }
+
+export const placeholderGeometry = new Geometry({ attributes: { aPosition: [0, 1], aUV: [0, 1] } });

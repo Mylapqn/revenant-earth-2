@@ -21,9 +21,9 @@ export class Weather implements ISerializable, ISceneObject {
     constructor() {
         game.activeScene.register(this);
         this.cloudMesh = new CloudMesh(Texture.WHITE);
-        game.bgLayer.container.addChild(this.cloudMesh);
+        game.skyLayer.container.addChild(this.cloudMesh);
         //TODO fix cloud uvs so they look the same on different aspect ratios
-        game.bgLayer.onResize = (width, height) => { this.cloudMesh.resize(width, height) }
+        game.skyLayer.onResize = (width, height) => { this.cloudMesh.resize(width, height) }
         this.cloudMesh.resize(game.camera.pixelScreen.x + 1, game.camera.pixelScreen.y + 1)
     }
     serialise(mode: StateMode): KindedObject | false {

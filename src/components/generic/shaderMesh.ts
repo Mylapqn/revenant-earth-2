@@ -25,7 +25,7 @@ export class ShaderMeshRenderer extends Component {
         this.container.position.set(0,0);
         this.renderTexture = RenderTexture.create({ width: 32, height: 32, antialias: false, scaleMode: 'nearest' });
         this.renderMesh = new FoliageMesh(this.renderTexture);
-        game.pixelLayer.container.addChild(this.renderMesh);
+        game.foliageContainer.addChild(this.renderMesh);
     }
 
     override remove() {

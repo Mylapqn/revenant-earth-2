@@ -10,7 +10,8 @@ import { Input, MouseButton } from "../input";
 
 import vertex from "../shaders/terrainSurface.vert?raw";
 import fragment from "../shaders/terrainSurface.frag?raw";
-import { lerp } from "../utils/utils";
+import { placeholderGeometry, lerp } from "../utils/utils";
+import { HitboxGeometry } from "../shaders/hitboxMesh";
 
 export enum TerrainInspectMode {
     none = 0,
@@ -44,7 +45,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.graphics = new Graphics();
         this.terrainMesh = new TerrainMesh();
         this.surfaceMesh = new Mesh({
-            geometry: new Geometry({ attributes: { aPosition: [0, 1], aUV: [0, 1] } }), shader: new Shader({
+            geometry: placeholderGeometry, shader: new Shader({
                 glProgram: new GlProgram({ vertex, fragment }),
                 resources: {
                     group: {
@@ -300,11 +301,8 @@ export class Terrain implements ISerializable, ISceneObject {
             this.graphics.lineTo(node.x, node.y);
         }
 
-        this.graphics.fill(0x000000);
-        //this.graphics.stroke({ color: 0x889944, alpha: 1, width: 1 });
+        this.graphics.fill(0x050403);
 
-        const positions: number[] = [];
-        const uvs: number[] = [];
         const terrainStats: number[] = [];
         const terrainInspect: number[] = [];
         const depth = 30;
@@ -314,53 +312,30 @@ export class Terrain implements ISerializable, ISceneObject {
             const node = this.hitbox.points[i];
             //const x = Math.round(node.x / this.dataWidth) * this.dataWidth;
             const data = this.getProperties(node.x);
-            const tangentLeft = this.hitbox.points[i].clone().sub(this.hitbox.points[i - 1]).normalize();
-            const tangentRight = this.hitbox.points[i + 1].clone().sub(this.hitbox.points[i]).normalize();
-            const normal = tangentLeft.add(tangentRight).normalize();
-            normal.rotate(Math.PI / 2);
-            //this.graphics.moveTo(node.x, node.y);
-            //this.graphics.lineTo(node.x + normal.x, node.y + normal.y);
-            const camDiff = new Vector((node.x - game.camera.position.x/Game.pixelScale), (node.y - game.camera.position.y/Game.pixelScale));
-            camDiff.mult(.1);
 
-            positions.push(node.x, node.y, node.x + normal.x * depth + camDiff.x, node.y + normal.y * depth + camDiff.y);
-            uvs.push((this.initialIndex + i) * uvWidth, 0, (this.initialIndex + i) * uvWidth, 1);
             terrainStats.push(data.moisture, data.fertility, data.erosion);
             terrainStats.push(data.moisture, data.fertility, data.erosion);
 
             let inspect = 0;
             if (this.inspectMode != 0) inspect = this.getProperties(node.x)[Terrain.inspectModes[this.inspectMode] as keyof TerrainData];
             if (this.inspectMode == TerrainInspectMode.pollution || this.inspectMode == TerrainInspectMode.erosion) inspect = 1 - inspect;
+
             terrainInspect.push(inspect);
             terrainInspect.push(inspect);
-
-            /* this.graphics.lineTo(node.x - normal.x * data.moisture * 5, node.y - normal.y * data.moisture * 5);
-
-            let r = Math.floor(Math.max(0, Math.min(1, (1 - data.fertility) * 2)) * 255)
-                .toString(16)
-                .padStart(2, "0");
-            let g = Math.floor(Math.max(0, Math.min(1, data.fertility * 2)) * 255)
-                .toString(16)
-                .padStart(2, "0");
-            let b = Math.floor(Math.max(0, Math.min(1, data.moisture * 2)) * 255)
-                .toString(16)
-                .padStart(2, "0");
-            b = "00";
-
-            this.graphics.stroke({ color: `0x${r}${g}${b}`, alpha: 1, width: 1 }); */
         }
-        const meshGeometry = new Geometry({ attributes: { aPosition: positions, aUV: uvs, aTerrainStats: terrainStats, aTerrainInspect: terrainInspect }, topology: "triangle-strip" });
-        //const mesh = new Mesh({ geometry: meshGeometry, shader: new Shader({ glProgram: new GlProgram({ vertex, fragment }) }) });
-        //game.terrainContainer.addChild(mesh);
-        this.surfaceMesh.geometry = meshGeometry;
-        this.surfaceMesh.shader!.resources.group.uniforms.uInspectMode = this.inspectMode != 0 ? 1 : 0;
 
-        /*for (let index = -20; index < 20; index++) {
-            const x = (Math.round(game.player.position.x / this.dataWidth) + index) * this.dataWidth
-            const data = this.getProperties(x);
-            this.graphics.rect(x, game.player.position.y - 500, this.dataWidth, 1000);
-            this.graphics.fill({ color: 0x00ff00, alpha: data.fertility });
-        }*/
+        const hitboxGeometry = new HitboxGeometry({
+            points: this.hitbox.points,
+            uvOffset: this.initialIndex,
+            depth: depth,
+            perspectiveDepth: 0.1,
+            customAttributes: {
+                aTerrainStats: terrainStats, aTerrainInspect: terrainInspect
+            },
+        });
+
+        this.surfaceMesh.geometry = hitboxGeometry;
+        this.surfaceMesh.shader!.resources.group.uniforms.uInspectMode = this.inspectMode != 0 ? 1 : 0;
     }
 
     changeFixer(affectedNodes: Set<TerrainNode>) {
@@ -379,8 +354,10 @@ export class Terrain implements ISerializable, ISceneObject {
             if (node.y > effectBB.y) effectBB.y = node.y;
         }
 
-        this.graphics.rect(effectAA.x, effectAA.y, effectBB.x - effectAA.x, effectBB.y - effectAA.y);
-        this.graphics.stroke({ color: 0xff0000, width: 1 });
+        if(game.debugView){
+            this.graphics.rect(effectAA.x, effectAA.y, effectBB.x - effectAA.x, effectBB.y - effectAA.y);
+            this.graphics.stroke({ color: 0xff0000, width: 1 });
+        }
         game.app.render();
         const relevantNodes = new Array<Vector>();
 

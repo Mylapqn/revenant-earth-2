@@ -36,6 +36,7 @@ export class Game {
     static pixelScale = 4;
 
     elapsedTime = 0;
+    debugView = false;
 
     app: Application;
     input: Input;
@@ -53,16 +54,18 @@ export class Game {
 
     player!: Player;
     pixelLayer!: PixelLayer;
+    entityContainer!: Container;
     terrainContainer!: Container;
     playerContainer!: Container;
     foliageContainer!: Container;
+    skyContainer!: Container;
     bgContainer!: Container;
     mainContainer!: Container;
     fgContainer!: Container;
     worldDebugGraphics!: Graphics;
     weatherContainer!: Container;
 
-    bgLayer!: PixelLayer;
+    skyLayer!: PixelLayer;
     bgLayers: PixelLayer[] = [];
 
     collisionSystem!: System;
@@ -132,7 +135,7 @@ export class Game {
         );
 
 
-        this.bgContainer = new Container({ parent: this.app.stage });
+        this.skyContainer = new Container({ parent: this.app.stage });
         this.mainContainer = new Container({ parent: this.app.stage });
         this.fgContainer = new Container({ parent: this.app.stage });
         this.collisionSystem = new System();
@@ -233,26 +236,26 @@ export class Game {
             },
         ];
 
-        this.bgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.bgContainer,worldSpace:false });
+        this.skyLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.skyContainer, worldSpace: false });
         const a = new Sprite(await Assets.load("./tree.png"));
         a.scale.set(1);
-        this.bgLayer.container.addChild(a);
+        this.skyLayer.container.addChild(a);
 
         const layers = 5;
         for (let i = 0; i < layers; i++) {
-            const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.bgContainer });
+            const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.skyContainer });
             this.bgLayers.push(bgl);
             const bgg = new Graphics({ parent: bgl.container });
             let y = 0;
-            bgg.moveTo(0,1000);
-            bgg.lineTo(0,y);
+            bgg.moveTo(0, 1000);
+            bgg.lineTo(0, y);
             const width = 256;
             for (let t = 0; t < width; t++) {
-                y += (Math.random()-.5)*5;
-                bgg.lineTo(t*5,y);
+                y += (Math.random() - .5) * 5;
+                bgg.lineTo(t * 5, y);
             }
-            bgg.lineTo(width*5,1000);
-            bgg.fill(new CustomColor(255*i / layers,255*i / layers,255*i / layers));
+            bgg.lineTo(width * 5, 1000);
+            bgg.fill(new CustomColor(255 * i / layers, 255 * i / layers, 255 * i / layers));
         }
 
 
@@ -261,6 +264,8 @@ export class Game {
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
+        this.pixelLayer.container.addChild((this.bgContainer = new Container()));
+        this.pixelLayer.container.addChild((this.entityContainer = new Container()));
         this.pixelLayer.container.addChild((this.terrainContainer = new Container()));
         this.pixelLayer.container.addChild((this.foliageContainer = new Container()));
         this.pixelLayer.container.addChild((this.weatherContainer = new Container()));
@@ -268,7 +273,7 @@ export class Game {
         this.worldDebugGraphics.scale.set(Game.pixelScale);
 
         this.player = new Player();
-        this.camera.position.set(this.player.position.x*Game.pixelScale, this.player.position.y*Game.pixelScale);
+        this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
 
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
@@ -301,7 +306,7 @@ export class Game {
                     {
                         componentType: "Transform",
                         data: {
-                            position: { x: 100, y: 100 },
+                            position: { x: 1000, y: -5 },
                         },
                     },
                     {
@@ -359,6 +364,7 @@ export class Game {
         this.activeScene.draw(dt);
 
         if (this.input.key("control")) {
+            this.debugView = true;
             for (let x = 0; x < this.terrain.nodes.length; x++) {
                 const node = this.terrain.nodes[x];
                 const tdata = this.terrain.getProperties(node.x);
@@ -367,6 +373,9 @@ export class Game {
                 this.worldDebugGraphics.circle(node.x, node.y, adata.pollution * 10);
                 this.worldDebugGraphics.stroke({ width: 1, color: new Color({ r: 255, g: 100, b: 0, a: 1 }) });
             }
+        }
+        else {
+            this.debugView = false;
         }
 
 
@@ -428,8 +437,8 @@ export class Game {
                 this.weather.weatherData.rainBuildup += 2;
             }
             if (this.input.keyDown("q")) {
-                this.terrain.inspectMode ++;
-                if(this.terrain.inspectMode >= Terrain.inspectModes.length) this.terrain.inspectMode = 0;
+                this.terrain.inspectMode++;
+                if (this.terrain.inspectMode >= Terrain.inspectModes.length) this.terrain.inspectMode = 0;
                 new ParticleText(Terrain.inspectModes[this.terrain.inspectMode], this.player.position);
             }
 

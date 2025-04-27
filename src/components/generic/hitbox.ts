@@ -1,4 +1,4 @@
-import { Assets, Graphics, Sprite, Texture } from "pixi.js";
+import { Assets, GlProgram, Graphics, Mesh, Shader, Sprite, Texture, TilingSprite } from "pixi.js";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
@@ -6,6 +6,11 @@ import { SpriteDirection } from "./spriteDirection";
 import { Polygon, SATVector } from "detect-collisions";
 import { Vector, Vectorlike } from "../../utils/vector";
 import { decomp, makeCCW, quickDecomp } from "poly-decomp-es";
+import { placeholderGeometry } from "../../utils/utils";
+
+import vertex from "../../shaders/vert.vert?raw";
+import fragment from "../../shaders/frag.frag?raw";
+import { HitboxGeometry } from "../../shaders/hitboxMesh";
 
 
 
@@ -17,6 +22,11 @@ export class Hitbox extends Component {
     graphics: Graphics;
     isInterior = false;
     directionComponent?: SpriteDirection;
+    refreshRender = true;
+    hitboxMesh;
+    edgeTexture!:Texture;
+    bgTexture!:Texture;
+    bgSprite:TilingSprite;
 
     constructor(entity: Entity) {
         super(entity);
@@ -24,6 +34,28 @@ export class Hitbox extends Component {
         this.onEntity("draw", (dt) => this.draw(dt));
         this.onEntity("update", (dt) => this.update(dt));
         this.polygons = [];
+        this.edgeTexture = Texture.WHITE;
+        this.bgTexture = Texture.WHITE;
+        this.bgSprite = new TilingSprite({texture: this.bgTexture, width:10000, height:10000});
+        this.bgSprite.position.set(-1000, -1000);
+        this.hitboxMesh = new Mesh({
+            geometry: placeholderGeometry, shader: new Shader({
+                glProgram: new GlProgram({ vertex, fragment }),
+                resources: {
+                    uSampler: Texture.WHITE.source,
+                }
+            })
+        });
+        Assets.load("floor.png").then((texture) => {
+            this.edgeTexture = texture;
+            this.edgeTexture.source.scaleMode = "nearest";
+            this.edgeTexture.source.wrapMode = "repeat";
+            this.hitboxMesh.shader!.resources.uSampler = this.edgeTexture.source
+        });
+        Assets.load("interior_bg.png").then((texture) => {
+            this.bgTexture = texture;
+            this.bgSprite.texture = this.bgTexture;
+        });
     }
 
     override toData(): ComponentData {
@@ -33,11 +65,13 @@ export class Hitbox extends Component {
 
     override applyData(data: { nodes: Vectorlike[], interior?: boolean }): void {
         this.isInterior = data.interior ?? false;
-        this.nodes = data.nodes.map(node => ({ x: node.x * 10, y: node.y * 10 }));
+        this.nodes = data.nodes.map(node => ({ x: node.x * 20, y: node.y * 20 }));
         //this.nodes = data.nodes;
         this.originalNodes = data.nodes;
 
+        game.bgContainer.addChild(this.bgSprite);
         game.pixelLayer.container.addChild(this.graphics);
+        game.pixelLayer.container.addChild(this.hitboxMesh);
 
         if (this.isInterior)
             this.nodes = this.interiorHitbox();
@@ -54,6 +88,8 @@ export class Hitbox extends Component {
 
     override remove() {
         this.graphics.destroy();
+        this.hitboxMesh.destroy();
+        this.bgSprite.destroy();
         for (const polygon of this.polygons) {
             game.collisionSystem.remove(polygon);
         }
@@ -65,6 +101,8 @@ export class Hitbox extends Component {
     }
 
     draw(dt: number) {
+        if (!this.refreshRender) //return;
+            this.refreshRender = false;
         //if (this.directionComponent != undefined) this.sprite.scale.x = this.directionComponent.direction;
         //this.sprite.position.set(this.transform.position.x, this.transform.position.y);
         this.graphics.clear();
@@ -76,15 +114,22 @@ export class Hitbox extends Component {
             }
             this.graphics.lineTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
             this.graphics.fill(0x000000, 1);
-            this.graphics.stroke({ color: 0xff0000, width: 1, alpha: .1 });
+            //this.graphics.stroke({ color: 0xff0000, width: 1, alpha: .1 });
         }
 
-        this.graphics.moveTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
+/*         this.graphics.moveTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
         for (let i = 0; i < this.nodes.length - (this.isInterior ? 6 : 0); i++) {
             this.graphics.lineTo(this.nodes[i].x + this.transform.position.x, this.nodes[i].y + this.transform.position.y);
         }
         this.graphics.lineTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
-        this.graphics.stroke({ color: 0x00ff00, width: 1 });
+        this.graphics.stroke({ color: 0x00ff00, width: 1 }); */
+        const hbGeo = new HitboxGeometry({
+            points: this.nodes.map(node => new SATVector(node.x + this.transform.position.x, node.y + this.transform.position.y)),
+            depth: this.edgeTexture.height,
+            perspectiveDepth: 0,
+            UVWidth:this.edgeTexture.width
+        });
+        this.hitboxMesh.geometry = hbGeo;
 
 
     }

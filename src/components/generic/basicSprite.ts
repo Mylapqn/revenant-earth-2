@@ -25,7 +25,7 @@ export class BasicSprite extends Component {
     override applyData(data: { asset: string }): void {
         this.asset = data.asset;
         this.sprite = new Sprite(Texture.EMPTY);
-        game.pixelLayer.container.addChild(this.sprite);
+        game.entityContainer.addChild(this.sprite);
         this.sprite.anchor.set(0.5);
         Assets.load(data.asset).then((texture) => {
             this.sprite.texture = texture;

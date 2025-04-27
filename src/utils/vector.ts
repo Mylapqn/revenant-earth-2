@@ -127,11 +127,11 @@ export class Vector {
         return new Vector(v.x, v.y);
     }
 
-    static cross(v1: Vector, v2: Vector): number {
+    static cross(v1: Vectorlike, v2: Vectorlike): number {
         return v1.x * v2.y - v1.y * v2.x;
     }
 
-    static add(v1: Vector, v2: Vector): Vector {
+    static add(v1: Vectorlike, v2: Vectorlike): Vector {
         return new Vector(v1.x + v2.x, v1.y + v2.y);
     }
     static dot(v1: Vectorlike, v2: Vectorlike): number {
