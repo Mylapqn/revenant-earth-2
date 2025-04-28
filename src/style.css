@@ -5,6 +5,12 @@
     --hacking-color-muted: rgba(12, 189, 33, 0.5);
 }
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 @font-face {
     font-family: "monogram";
     src: url(public/font/monogram.ttf) format("truetype");
@@ -141,6 +147,7 @@ body {
 #tooltip .panel.title {
     background-color: #0C68D6;
 }
+
 #tooltip .panel.highlight {
     background-color: #3d4955;
 }
@@ -177,4 +184,109 @@ body {
     height: 100%;
     background-color: rgb(98, 149, 216);
     border-right: 2px solid white;
+}
+
+.fullscreenMenu {
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #18467E;
+    background: radial-gradient(circle, #1E3753 0%, #0D1825 80%);
+    background: radial-gradient(circle, #194880 0%, #12335C 80%);
+    mask-image: radial-gradient(black 50%, transparent 51%);
+    mask-repeat: no-repeat;
+    mask-position: 50% 50%;
+    mask-size: 0 0;
+    width: 100vw;
+    height: 100vh;
+    animation-duration: .4s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: both;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: none;
+    padding: 10px;
+}
+
+.menuAppear {
+    display: flex;
+    animation-name: menuAppear;
+}
+
+.menuHide {
+    display: flex;
+    animation-name: menuAppear2;
+    animation-direction: reverse;
+}
+
+@keyframes menuAppear {
+    0% {
+        display: none;
+        mask-size: 0 0;
+        mask-position: 50% 50%;
+    }
+
+    1% {
+        display: flex;
+    }
+
+    99% {
+        mask-size: 200vw 200vw;
+        mask-position: 50% 50%;
+    }
+
+    100% {
+        mask-size: 500vw 500vw;
+    }
+}
+
+@keyframes menuAppear2 {
+    0% {
+        display: none;
+        mask-size: 0 0;
+        mask-position: 50% 50%;
+    }
+
+    1% {
+        display: flex;
+    }
+
+    99% {
+        mask-size: 200vw 200vw;
+        mask-position: 50% 50%;
+    }
+
+    100% {
+        mask-size: 500vw 500vw;
+    }
+}
+
+.menuBG {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.menuBorder {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ffffff48;
+    padding: 10px;
+    border-radius: 2px;
+}
+
+.menuPattern {
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, #ffffff4f 8%, transparent 10%);
+    background-size: 15px 15px;
 }

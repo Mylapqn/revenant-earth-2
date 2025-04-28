@@ -29,6 +29,9 @@ import { Plant } from "./components/custom/plant";
 import { Weather } from "./world/weather";
 import { CloudMesh } from "./world/cloudMesh";
 import { CustomColor } from "./utils/color";
+import { UI } from "./ui/ui";
+import { UIFullscreenMenu } from "./ui/fullscreenMenu";
+import { sound } from "@pixi/sound";
 
 export let game: Game;
 
@@ -72,6 +75,8 @@ export class Game {
     tooltip!: UITooltip;
 
     selectedSeed?: string;
+
+    sound = sound;
 
     get worldMouse(): Vectorlike {
         return new Vector()
@@ -346,6 +351,13 @@ export class Game {
         this.weather = new Weather();
 
         this.app.ticker.add(this.update, this);
+        UI.fullscreenMenu = new UIFullscreenMenu();
+
+        this.sound.add("footstep-0", await Assets.load("./sound/muddry_footsteps/footsmuddry_1.wav"));
+        this.sound.add("footstep-1", await Assets.load("./sound/muddry_footsteps/footsmuddry_2.wav"));
+        this.sound.add("footstep-2", await Assets.load("./sound/muddry_footsteps/footsmuddry_3.wav"));
+        this.sound.add("footstep-3", await Assets.load("./sound/muddry_footsteps/footsmuddry_4.wav"));
+        this.sound.add("footstep-4", await Assets.load("./sound/muddry_footsteps/footsmuddry_5.wav"));
     }
 
     update(ticker: Ticker) {
@@ -381,8 +393,8 @@ export class Game {
 
         this.camera.update(dt);
 
-        this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
-        this.worldDebugGraphics.stroke(0x999999);
+        //this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
+        //this.worldDebugGraphics.stroke(0x999999);
 
         for (const layer of PixelLayer.renderLayers) {
             layer.render();
@@ -394,6 +406,10 @@ export class Game {
         if (this.input.keyDown("h")) {
             if (this.hacking) this.hacking = this.hacking.close();
             else this.hacking = new HackingMinigame();
+        }
+
+        if (this.input.keyDown("m")) {
+            UI.fullscreenMenu.toggle();
         }
 
         if (this.hacking) {

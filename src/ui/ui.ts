@@ -1,3 +1,5 @@
+import { UIFullscreenMenu } from "./fullscreenMenu";
+
 export class UI {
     static customElement(type: string, parent: HTMLElement, ...classes: string[]) {
         const element = document.createElement(type);
@@ -8,4 +10,5 @@ export class UI {
     static customDiv(parent: HTMLElement, ...classes: string[]) {
         return UI.customElement("div", parent, ...classes) as HTMLDivElement;
     }
+    static fullscreenMenu:UIFullscreenMenu;
 }

@@ -18,6 +18,7 @@
     "vite": "^6.0.1"
   },
   "dependencies": {
+    "@pixi/sound": "^6.0.1",
     "detect-collisions": "^9.24.0",
     "pixi.js": "^8.6.2",
     "poly-decomp-es": "^0.4.2",
