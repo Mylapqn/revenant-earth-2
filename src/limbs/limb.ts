@@ -30,7 +30,8 @@ export class Limb {
                 this.ratioRemaining = 0;
                 this.moving = false;
                 this.end = this.target.result();
-                game.sound.play("footstep-"+Math.floor(Math.random() * 5),{speed:1+Math.random()*.4});
+                //game.sound.play("footstep-"+Math.floor(Math.random() * 5),{speed:1+Math.random()*.4});
+                game.soundManager.playOneshot("footstep");
             }
             else {
                 this.end.add(moveDir.result().mult(Math.min(moveDist, (100 * dt))));

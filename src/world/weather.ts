@@ -3,8 +3,9 @@ import { Game, game } from "../game";
 import { ISceneObject, Scene } from "../hierarchy/scene";
 import { ISerializable, KindedObject, StateMode } from "../hierarchy/serialise";
 import { Vector } from "../utils/vector";
-import { RandomGenerator } from "../utils/utils";
+import { displayNumber, RandomGenerator } from "../utils/utils";
 import { CloudMesh } from "./cloudMesh";
+import { VolumeCurve } from "../sound/sound";
 
 export class Weather implements ISerializable, ISceneObject {
     weatherData: WeatherData = {
@@ -40,22 +41,34 @@ export class Weather implements ISerializable, ISceneObject {
     update(dt: number): void {
         if (this.weatherData.rainThreshold === 0) this.weatherData.rainThreshold = this.random.range(10, 40);
         if (this.weatherData.rainIntensity > 0) {
-            const rainMult = this.weatherData.rainBuildup / this.weatherData.rainThreshold + .1;
+            const rainRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
+            const rainMult = rainRatio + .01;
+            game.soundManager.soundLibrary.volume("rain_heavy", VolumeCurve.curves.rainHeavy.apply(1 - rainRatio));
+            game.soundManager.soundLibrary.volume("rain_light", VolumeCurve.curves.rainLight.apply(1 - rainRatio));
+            game.debugText += "rainRatio:      " + displayNumber(rainRatio) + "\n";
+            game.debugText += "rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)) + "\n";
+            game.debugText += "rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)) + "\n";
             this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity;
-            const pos = game.camera.worldPosition.x + (Math.random() - .5) *game.camera.pixelScreen.x * 1.5;
+            const pos = game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5;
             if (pos > 0) {
                 game.terrain.addMoisture(pos, dt * this.weatherData.rainIntensity * rainMult);
                 game.atmo.energy(dt * this.weatherData.rainIntensity * rainMult * 10000, "condensation");
             }
             if (this.weatherData.rainBuildup < 0) {
+                //stop rain
+                game.soundManager.soundLibrary.pause("rain_heavy");
+                game.soundManager.soundLibrary.pause("rain_light");
                 this.weatherData.rainBuildup = 0;
                 this.weatherData.rainIntensity = 0;
                 this.weatherData.rainThreshold = this.random.range(10, 40);
             }
         }
         else if (this.weatherData.rainBuildup > this.weatherData.rainThreshold) {
+            //start rain
             this.weatherData.rainIntensity = this.random.range(.2, 2);
-            this.rainAngle = this.random.range(-.5,.5);
+            this.rainAngle = this.random.range(-.5, .5);
+            game.soundManager.soundLibrary.play("rain_heavy");
+            game.soundManager.soundLibrary.play("rain_light");
         }
         else {
             this.weatherData.rainBuildup += dt * game.atmo.temp * .002;
@@ -78,19 +91,21 @@ export type WeatherData = {
 
 class RainRenderer {
     raindrops: RainParticle[];
+    raindropBuildup: number = 0;
     constructor() {
         this.raindrops = [];
     }
     draw(dt: number) {
         const rainSpeed = 600;
-        for (let i = 0; i < 800 * dt * game.weather.weatherData.rainIntensity * game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold; i++) {
+        this.raindropBuildup += 800 * dt * game.weather.weatherData.rainIntensity * game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold;
+        while (this.raindropBuildup > 1) {
+            this.raindropBuildup -= 1;
             const raindrop = new RainParticle(new Vector(game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2), game.weather.rainAngle);
             this.raindrops.push(raindrop);
             let hit = game.collisionSystem.raycast(raindrop.position.result().add(Vector.fromAngle(raindrop.angle).mult(-200)), raindrop.position.result().add(Vector.fromAngle(raindrop.angle).mult(500)), (body) => { return body.userData?.terrain });
             if (hit) {
                 raindrop.groundY = hit.point.y;
             }
-
         }
         for (const raindrop of [...this.raindrops]) {
             const dir = Vector.fromAngle(raindrop.angle)

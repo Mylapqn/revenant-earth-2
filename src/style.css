@@ -24,6 +24,16 @@ body {
     overflow: hidden;
 }
 
+.debugText {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: "monogram";
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    padding: 20px;
+}
+
 .hacking {
     position: absolute;
     width: 1000px;

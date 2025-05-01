@@ -32,6 +32,7 @@ import { CustomColor } from "./utils/color";
 import { UI } from "./ui/ui";
 import { UIFullscreenMenu } from "./ui/fullscreenMenu";
 import { sound } from "@pixi/sound";
+import { SoundManager } from "./sound/sound";
 
 export let game: Game;
 
@@ -75,8 +76,10 @@ export class Game {
     tooltip!: UITooltip;
 
     selectedSeed?: string;
+    debugText = "";
+    private debugTextElement = UI.customDiv(document.body, "debugText");
 
-    sound = sound;
+    soundManager = new SoundManager();
 
     get worldMouse(): Vectorlike {
         return new Vector()
@@ -352,12 +355,7 @@ export class Game {
 
         this.app.ticker.add(this.update, this);
         UI.fullscreenMenu = new UIFullscreenMenu();
-
-        this.sound.add("footstep-0", await Assets.load("./sound/muddry_footsteps/footsmuddry_1.wav"));
-        this.sound.add("footstep-1", await Assets.load("./sound/muddry_footsteps/footsmuddry_2.wav"));
-        this.sound.add("footstep-2", await Assets.load("./sound/muddry_footsteps/footsmuddry_3.wav"));
-        this.sound.add("footstep-3", await Assets.load("./sound/muddry_footsteps/footsmuddry_4.wav"));
-        this.sound.add("footstep-4", await Assets.load("./sound/muddry_footsteps/footsmuddry_5.wav"));
+        await this.soundManager.loadSounds();
     }
 
     update(ticker: Ticker) {
@@ -507,6 +505,8 @@ export class Game {
 
 
         this.input.update();
+        this.debugTextElement.innerText = this.debugText;
+        this.debugText = "";
     }
 
     loadScene(name: string) {
