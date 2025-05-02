@@ -127,7 +127,7 @@ export class Plant extends Component {
                 }
             }
             if (seedValid) {
-                let newtree = Prefab.Tree({ species: this.species.name, scene: this.entity.scene });
+                let newtree = Prefab.Plant({ species: this.species.name, scene: this.entity.scene });
                 new ParticleText("seed", this.transform.position.result().add(new Vector(0, -40)));
                 newtree.transform.position.x = seedPos;
                 newtree.transform.position.y = this.transform.position.y;

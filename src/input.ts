@@ -67,6 +67,9 @@ class Mouse {
     public getButtonUp(button: MouseButton) {
         return this.lastButtonsHeld & (1 << (button)) && !(this.buttonsHeld & (1 << (button)));
     }
+    public getButtonDown(button: MouseButton) {
+        return !(this.lastButtonsHeld & (1 << (button))) && (this.buttonsHeld & (1 << (button)));
+    }
     public getScroll() {
         return this.scroll;
     }
@@ -85,9 +88,10 @@ class Mouse {
         this.buttonsHeld = e.buttons;
     }
     mouseMove(e: MouseEvent) {
-        this.position.set(e.clientX, e.clientY);
+        const pos = { x: e.clientX, y: e.clientY };
+        this.delta.set(pos.x - this.position.x, pos.y - this.position.y);
+        this.position.set(pos, 0);
         this.pixelPosition = this.position.result().mult(1 / Game.pixelScale).floor();
-        this.delta.set(e.movementX, e.movementY);
         this.pixelDelta = this.delta.result().mult(1 / Game.pixelScale).floor();
     }
     mouseScroll(e: WheelEvent) {

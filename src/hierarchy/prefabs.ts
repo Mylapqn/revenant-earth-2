@@ -10,10 +10,11 @@ export type PrefabParams = {
 };
 export type PrefabTreeParams = { species: string } & PrefabParams;
 export class Prefab {
-    static Tree(params: PrefabTreeParams) {
+    static Plant(params: PrefabTreeParams) {
         let newtree = Entity.fromData(
             {
                 kind: "Entity",
+                name: "Plant",
                 component: [
                     {
                         componentType: "ShaderMesh",

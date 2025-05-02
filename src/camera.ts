@@ -1,3 +1,4 @@
+import { Debug } from "./dev/debug";
 import { Game, game } from "./game";
 import { lerp } from "./utils/utils";
 import { Vector, Vectorlike } from "./utils/vector";
@@ -62,7 +63,7 @@ export class Camera {
         this.offsetRemainder = this.screenPixelOffset.result().mult(1 / Game.pixelScale).sub(this.pixelOffset);
         game.playerContainer.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
         //game.terrainContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
-        game.worldDebugGraphics.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
+        Debug.graphicsWorldspace.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
 
     }
 }

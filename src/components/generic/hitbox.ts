@@ -24,9 +24,9 @@ export class Hitbox extends Component {
     directionComponent?: SpriteDirection;
     refreshRender = true;
     hitboxMesh;
-    edgeTexture!:Texture;
-    bgTexture!:Texture;
-    bgSprite:TilingSprite;
+    edgeTexture!: Texture;
+    bgTexture!: Texture;
+    bgSprite: TilingSprite;
 
     constructor(entity: Entity) {
         super(entity);
@@ -36,7 +36,7 @@ export class Hitbox extends Component {
         this.polygons = [];
         this.edgeTexture = Texture.WHITE;
         this.bgTexture = Texture.WHITE;
-        this.bgSprite = new TilingSprite({texture: this.bgTexture, width:10000, height:10000});
+        this.bgSprite = new TilingSprite({ texture: this.bgTexture, width: 10000, height: 10000 });
         this.bgSprite.position.set(-1000, -1000);
         this.hitboxMesh = new Mesh({
             geometry: placeholderGeometry, shader: new Shader({
@@ -65,25 +65,12 @@ export class Hitbox extends Component {
 
     override applyData(data: { nodes: Vectorlike[], interior?: boolean }): void {
         this.isInterior = data.interior ?? false;
-        this.nodes = data.nodes.map(node => ({ x: node.x * 20, y: node.y * 20 }));
-        //this.nodes = data.nodes;
-        this.originalNodes = data.nodes;
 
         game.bgContainer.addChild(this.bgSprite);
         game.pixelLayer.container.addChild(this.graphics);
         game.pixelLayer.container.addChild(this.hitboxMesh);
 
-        if (this.isInterior)
-            this.nodes = this.interiorHitbox();
-
-        let arrayedVerts = this.nodes.map(node => [node.x, node.y] as [number, number]);
-        makeCCW(arrayedVerts);
-        const convexPolygons = quickDecomp(arrayedVerts);
-        if (!convexPolygons) throw new Error("No convex polygons");
-
-        for (const convexPolygon of convexPolygons) {
-            this.polygons.push(game.collisionSystem.createPolygon({ x: 0, y: 0 }, convexPolygon.map(node => new SATVector(node[0], node[1]))));
-        }
+        this.applyNodes(data.nodes);
     }
 
     override remove() {
@@ -98,6 +85,28 @@ export class Hitbox extends Component {
 
     override init(): void {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
+    }
+
+    applyNodes(originalNodes: Vectorlike[]) {
+        this.originalNodes = originalNodes;
+        this.nodes = originalNodes;
+
+        for (const polygon of this.polygons) {
+            game.collisionSystem.remove(polygon);
+        }
+        this.polygons = [];
+
+        if (this.isInterior)
+            this.nodes = this.interiorHitbox();
+
+        let arrayedVerts = this.nodes.map(node => [node.x, node.y] as [number, number]);
+        makeCCW(arrayedVerts);
+        const convexPolygons = quickDecomp(arrayedVerts);
+        if (!convexPolygons) throw new Error("No convex polygons");
+
+        for (const convexPolygon of convexPolygons) {
+            this.polygons.push(game.collisionSystem.createPolygon({ x: 0, y: 0 }, convexPolygon.map(node => new SATVector(node[0], node[1]))));
+        }
     }
 
     draw(dt: number) {
@@ -117,17 +126,24 @@ export class Hitbox extends Component {
             //this.graphics.stroke({ color: 0xff0000, width: 1, alpha: .1 });
         }
 
-/*         this.graphics.moveTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
-        for (let i = 0; i < this.nodes.length - (this.isInterior ? 6 : 0); i++) {
-            this.graphics.lineTo(this.nodes[i].x + this.transform.position.x, this.nodes[i].y + this.transform.position.y);
+        /*         this.graphics.moveTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
+                for (let i = 0; i < this.nodes.length - (this.isInterior ? 6 : 0); i++) {
+                    this.graphics.lineTo(this.nodes[i].x + this.transform.position.x, this.nodes[i].y + this.transform.position.y);
+                }
+                this.graphics.lineTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
+                this.graphics.stroke({ color: 0x00ff00, width: 1 }); */
+        const points = this.nodes.map(node => new SATVector(node.x + this.transform.position.x, node.y + this.transform.position.y));
+        if(this.isInterior){
+            //remove last 3 
+            points.splice(points.length - 5, 5);
+            points.push(points[1]);
+            points.push(points[2]);
         }
-        this.graphics.lineTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
-        this.graphics.stroke({ color: 0x00ff00, width: 1 }); */
         const hbGeo = new HitboxGeometry({
-            points: this.nodes.map(node => new SATVector(node.x + this.transform.position.x, node.y + this.transform.position.y)),
+            points: points,
             depth: this.edgeTexture.height,
             perspectiveDepth: 0,
-            UVWidth:this.edgeTexture.width
+            UVWidth: this.edgeTexture.width
         });
         this.hitboxMesh.geometry = hbGeo;
 

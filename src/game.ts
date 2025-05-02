@@ -10,7 +10,6 @@ import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 import { Entity } from "./hierarchy/entity";
 import { Scene } from "./hierarchy/scene";
 import doorHitbox from "./environment/doorHitbox.json";
-import interior from "./environment/hitbox.json";
 import { initComponents } from "./components/componentIndex";
 import { ProgressDatabase } from "./hierarchy/progressDatabase";
 import { ParticleText } from "./hierarchy/particleText";
@@ -33,6 +32,8 @@ import { UI } from "./ui/ui";
 import { UIFullscreenMenu } from "./ui/fullscreenMenu";
 import { sound } from "@pixi/sound";
 import { SoundManager } from "./sound/sound";
+import { Debug } from "./dev/debug";
+import { scene2data } from "./environment/scene2data";
 
 export let game: Game;
 
@@ -66,7 +67,6 @@ export class Game {
     bgContainer!: Container;
     mainContainer!: Container;
     fgContainer!: Container;
-    worldDebugGraphics!: Graphics;
     weatherContainer!: Container;
 
     skyLayer!: PixelLayer;
@@ -76,8 +76,6 @@ export class Game {
     tooltip!: UITooltip;
 
     selectedSeed?: string;
-    debugText = "";
-    private debugTextElement = UI.customDiv(document.body, "debugText");
 
     soundManager = new SoundManager();
 
@@ -105,7 +103,7 @@ export class Game {
             if (this.input.key("control")) {
                 const nearest = this.nearestEntity(this.worldMouse);
 
-                if (nearest) DevSync.trigger(nearest.toData());
+                //if (nearest) DevSync.trigger(nearest.toData());
             }
         });
     }
@@ -117,6 +115,7 @@ export class Game {
     }
 
     async init() {
+        Debug.init();
         await Assets.load("./font/monogram.ttf");
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
@@ -158,91 +157,7 @@ export class Game {
         const s2t = new Array(1000).fill({ x: 0, y: 0 }).map((n, i) => ({ x: i * 10, y: 0 }));
         const s2td = new Array(1000).fill({ pollution: 0, fertility: 0, erosion: 0, moisture: 0 });
 
-        scene2.data = [
-            {
-                kind: "Entity",
-                component: [
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./door.png",
-                        },
-                    },
-                    {
-                        componentType: "Interactable",
-                    },
-                    {
-                        componentType: "Door",
-                        data: {
-                            target: "Scene",
-                        },
-                    },
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 40, y: 20 },
-                            velocity: { x: 0, y: 0 },
-                        },
-                    },
-                ],
-            },
-            {
-                kind: "Entity",
-                component: [
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./robo.png",
-                        },
-                    },
-                    {
-                        componentType: "Interactable",
-                    },
-                    {
-                        componentType: "Button",
-                        data: {
-                            dbName: "pollutionSpeed",
-                        },
-                    },
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 10, y: 20 },
-                            velocity: { x: 0, y: 0 },
-                        },
-                    },
-                ],
-            },
-            {
-                kind: "Entity",
-                component: [
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 40, y: 0 },
-                            velocity: { x: 0, y: 0 },
-                        },
-                    },
-                    {
-                        componentType: "Hitbox",
-                        data: {
-                            nodes: doorHitbox,
-                            interior: true,
-                        },
-                    },
-                ],
-            },
-            {
-                kind: "Player",
-                position: { x: 10, y: 0 },
-                velocity: { x: 0, y: 0 },
-            },
-            {
-                kind: "Terrain",
-                terrainMesh: [...s2t],
-                terrainData: [...s2td],
-            },
-        ];
+        scene2.data = scene2data as any;
 
         this.skyLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.skyContainer, worldSpace: false });
         const a = new Sprite(await Assets.load("./tree.png"));
@@ -277,8 +192,8 @@ export class Game {
         this.pixelLayer.container.addChild((this.terrainContainer = new Container()));
         this.pixelLayer.container.addChild((this.foliageContainer = new Container()));
         this.pixelLayer.container.addChild((this.weatherContainer = new Container()));
-        this.app.stage.addChild((this.worldDebugGraphics = new Graphics()));
-        this.worldDebugGraphics.scale.set(Game.pixelScale);
+        this.app.stage.addChild((Debug.graphicsWorldspace = new Graphics()));
+        Debug.graphicsWorldspace.scale.set(Game.pixelScale);
 
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
@@ -289,6 +204,7 @@ export class Game {
         Entity.fromData(
             {
                 kind: "Entity",
+                name: "Robo",
                 component: [
                     {
                         componentType: "SpriteDirection",
@@ -310,6 +226,7 @@ export class Game {
         Entity.fromData(
             {
                 kind: "Entity",
+                name: "Door",
                 component: [
                     {
                         componentType: "Transform",
@@ -344,8 +261,8 @@ export class Game {
             this.activeScene
         );
 
-        Prefab.Tree({ scene: this.activeScene, x: 100, y: 100, species: "Tree" });
-        Prefab.Tree({ scene: this.activeScene, x: 300, y: 100, species: "Tree" });
+        Prefab.Plant({ scene: this.activeScene, x: 100, y: 100, species: "Tree" });
+        Prefab.Plant({ scene: this.activeScene, x: 300, y: 100, species: "Tree" });
 
         this.tooltip = new UITooltip();
 
@@ -354,7 +271,7 @@ export class Game {
         this.weather = new Weather();
 
         this.app.ticker.add(this.update, this);
-        UI.fullscreenMenu = new UIFullscreenMenu();
+        UI.init();
         await this.soundManager.loadSounds();
     }
 
@@ -365,7 +282,6 @@ export class Game {
 
         this.tooltip.update(dt);
 
-        this.worldDebugGraphics.clear();
 
         for (const particleText of [...ParticleText.list]) {
             particleText.update(dt);
@@ -373,20 +289,10 @@ export class Game {
         this.activeScene.update(dt);
         this.activeScene.draw(dt);
 
-        if (this.input.key("control")) {
-            this.debugView = true;
-            for (let x = 0; x < this.terrain.nodes.length; x++) {
-                const node = this.terrain.nodes[x];
-                const tdata = this.terrain.getProperties(node.x);
-                const adata = this.atmo.getProperties(node.x);
-                if (tdata == undefined) continue;
-                this.worldDebugGraphics.circle(node.x, node.y, adata.pollution * 10);
-                this.worldDebugGraphics.stroke({ width: 1, color: new Color({ r: 255, g: 100, b: 0, a: 1 }) });
-            }
-        }
-        else {
-            this.debugView = false;
-        }
+        Debug.debugView = this.input.key("control");
+        Debug.update(dt);
+
+
 
 
         this.camera.update(dt);
@@ -456,44 +362,10 @@ export class Game {
                 new ParticleText(Terrain.inspectModes[this.terrain.inspectMode], this.player.position);
             }
 
-            if (this.input.key("control")) {
-                const nearest = this.nearestEntity(this.worldMouse);
-                if (nearest) {
-                    this.worldDebugGraphics.moveTo(nearest.transform.position.x, nearest.transform.position.y);
-                    this.worldDebugGraphics.lineTo(this.worldMouse.x, this.worldMouse.y);
-                    this.worldDebugGraphics.stroke({ color: 0x999999, width: 0.25 });
-                    const sprite = nearest.getComponent(BasicSprite);
-                    if (sprite) {
-                        this.worldDebugGraphics.rect(sprite.sprite.bounds.x + nearest.transform.position.x, sprite.sprite.bounds.y + nearest.transform.position.y, sprite.sprite.bounds.width, sprite.sprite.bounds.height);
-                        this.worldDebugGraphics.stroke(0x999999);
-                    }
-                    const hitbox = nearest.getComponent(Hitbox);
-                    if (hitbox) {
-                    }
-                }
-                const columns: TooltipPanel[] = [];
-                let text = "";
-                text += "CO2: " + displayNumber(this.atmo.co2, 2) + "\n";
-                text += "TEMP: " + displayNumber(this.atmo.celsius, 2) + "\n";
-                Object.entries(this.atmo.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                columns.push({ title: "Atmo", text: text });
-                text = "";
-                Object.entries(this.terrain.getProperties(this.worldMouse.x)).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                columns.push({ title: "Terrain", text: text });
-                text = "";
-                Object.entries(this.weather.weatherData).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
-                columns.push({ title: "Weather", text: text });
-                this.tooltip.hover(
-                    { title: "Debug data" },
-                    { text: "X: " + Math.floor(this.worldMouse.x) + " // Y: " + Math.floor(this.worldMouse.y), highlight: true },
-                    { text: "" + game.pixelLayer.sprite.x },
-                    { columns: columns }
-                )
-            }
             if (this.selectedSeed) {
                 this.tooltip.hover({ text: "SEED: " + this.selectedSeed });
                 if (this.input.mouse.getButtonUp(MouseButton.Left)) {
-                    let tree = Prefab.Tree({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
+                    let tree = Prefab.Plant({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
                     tree.getComponent(Plant)!.growth = 2;
                     this.selectedSeed = undefined;
                 }
@@ -504,9 +376,10 @@ export class Game {
         }
 
 
+        UI.update();
+
+        //clears input
         this.input.update();
-        this.debugTextElement.innerText = this.debugText;
-        this.debugText = "";
     }
 
     loadScene(name: string) {

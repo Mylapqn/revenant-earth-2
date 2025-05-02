@@ -1,8 +1,10 @@
 import { Geometry } from "pixi.js";
+import { Vector, Vectorlike } from "./vector";
+import { Entity } from "../hierarchy/entity";
 
 export class RandomGenerator {
     seed: number = 0;
-    constructor(seed: number = Math.random()*1000) {
+    constructor(seed: number = Math.random() * 1000) {
         this.seed = seed;
     }
     float() {
@@ -23,7 +25,7 @@ export class RandomGenerator {
         return ((t ^ t >>> 14) >>> 0) / 4294967296;
     }
     child() {
-        return new RandomGenerator(this.float()*10000);
+        return new RandomGenerator(this.float() * 10000);
     }
 }
 
@@ -31,7 +33,7 @@ export function lerp(a: number, b: number, t: number) {
     return a + (b - a) * t;
 }
 
-export function clamp(n: number,min = 0,max = 1) {
+export function clamp(n: number, min = 0, max = 1) {
     return Math.min(max, Math.max(min, n));
 }
 
@@ -40,3 +42,4 @@ export function displayNumber(n: number, digits = 2) {
 }
 
 export const placeholderGeometry = new Geometry({ attributes: { aPosition: [0, 1], aUV: [0, 1] } });
+

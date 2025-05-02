@@ -12,6 +12,7 @@ import vertex from "../shaders/terrainSurface.vert?raw";
 import fragment from "../shaders/terrainSurface.frag?raw";
 import { placeholderGeometry, lerp } from "../utils/utils";
 import { HitboxGeometry } from "../shaders/hitboxMesh";
+import { Debug } from "../dev/debug";
 
 export enum TerrainInspectMode {
     none = 0,
@@ -139,7 +140,7 @@ export class Terrain implements ISerializable, ISceneObject {
         const editedNodes = new Set<TerrainNode>();
         let prev = this.nodes[0];
         for (const node of this.nodes) {
-            if (node.distance(game.worldMouse) < 30 && game.input.mouse.getButton(MouseButton.Left)) {
+            if (node.distance(game.worldMouse) < 30 && game.input.mouse.getButton(MouseButton.Left) && !Debug.movingEntity && !Debug.debugView) {
                 const dir = node.diff(game.worldMouse);
                 const length = dir.length() / 30;
                 node.add(dir.normalize().mult((1 - length) * (1 - length) * 10));

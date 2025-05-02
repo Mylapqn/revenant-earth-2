@@ -1,8 +1,10 @@
 :root {
     --unera-color: rgb(26, 118, 238);
-    --under-panel: rgb(40, 130, 247);
+    --under-panel: #0C68D6;
     --hacking-color: rgb(23, 238, 62);
     --hacking-color-muted: rgba(12, 189, 33, 0.5);
+    --bg-color: #1F2730;
+    --highlight-color: #3d4955;
 }
 
 * {
@@ -22,6 +24,14 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+}
+
+.uiContainer {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
 }
 
 .debugText {
@@ -299,4 +309,52 @@ body {
     height: 100%;
     background-image: radial-gradient(circle, #ffffff4f 8%, transparent 10%);
     background-size: 15px 15px;
+}
+
+.drop-menu {
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    left: 100px;
+    overflow: hidden;
+    text-align: left;
+}
+
+.drop-menu .header {
+    width: 100%;
+    padding: .5rem;
+    text-align: left;
+    background-color: var(--under-panel);
+    font-weight: bold;
+}
+
+.drop-menu button {
+    width: 100%;
+    padding: .5rem;
+    text-align: left;
+}
+
+.drop-menu button+button {
+    margin-top: .2rem;
+}
+
+button {
+    color: inherit;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.1s;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background-color: var(--highlight-color);
+}
+
+.basic {
+    background-color: var(--bg-color);
+    color: #e9e9e9;
+    border-radius: 0.1rem;
+    font-family: "Chakra Petch";
+    font-size: 16px;
 }

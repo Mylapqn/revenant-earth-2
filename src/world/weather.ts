@@ -6,6 +6,7 @@ import { Vector } from "../utils/vector";
 import { displayNumber, RandomGenerator } from "../utils/utils";
 import { CloudMesh } from "./cloudMesh";
 import { VolumeCurve } from "../sound/sound";
+import { Debug } from "../dev/debug";
 
 export class Weather implements ISerializable, ISceneObject {
     weatherData: WeatherData = {
@@ -45,9 +46,11 @@ export class Weather implements ISerializable, ISceneObject {
             const rainMult = rainRatio + .01;
             game.soundManager.soundLibrary.volume("rain_heavy", VolumeCurve.curves.rainHeavy.apply(1 - rainRatio));
             game.soundManager.soundLibrary.volume("rain_light", VolumeCurve.curves.rainLight.apply(1 - rainRatio));
-            game.debugText += "rainRatio:      " + displayNumber(rainRatio) + "\n";
-            game.debugText += "rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)) + "\n";
-            game.debugText += "rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)) + "\n";
+            
+            Debug.log("rainRatio:      " + displayNumber(rainRatio));
+            Debug.log("rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)));
+            Debug.log("rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)));
+
             this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity;
             const pos = game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5;
             if (pos > 0) {
@@ -72,6 +75,8 @@ export class Weather implements ISerializable, ISceneObject {
         }
         else {
             this.weatherData.rainBuildup += dt * game.atmo.temp * .002;
+            const rainBuildupRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
+            game.soundManager.soundLibrary.volume("wind", VolumeCurve.curves.windFromRainBuildup.apply(rainBuildupRatio));
         }
     }
     draw(dt: number): void {

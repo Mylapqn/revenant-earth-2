@@ -145,7 +145,7 @@ export class Vector {
      * @return {number}
      * https://www.youtube.com/watch?v=KHuI9bXZS74
      */
-    static distanceToLine(A: Vector, B: Vector, C: Vector): number {
+    static distanceToLine(A: Vectorlike, B: Vectorlike, C: Vectorlike): number {
         return Math.abs((C.x - A.x) * (-B.y + A.y) + (C.y - A.y) * (B.x - A.x)) / Math.sqrt((-B.y + A.y) * (-B.y + A.y) + (B.x - A.x) * (B.x - A.x));
     }
 
@@ -154,12 +154,25 @@ export class Vector {
      * @param {Vector} v2
      * @return {boolean} two vectors have same values
      */
-    static equals(v1: Vector, v2: Vector): boolean {
+    static equals(v1: Vectorlike, v2: Vectorlike): boolean {
         return v1.x == v2.x && v1.y == v2.y;
     }
 
-    static lerp(v1: Vector, v2: Vector, t: number): Vector {
+    static lerp(v1: Vectorlike, v2: Vectorlike, t: number): Vector {
         return new Vector(v1.x + (v2.x - v1.x) * t, v1.y + (v2.y - v1.y) * t);
+    }
+
+    static nearestPositionIndex(origin: Vectorlike, positions: Vector[]) {
+        let nearest = -1;
+        let nearestDistance = Infinity;
+        for (let index = 0; index < positions.length; index++) {
+            const distance = positions[index].distanceSquared(origin);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearest = index;
+            }
+        }
+        return nearest;
     }
 }
 

@@ -22,11 +22,13 @@ export class Entity implements ISerializable, ISceneObject {
     componentIndex = 0;
     transform!: Transform;
     scene?: Scene;
+    name: string;
 
     static entityId = 0; //TODO save+load global next entity id
 
     constructor(id: number) {
         this.id = id;
+        this.name = "Entity " + id;
     }
 
     on<T extends keyof KnownEvents>(event: T, callback: Callback<T>) {
@@ -108,6 +110,7 @@ export class Entity implements ISerializable, ISceneObject {
 
     static fromData(data: EntityData, scene?: Scene) {
         const entity = new Entity(data.id ?? this.entityId++);
+        if(data.name) entity.name = data.name;
         entity.componentIndex = data.component.reduce((max, c) => Math.max(max, c.id ?? -1), -1) + 1;
 
         for (const component of data.component) {
@@ -148,7 +151,7 @@ export class Entity implements ISerializable, ISceneObject {
     static deserialise(deserialise: any, scene?: Scene) {
         const entity = Entity.fromData(deserialise as EntityData);
         scene?.register(entity);
-        if(scene) entity.scene = scene;
+        if (scene) entity.scene = scene;
     }
 
     serialise(mode: StateMode): KindedObject | false {
@@ -160,6 +163,7 @@ export class Entity implements ISerializable, ISceneObject {
         const data: EntityData = {
             kind: "Entity",
             id: this.id,
+            name: this.name,
             component: [],
         };
 
@@ -174,5 +178,6 @@ export class Entity implements ISerializable, ISceneObject {
 type EntityData = {
     kind: "Entity";
     id?: number;
+    name?: string;
     component: Array<ComponentData>;
 };

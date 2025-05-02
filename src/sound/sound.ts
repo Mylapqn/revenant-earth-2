@@ -31,7 +31,7 @@ export class SoundManager {
         this.loadOneshotRange("footstep", "./sound/muddry_footsteps/footsmuddry_%.wav", 5, 1);
         this.soundLibrary.add("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true });
         this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true });
-        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true });
+        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, autoPlay: true, singleInstance: true });
     }
 }
 
@@ -52,7 +52,8 @@ export class VolumeCurve {
         return this.stops[this.stops.length - 1].y;
     }
     static curves = {
-        rainHeavy: new VolumeCurve([{ x: 0, y: 0 }, { x: 0.1, y: 1 }, { x: .5, y: .5 }, { x: .8, y: .1 }, { x: 1, y: 0 }]),
-        rainLight: new VolumeCurve([{ x: 0, y: 0 }, { x: 0.1, y: 0 }, { x: .5, y: 0 }, { x: .8, y: .8 }, { x: 1, y: 0 }]),
+        rainHeavy: new VolumeCurve([{ x: 0, y: 0 }, { x: 0.05, y: 1 }, { x: .5, y: .5 }, { x: .8, y: .1 }, { x: 1, y: 0 }]),
+        rainLight: new VolumeCurve([{ x: 0, y: 0 }, { x: 0.05, y: 0 }, { x: .5, y: 0 }, { x: .8, y: .8 }, { x: 1, y: 0 }]),
+        windFromRainBuildup: new VolumeCurve([{ x: 0, y: 0.1 }, { x: .2, y: .3 }, { x: .2, y: .5 }, { x: 1, y: 0.1 }]),
     }
 }
