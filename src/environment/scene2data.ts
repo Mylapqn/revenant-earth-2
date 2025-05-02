@@ -16,6 +16,7 @@ export const scene2data = [
                 componentType: "Door",
                 data: {
                     target: "Scene",
+                    doorId: "dungeon-door-1",
                 },
             },
             {

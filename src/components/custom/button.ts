@@ -2,6 +2,8 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
+import { UIElement } from "../../ui/ui";
+import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
 
 export class Button extends Component {
@@ -29,10 +31,15 @@ export class Button extends Component {
 
     activate() {
         game.progressDatabase.db.set(this.dbName, 0);
-        new ParticleText("Activated "+this.dbName, this.transform.position.result().add(new Vector(0, -40)));
+        new ParticleText("Activated " + this.dbName, this.transform.position.result().add(new Vector(0, -40)));
     }
 
     update(dt: number) {
+    }
+
+    debugOptions(buttons: UIElement[]): UIElement[] {
+        buttons.push(new UIButton(`Activate ${this.dbName}`, () => { this.activate() }));
+        return super.debugOptions(buttons);
     }
 
 

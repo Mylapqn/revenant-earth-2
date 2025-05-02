@@ -1,4 +1,5 @@
 import { game } from "../game";
+import { Component, Constructor } from "./component";
 import { Entity } from "./entity";
 import { ISerializable, KindedObject, ObjectKind, StateManager, StateMode } from "./serialise";
 
@@ -32,6 +33,17 @@ export class Scene implements ISerializable {
                 if (obj.id === id) return obj;
             }
         }
+    }
+
+    findComponents<T extends Component>(type: Constructor<T>) {
+        const result: T[] = [];
+        for (const obj of this.objects) {
+            if (obj instanceof Entity) {
+                const component = obj.getComponent(type);
+                if (component) result.push(component);
+            }
+        }
+        return result;
     }
 
     register(obj: ISerializable) {

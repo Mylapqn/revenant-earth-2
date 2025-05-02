@@ -1,4 +1,4 @@
-import { UIElement } from "./uiElement";
+import { UIElement } from "./ui";
 
 export class UIButton extends UIElement {
     constructor(label: string = "Button", onclick?: () => void) {

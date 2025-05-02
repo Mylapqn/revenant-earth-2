@@ -39,7 +39,7 @@ export class Player implements ISerializable {
         this.oxygenBar = new UIProgressBar("Oxygen", this.statsDisplay);
 
         game.activeScene.register(this);
-        this.pixelLayer = new PixelLayer({width:64, height:64,autoRender:true,parent:game.playerContainer,worldSpace:false});
+        this.pixelLayer = new PixelLayer({ width: 64, height: 64, autoRender: true, parent: game.playerContainer, worldSpace: false });
 
         this.graphics = new Graphics();
         this.legGraphics = new Graphics();
@@ -95,12 +95,14 @@ export class Player implements ISerializable {
         this.oxygenBar.progress = (this.oxygen / 100);
         //console.log(Atmo.displayValues(game.atmo.getProperties(this.position)));
 
-        if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;
-        else if (game.input.key("a") && this.velocity.x > -40) this.velocity.x -= 300 * dt;
-        else if (this.grounded) this.velocity.x *= 0.9;
-        if (game.input.key(" ") && this.grounded) {
-            this.velocity.y = -300;
-            this.groundedTimer = 0;
+        if (game.inputEnabled) {
+            if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;
+            else if (game.input.key("a") && this.velocity.x > -40) this.velocity.x -= 300 * dt;
+            else if (this.grounded) this.velocity.x *= 0.9;
+            if (game.input.key(" ") && this.grounded) {
+                this.velocity.y = -300;
+                this.groundedTimer = 0;
+            }
         }
 
         if (!this.grounded) this.velocity.y += 1000 * dt;

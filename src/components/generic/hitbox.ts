@@ -11,6 +11,9 @@ import { placeholderGeometry } from "../../utils/utils";
 import vertex from "../../shaders/vert.vert?raw";
 import fragment from "../../shaders/frag.frag?raw";
 import { HitboxGeometry } from "../../shaders/hitboxMesh";
+import { UIElement } from "../../ui/ui";
+import { UIButton } from "../../ui/uiButton";
+import { Debug } from "../../dev/debug";
 
 
 
@@ -86,6 +89,11 @@ export class Hitbox extends Component {
     override init(): void {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
     }
+    debugOptions(): UIElement[] {
+        const buttons = [];
+        buttons.push(new UIButton(`Edit hitbox`, () => { Debug.hitboxEditor.startEditing(this) }));
+        return super.debugOptions(buttons);
+    }
 
     applyNodes(originalNodes: Vectorlike[]) {
         this.originalNodes = originalNodes;
@@ -133,7 +141,7 @@ export class Hitbox extends Component {
                 this.graphics.lineTo(this.nodes[0].x + this.transform.position.x, this.nodes[0].y + this.transform.position.y);
                 this.graphics.stroke({ color: 0x00ff00, width: 1 }); */
         const points = this.nodes.map(node => new SATVector(node.x + this.transform.position.x, node.y + this.transform.position.y));
-        if(this.isInterior){
+        if (this.isInterior) {
             //remove last 3 
             points.splice(points.length - 5, 5);
             points.push(points[1]);

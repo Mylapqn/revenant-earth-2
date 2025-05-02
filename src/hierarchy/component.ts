@@ -1,3 +1,4 @@
+import { UIElement } from "../ui/ui";
 import { Callback, Entity, KnownEvents } from "./entity";
 import { primitiveObject } from "./serialise";
 
@@ -53,6 +54,16 @@ export class Component {
     onEntity<T extends keyof KnownEvents>(event: T, callback: Callback<T>) {
         this.subscribedEvents.add({ type: event, callback });
         this.entity.on(event, callback);
+    }
+
+    debugOptions(buttons: UIElement[]): UIElement[] {
+        //prepend element to buttons
+        if(buttons.length > 0){
+            const header = new UIElement("div", "header");
+            header.htmlElement.innerText = this.componentType;
+            buttons.unshift(header);
+        }
+        return buttons;
     }
 }
 

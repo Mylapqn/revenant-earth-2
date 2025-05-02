@@ -140,7 +140,7 @@ export class Terrain implements ISerializable, ISceneObject {
         const editedNodes = new Set<TerrainNode>();
         let prev = this.nodes[0];
         for (const node of this.nodes) {
-            if (node.distance(game.worldMouse) < 30 && game.input.mouse.getButton(MouseButton.Left) && !Debug.movingEntity && !Debug.debugView) {
+            if (node.distance(game.worldMouse) < 30 && game.input.mouse.getButton(MouseButton.Left) && !Debug.movingEntity && game.inputEnabled) {
                 const dir = node.diff(game.worldMouse);
                 const length = dir.length() / 30;
                 node.add(dir.normalize().mult((1 - length) * (1 - length) * 10));
@@ -355,7 +355,7 @@ export class Terrain implements ISerializable, ISceneObject {
             if (node.y > effectBB.y) effectBB.y = node.y;
         }
 
-        if(game.debugView){
+        if (game.debugView) {
             this.graphics.rect(effectAA.x, effectAA.y, effectBB.x - effectAA.x, effectBB.y - effectAA.y);
             this.graphics.stroke({ color: 0xff0000, width: 1 });
         }

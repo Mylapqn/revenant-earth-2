@@ -10,6 +10,8 @@ export class Camera {
     pixelOffset = new Vector(0, 0);
     offsetRemainder = new Vector(0, 0);
 
+    customTarget?: Vector;
+
     get screen() {
         return {
             x: window.innerWidth,
@@ -51,9 +53,14 @@ export class Camera {
 
 
     update(dt: number) {
-        const targetPosition = new Vector(0, 0);
-        targetPosition.x = game.player.position.x * Game.pixelScale;
-        targetPosition.y = game.player.position.y * Game.pixelScale - this.screen.y * .2;
+        let targetPosition = new Vector(0, 0);
+        if (this.customTarget) {
+            targetPosition = this.customTarget.result();
+        }
+        else {
+            targetPosition.x = game.player.position.x * Game.pixelScale;
+            targetPosition.y = game.player.position.y * Game.pixelScale - this.screen.y * .2;
+        }
 
         this.position.x = (targetPosition.x + this.position.x * 19) / 20;
         this.position.y = (targetPosition.y + this.position.y * 19) / 20;

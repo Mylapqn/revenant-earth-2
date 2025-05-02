@@ -1,4 +1,4 @@
-import { Application, Assets, Color, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
+import { Application, Assets, Container, Graphics, Sprite, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -6,31 +6,22 @@ import { Player } from "./player";
 import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./utils/vector";
 import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
-import { htcrudLoad, htcrudSave } from "./dev/htcrud-helper";
 import { Entity } from "./hierarchy/entity";
 import { Scene } from "./hierarchy/scene";
-import doorHitbox from "./environment/doorHitbox.json";
 import { initComponents } from "./components/componentIndex";
 import { ProgressDatabase } from "./hierarchy/progressDatabase";
 import { ParticleText } from "./hierarchy/particleText";
-import { DevSync } from "./dev/devsync";
-import { Hitbox } from "./components/generic/hitbox";
-import { BasicSprite } from "./components/generic/basicSprite";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input, MouseButton } from "./input";
 import { TimedShader } from "./shaders/timedShader";
-import { TooltipPanel, UITooltip } from "./ui/tooltip";
+import { UITooltip } from "./ui/tooltip";
 import { Prefab } from "./hierarchy/prefabs";
 import { Atmo } from "./world/atmo";
-import { displayNumber } from "./utils/utils";
 import { PlantSpecies } from "./plants/plantSpecies";
 import { Plant } from "./components/custom/plant";
 import { Weather } from "./world/weather";
-import { CloudMesh } from "./world/cloudMesh";
 import { CustomColor } from "./utils/color";
 import { UI } from "./ui/ui";
-import { UIFullscreenMenu } from "./ui/fullscreenMenu";
-import { sound } from "@pixi/sound";
 import { SoundManager } from "./sound/sound";
 import { Debug } from "./dev/debug";
 import { scene2data } from "./environment/scene2data";
@@ -78,6 +69,12 @@ export class Game {
     selectedSeed?: string;
 
     soundManager = new SoundManager();
+    timeScale: number = 1;
+
+
+    public get inputEnabled(): boolean {
+        return !Debug.editorMode && !this.hacking
+    }
 
     get worldMouse(): Vectorlike {
         return new Vector()
@@ -115,7 +112,6 @@ export class Game {
     }
 
     async init() {
-        Debug.init();
         await Assets.load("./font/monogram.ttf");
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
@@ -247,6 +243,7 @@ export class Game {
                         componentType: "Door",
                         data: {
                             target: "Scene 2",
+                            doorId: "dungeon-door-1",
                         },
                     },
                     {
@@ -272,30 +269,28 @@ export class Game {
 
         this.app.ticker.add(this.update, this);
         UI.init();
+        Debug.init();
         await this.soundManager.loadSounds();
     }
 
     update(ticker: Ticker) {
-        const dt = ticker.deltaMS / 1000;
+        const realDt = ticker.elapsedMS / 1000;
+        const dt = realDt * this.timeScale;
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);
 
-        this.tooltip.update(dt);
+        this.tooltip.update(realDt);
 
 
         for (const particleText of [...ParticleText.list]) {
-            particleText.update(dt);
+            particleText.update(realDt);
         }
         this.activeScene.update(dt);
         this.activeScene.draw(dt);
 
-        Debug.debugView = this.input.key("control");
-        Debug.update(dt);
 
 
-
-
-        this.camera.update(dt);
+        this.camera.update(realDt);
 
         //this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
         //this.worldDebugGraphics.stroke(0x999999);
@@ -304,9 +299,49 @@ export class Game {
             layer.render();
         }
 
-
         const address = "http://localhost:3000/state.json";
 
+        if (this.input.keyUp("tab")) {
+            Debug.editorMode = !Debug.editorMode;
+        }
+
+        if (!Debug.editorMode) {
+            this.handleNormalInput();
+            if (this.hacking) {
+                this.hacking.update();
+            }
+        }
+        Debug.debugView = this.input.key("control");
+        Debug.update(realDt);
+
+        UI.update();
+
+        //clears input
+        this.input.update();
+    }
+
+    loadScene(name: string) {
+        this.activeScene.serialise(StateMode.full);
+        this.scenes.get(name)!.load();
+    }
+
+    nearestEntity(position: Vectorlike) {
+        let nearest = undefined;
+        let nearestDistance = Infinity;
+        for (const entity of game.activeScene.objects) {
+            if (entity instanceof Entity) {
+                const distance = entity.transform.position.distanceSquared(position);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearest = entity;
+                }
+            }
+        }
+
+        return nearest;
+    }
+
+    private handleNormalInput() {
         if (this.input.keyDown("h")) {
             if (this.hacking) this.hacking = this.hacking.close();
             else this.hacking = new HackingMinigame();
@@ -316,10 +351,7 @@ export class Game {
             UI.fullscreenMenu.toggle();
         }
 
-        if (this.hacking) {
-            this.hacking.update();
-        }
-        else {
+        if (this.inputEnabled) {
             if (this.input.keyDown("t")) {
                 if (!this.selectedSeed) {
                     this.selectedSeed = "Tree";
@@ -374,32 +406,5 @@ export class Game {
                 }
             }
         }
-
-
-        UI.update();
-
-        //clears input
-        this.input.update();
-    }
-
-    loadScene(name: string) {
-        this.activeScene.serialise(StateMode.full);
-        this.scenes.get(name)!.load();
-    }
-
-    nearestEntity(position: Vectorlike) {
-        let nearest = undefined;
-        let nearestDistance = Infinity;
-        for (const entity of game.activeScene.objects) {
-            if (entity instanceof Entity) {
-                const distance = entity.transform.position.distanceSquared(position);
-                if (distance < nearestDistance) {
-                    nearestDistance = distance;
-                    nearest = entity;
-                }
-            }
-        }
-
-        return nearest;
     }
 }

@@ -5,27 +5,70 @@ import { BasicSprite } from "../components/generic/basicSprite";
 import { Hitbox } from "../components/generic/hitbox";
 import { TooltipPanel } from "../ui/tooltip";
 import { MouseButton } from "../input";
-import { UIContextMenu } from "../ui/contextMenu";
-import { UIButton } from "../ui/button";
+import { UIContextMenu } from "../ui/ui";
+import { UIButton } from "../ui/uiButton";
 import { UI } from "../ui/ui";
-import { UIPanel } from "../ui/panel";
-import { UIElement } from "../ui/uiElement";
+import { UIElement } from "../ui/ui";
+import { UIPanel } from "../ui/ui";
 import { HitboxEditor } from "./hitbox-editor";
 import { Entity } from "../hierarchy/entity";
+import { Vector } from "../utils/vector";
+import { ParticleText } from "../hierarchy/particleText";
+import { StateMode } from "../hierarchy/serialise";
 
 export class Debug {
     private static debugTextElement: HTMLDivElement;
-    static debugMode = false;
+    private static _editorMode = false;
+    public static get editorMode() {
+        return Debug._editorMode;
+    }
+    public static set editorMode(value) {
+        Debug._editorMode = value;
+        if (value) {
+            game.camera.customTarget = game.camera.position.result();
+        }
+        else {
+            game.camera.customTarget = undefined;
+        }
+
+    }
     static debugView = false;
     static hitboxEditor: HitboxEditor;
     private static debugText = "";
     static graphicsWorldspace: Graphics;
-    static movingEntity?:Entity;
+    static movingEntity?: Entity;
     static log(text: string | number) { this.debugText += text + "\n"; };
     static update(dt: number) {
         this.graphicsWorldspace.clear();
-        if (this.debugView) {
+        if (this.editorMode) {
+            const camSpeed = 1000;
+            if (game.input.key("a")) game.camera.customTarget!.x -= camSpeed * dt;
+            if (game.input.key("d")) game.camera.customTarget!.x += camSpeed * dt;
+            if (game.input.key("w")) game.camera.customTarget!.y -= camSpeed * dt;
+            if (game.input.key("s")) game.camera.customTarget!.y += camSpeed * dt;
+            if (game.input.keyUp(" ")) game.timeScale = game.timeScale == 1 ? 0 : 1;
+
+            //draw grid
+            this.drawGrid(10);
+            this.drawGrid(40, { width: .25, color: 0xffffff, alpha: .1 });
+
+            //draw origin lines at world 0
+            this.graphicsWorldspace.moveTo(0, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2);
+            this.graphicsWorldspace.lineTo(0, game.camera.worldPosition.y + game.camera.pixelScreen.y / 2);
+            this.graphicsWorldspace.stroke({ width: .5, color: 0x00ff00, alpha: .2 });
+            this.graphicsWorldspace.moveTo(game.camera.worldPosition.x - game.camera.pixelScreen.x / 2, 0);
+            this.graphicsWorldspace.lineTo(game.camera.worldPosition.x + game.camera.pixelScreen.x / 2, 0);
+            this.graphicsWorldspace.stroke({ width: .5, color: 0xff0000, alpha: .2 });
+
+        }
+        if (this.debugView || this.editorMode) {
             const nearestEntity = game.nearestEntity(game.worldMouse);
+            for (const entity of game.activeScene.objects) {
+                if (entity instanceof Entity) {
+                    this.graphicsWorldspace.circle(entity.transform.position.x, entity.transform.position.y, 2);
+                }
+            }
+            this.graphicsWorldspace.stroke({ width: 1, color: 0xaaaaaa });
             for (let x = 0; x < game.terrain.nodes.length; x++) {
                 const node = game.terrain.nodes[x];
                 const tdata = game.terrain.getProperties(node.x);
@@ -47,40 +90,74 @@ export class Debug {
                 if (hitbox && !this.hitboxEditor.editing) {
                     this.drawHitbox(hitbox)
                 }
-                if (game.input.mouse.getButtonUp(MouseButton.Right)) {
-                    const buttons = [];
-                    const header = new UIElement("div", "header");
+            }
+            if (game.input.mouse.getButtonUp(MouseButton.Right)) {
+                const buttons = [];
+                const header = new UIElement("div", "header");
+                buttons.push(header);
+                if (nearestEntity && nearestEntity.transform.position.distance(game.worldMouse) < 100) {
                     header.htmlElement.innerText = nearestEntity.name;
-                    buttons.push(header);
                     buttons.push(new UIButton("Delete", () => nearestEntity.remove()));
                     buttons.push(new UIButton("Move", () => { this.movingEntity = nearestEntity }));
                     buttons.push(new UIButton("Copy to Clipboard", () => {
                         navigator.clipboard.writeText(JSON.stringify(nearestEntity.toData()));
                     }));
+                    buttons.push(new UIButton("Duplicate", () => {
+                        const data = nearestEntity.toData();
+                        const entity = Entity.fromData(data as any, game.activeScene);
+                        entity.transform.position.set(game.worldMouse,0);
+                        this.movingEntity = entity;
+                    }))
+                    buttons.push(new UIButton("Paste from Clipboard", async () => {
+                        try {
+                            const data = JSON.parse(await navigator.clipboard.readText());
+                            nearestEntity.applyData(data);
 
-                    const hb = nearestEntity.getComponent(Hitbox);
-                    if (hb) {
-                        buttons.push(new UIButton("Edit hitbox", () => { this.hitboxEditor.startEditing(hb) }));
-                    }
+                        } catch (error: any) {
+                            new ParticleText((error as Error).message, Vector.fromLike(game.worldMouse));
+                        }
+                    }))
 
-                    new UIContextMenu(...buttons);
+                    nearestEntity.components.forEach((component) => {
+                        buttons.push(...component.debugOptions([]));
+                    });
                 }
-                
-            }
-            if (!UIContextMenu.current) {
-                this.debugTooltip();
+                else {
+                    header.htmlElement.innerText = "Empty space";
+                    buttons.push(new UIButton("Paste new Entity", async () => {
+                        try {
+                            const data = JSON.parse(await navigator.clipboard.readText());
+                            const entity = Entity.fromData(data, game.activeScene);
+                            entity.transform.position.set(game.worldMouse,0);
+                            this.movingEntity = entity;
+
+                        } catch (error: any) {
+                            new ParticleText((error as Error).message, Vector.fromLike(game.worldMouse));
+                        }
+                    }))
+                    buttons.push(new UIButton("Copy scene", async () => {
+                        navigator.clipboard.writeText(JSON.stringify(game.activeScene.serialise(StateMode.scene)));
+                    }))
+                }
+
+                new UIContextMenu(...buttons);
             }
         }
-        if(this.movingEntity) {
+        if (!UIContextMenu.current && this.debugView) {
+            this.debugTooltip();
+        }
+        if (this.movingEntity) {
             this.movingEntity.transform.position.x = game.worldMouse.x;
             this.movingEntity.transform.position.y = game.worldMouse.y;
-            if(game.input.mouse.getButtonDown(MouseButton.Left)) this.movingEntity = undefined;
+            if (game.input.mouse.getButtonDown(MouseButton.Left)) this.movingEntity = undefined;
         }
         this.hitboxEditor.update();
         this.debugTextElement.innerText = this.debugText;
         this.debugText = "";
     }
     static init() {
+        this.debugView = false;
+        this.editorMode = false;
         this.hitboxEditor = new HitboxEditor();
         this.debugTextElement = UI.customDiv(document.body, "debugText");
     }
@@ -108,6 +185,19 @@ export class Debug {
         for (const node of hitbox.nodes) {
             this.graphicsWorldspace.lineTo(node.x + hitbox.transform.position.x, node.y + hitbox.transform.position.y);
         };
+        this.graphicsWorldspace.stroke(style);
+    }
+    static drawGrid(gridSize: number = 10, style: StrokeInput = { width: .25, color: 0xffffff, alpha: .1 }) {
+        for (let x = game.camera.worldPosition.x - game.camera.pixelScreen.x / 2; x < game.camera.worldPosition.x + game.camera.pixelScreen.x / 2; x += gridSize) {
+            x = Math.floor(x / gridSize) * gridSize;
+            this.graphicsWorldspace.moveTo(x, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2);
+            this.graphicsWorldspace.lineTo(x, game.camera.worldPosition.y + game.camera.pixelScreen.y / 2);
+        }
+        for (let y = game.camera.worldPosition.y - game.camera.pixelScreen.y / 2; y < game.camera.worldPosition.y + game.camera.pixelScreen.y / 2; y += gridSize) {
+            y = Math.floor(y / gridSize) * gridSize;
+            this.graphicsWorldspace.moveTo(game.camera.worldPosition.x - game.camera.pixelScreen.x / 2, y);
+            this.graphicsWorldspace.lineTo(game.camera.worldPosition.x + game.camera.pixelScreen.x / 2, y);
+        }
         this.graphicsWorldspace.stroke(style);
     }
 }

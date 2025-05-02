@@ -1,0 +1,227 @@
+{
+    "kind": "Scene",
+    "name": "Scene 2",
+    "data": [
+        {
+            "kind": "Entity",
+            "id": 4,
+            "name": "Entity 4",
+            "component": [
+                {
+                    "id": 0,
+                    "componentType": "BasicSprite",
+                    "data": {
+                        "asset": "./door.png"
+                    }
+                },
+                {
+                    "id": 1,
+                    "componentType": "Interactable"
+                },
+                {
+                    "id": 2,
+                    "componentType": "Door",
+                    "data": {
+                        "target": "Scene",
+                        "doorId": "dungeon-door-1"
+                    }
+                },
+                {
+                    "id": 3,
+                    "componentType": "Transform",
+                    "data": {
+                        "position": {
+                            "x": 40,
+                            "y": 20
+                        },
+                        "velocity": {
+                            "x": 0,
+                            "y": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "kind": "Entity",
+            "id": 5,
+            "name": "Toggle Pollution",
+            "component": [
+                {
+                    "id": 0,
+                    "componentType": "BasicSprite",
+                    "data": {
+                        "asset": "./robo.png"
+                    }
+                },
+                {
+                    "id": 1,
+                    "componentType": "Interactable"
+                },
+                {
+                    "id": 2,
+                    "componentType": "Button",
+                    "data": {
+                        "dbName": "pollutionSpeed"
+                    }
+                },
+                {
+                    "id": 3,
+                    "componentType": "Transform",
+                    "data": {
+                        "position": {
+                            "x": 10,
+                            "y": 20
+                        },
+                        "velocity": {
+                            "x": 0,
+                            "y": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "kind": "Entity",
+            "id": 6,
+            "name": "Scene hitbox",
+            "component": [
+                {
+                    "id": 0,
+                    "componentType": "Transform",
+                    "data": {
+                        "position": {
+                            "x": 40,
+                            "y": 0
+                        },
+                        "velocity": {
+                            "x": 0,
+                            "y": 0
+                        }
+                    }
+                },
+                {
+                    "id": 1,
+                    "componentType": "Hitbox",
+                    "data": {
+                        "nodes": [
+                            {
+                                "x": 73.3,
+                                "y": 48
+                            },
+                            {
+                                "x": 91,
+                                "y": 48
+                            },
+                            {
+                                "x": 177.9,
+                                "y": 48
+                            },
+                            {
+                                "x": 177.9,
+                                "y": -53.1
+                            },
+                            {
+                                "x": 91,
+                                "y": -53.1
+                            },
+                            {
+                                "x": 91,
+                                "y": -25
+                            },
+                            {
+                                "x": 73.3,
+                                "y": -25
+                            },
+                            {
+                                "x": -16.6,
+                                "y": -104.1
+                            },
+                            {
+                                "x": -81.9,
+                                "y": -104.1
+                            },
+                            {
+                                "x": -81.9,
+                                "y": -71.5
+                            },
+                            {
+                                "x": -98.9,
+                                "y": -71.5
+                            },
+                            {
+                                "x": -98.9,
+                                "y": -104.5
+                            },
+                            {
+                                "x": -162.8,
+                                "y": -104.5
+                            },
+                            {
+                                "x": -223.4,
+                                "y": -104.5
+                            },
+                            {
+                                "x": -291.6,
+                                "y": -104.5
+                            },
+                            {
+                                "x": -252.3,
+                                "y": -39
+                            },
+                            {
+                                "x": -291.6,
+                                "y": 26.5
+                            },
+                            {
+                                "x": -223.4,
+                                "y": 26.5
+                            },
+                            {
+                                "x": -162.8,
+                                "y": 26.5
+                            },
+                            {
+                                "x": -98.9,
+                                "y": 26.5
+                            },
+                            {
+                                "x": -98.9,
+                                "y": 14
+                            },
+                            {
+                                "x": -81.9,
+                                "y": 14
+                            },
+                            {
+                                "x": -66.9,
+                                "y": 14
+                            },
+                            {
+                                "x": -23.2,
+                                "y": 14
+                            },
+                            {
+                                "x": 13.8,
+                                "y": 48
+                            }
+                        ],
+                        "interior": true
+                    }
+                }
+            ]
+        },
+        {
+            "kind": "Player",
+            "position": {
+                "x": 42.05971217237405,
+                "y": 18.75984485875428
+            },
+            "velocity": {
+                "x": 0.015419750837990073,
+                "y": 0
+            }
+        }
+    ],
+    "active": true
+}
