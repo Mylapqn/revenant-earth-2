@@ -40,7 +40,7 @@ export class Pollution extends Component {
         }
         if (this.totalPolluted > this.nextText) {
             this.nextText += 1;
-            new ParticleText("+1 pollution", this.transform.position.result().add(new Vector(0, -40)));
+            new ParticleText("+1 pollution", this.transform.position.clone().add(new Vector(0, -40)));
         }
     }
 

@@ -1,3 +1,4 @@
+import { Debug } from "../dev/debug";
 import { game } from "../game";
 import { Vector } from "../utils/vector";
 
@@ -121,7 +122,7 @@ export class UIContextMenu extends UIPanel {
         this.htmlElement.style.position = "absolute";
         this.htmlElement.style.top = game.input.mouse.position.y + "px";
         this.htmlElement.style.left = game.input.mouse.position.x + "px";
-        UIContextMenu.currentLocation = game.input.mouse.position.result();
+        UIContextMenu.currentLocation = game.input.mouse.position.clone();
         this.htmlElement.style.zIndex = "10";
 
         this.htmlElement.addEventListener("mouseleave", () => {

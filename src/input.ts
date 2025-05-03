@@ -14,7 +14,7 @@ export class Input {
         window.addEventListener("keydown", e => this.onKeyDown(e));
         window.addEventListener("keyup", e => this.onKeyUp(e));
     }
-    onKeyDown(e: KeyboardEvent) {
+    private onKeyDown(e: KeyboardEvent) {
         if (e.repeat) return;
         const key = e.key.toLowerCase();
         this.heldKeys.set(key, true);
@@ -24,7 +24,7 @@ export class Input {
                 e.preventDefault();
         }
     }
-    onKeyUp(e: KeyboardEvent) {
+    private onKeyUp(e: KeyboardEvent) {
         const key = e.key.toLowerCase();
         this.heldKeys.set(key, false);
         this.keysUp.set(key, true);
@@ -84,17 +84,17 @@ class Mouse {
         window.addEventListener("wheel", e => this.mouseScroll(e));
         document.addEventListener('contextmenu', event => event.preventDefault());
     }
-    mouseButtons(e: MouseEvent) {
+    private mouseButtons(e: MouseEvent) {
         this.buttonsHeld = e.buttons;
     }
-    mouseMove(e: MouseEvent) {
+    private mouseMove(e: MouseEvent) {
         const pos = { x: e.clientX, y: e.clientY };
         this.delta.set(pos.x - this.position.x, pos.y - this.position.y);
-        this.position.set(pos, 0);
-        this.pixelPosition = this.position.result().mult(1 / Game.pixelScale).floor();
-        this.pixelDelta = this.delta.result().mult(1 / Game.pixelScale).floor();
+        this.position.set(pos);
+        this.pixelPosition = this.position.clone().mult(1 / Game.pixelScale).floor();
+        this.pixelDelta = this.delta.clone().mult(1 / Game.pixelScale).floor();
     }
-    mouseScroll(e: WheelEvent) {
+    private mouseScroll(e: WheelEvent) {
         this.scroll = e.deltaY / 100;
     }
     movedThisFrame() {

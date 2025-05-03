@@ -25,6 +25,8 @@ import { UI } from "./ui/ui";
 import { SoundManager } from "./sound/sound";
 import { Debug } from "./dev/debug";
 import { scene2data } from "./environment/scene2data";
+import { HitboxLibrary } from "./environment/hitboxLibrary";
+import { displayNumber } from "./utils/utils";
 
 export let game: Game;
 
@@ -62,6 +64,7 @@ export class Game {
 
     skyLayer!: PixelLayer;
     bgLayers: PixelLayer[] = [];
+    fgLayer!: PixelLayer;
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -70,13 +73,16 @@ export class Game {
 
     soundManager = new SoundManager();
     timeScale: number = 1;
+    hitboxLibrary = new HitboxLibrary();
 
+    frameHistory: number[] = [];
 
     public get inputEnabled(): boolean {
         return !Debug.editorMode && !this.hacking
     }
 
     get worldMouse(): Vectorlike {
+        return this.camera.screenToWorld(this.input.mouse.position);
         return new Vector()
             .add(this.input.mouse.pixelPosition)
             .add(this.camera.worldPosition)
@@ -113,6 +119,7 @@ export class Game {
 
     async init() {
         await Assets.load("./font/monogram.ttf");
+        await this.hitboxLibrary.init();
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
         this.stateManager.register(this.progressDatabase);
@@ -164,22 +171,13 @@ export class Game {
         for (let i = 0; i < layers; i++) {
             const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.skyContainer });
             this.bgLayers.push(bgl);
-            const bgg = new Graphics({ parent: bgl.container });
-            let y = 0;
-            bgg.moveTo(0, 1000);
-            bgg.lineTo(0, y);
-            const width = 256;
-            for (let t = 0; t < width; t++) {
-                y += (Math.random() - .5) * 5;
-                bgg.lineTo(t * 5, y);
-            }
-            bgg.lineTo(width * 5, 1000);
-            bgg.fill(new CustomColor(255 * i / layers, 255 * i / layers, 255 * i / layers));
+            bgl.randomTerrain();
         }
 
 
         this.pixelLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1, parent: this.mainContainer, worldSpace: true });
-
+        this.fgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1.5, parent: this.fgContainer, worldSpace: true });
+        this.fgLayer.randomTerrain();
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
@@ -264,6 +262,7 @@ export class Game {
         this.tooltip = new UITooltip();
 
         this.terrain = new Terrain();
+        this.activeScene.hasTerrain = true;
         this.atmo = new Atmo();
         this.weather = new Weather();
 
@@ -275,6 +274,11 @@ export class Game {
 
     update(ticker: Ticker) {
         const realDt = ticker.elapsedMS / 1000;
+        this.frameHistory.push(realDt);
+        const avgFrame = this.frameHistory.reduce((a, b) => a + b, 0) / this.frameHistory.length;
+        while (this.frameHistory.length > 10)
+            this.frameHistory.shift();
+        Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
         const dt = realDt * this.timeScale;
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);

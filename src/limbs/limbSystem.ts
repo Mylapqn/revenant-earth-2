@@ -10,15 +10,15 @@ export class LimbSystem {
     update(dt: number, origin: Vector, retargetLegs: boolean = true) {
         this.timeSinceUpdate+= dt;
         if(this.timeSinceUpdate < 1/24) return;
-        let moved = this.origin.result().diff(origin);
-        this.origin = origin.result();
+        let moved = this.origin.clone().diff(origin);
+        this.origin = origin.clone();
         for (const group of this.limbGroups) {
-            group.update(this.timeSinceUpdate,retargetLegs ? moved.result(): new Vector(0,0));
+            group.update(this.timeSinceUpdate,retargetLegs ? moved.clone(): new Vector(0,0));
         }
         this.timeSinceUpdate = 0;
     }
     addGroup(offset:Vector, maxDistance: number) {
-        let lg = new LimbGroup(this, offset.result(),maxDistance);
+        let lg = new LimbGroup(this, offset.clone(),maxDistance);
         this.limbGroups.push(lg);
         return lg;
     }

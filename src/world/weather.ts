@@ -107,7 +107,7 @@ class RainRenderer {
             this.raindropBuildup -= 1;
             const raindrop = new RainParticle(new Vector(game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2), game.weather.rainAngle);
             this.raindrops.push(raindrop);
-            let hit = game.collisionSystem.raycast(raindrop.position.result().add(Vector.fromAngle(raindrop.angle).mult(-200)), raindrop.position.result().add(Vector.fromAngle(raindrop.angle).mult(500)), (body) => { return body.userData?.terrain });
+            let hit = game.collisionSystem.raycast(raindrop.position.clone().add(Vector.fromAngle(raindrop.angle).mult(-200)), raindrop.position.clone().add(Vector.fromAngle(raindrop.angle).mult(500)), (body) => { return body.userData?.terrain });
             if (hit) {
                 raindrop.groundY = hit.point.y;
             }

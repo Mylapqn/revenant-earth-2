@@ -1,6 +1,6 @@
-import { Color, Graphics, StrokeInput } from "pixi.js";
-import { game } from "../game";
-import { displayNumber } from "../utils/utils";
+import { Color, Graphics, StrokeStyle } from "pixi.js";
+import { Game, game } from "../game";
+import { clamp, displayNumber } from "../utils/utils";
 import { BasicSprite } from "../components/generic/basicSprite";
 import { Hitbox } from "../components/generic/hitbox";
 import { TooltipPanel } from "../ui/tooltip";
@@ -16,19 +16,24 @@ import { Vector } from "../utils/vector";
 import { ParticleText } from "../hierarchy/particleText";
 import { StateMode } from "../hierarchy/serialise";
 
+const entityDistance = 50;
+
 export class Debug {
     private static debugTextElement: HTMLDivElement;
     private static _editorMode = false;
+    static movingElapsed: number = 0;
     public static get editorMode() {
         return Debug._editorMode;
     }
     public static set editorMode(value) {
         Debug._editorMode = value;
         if (value) {
-            game.camera.customTarget = game.camera.position.result();
+            game.camera.customTarget = game.camera.position.clone();
         }
         else {
             game.camera.customTarget = undefined;
+            game.camera.zoom = 1;
+            this.hitboxEditor?.stopEditing();
         }
 
     }
@@ -41,24 +46,28 @@ export class Debug {
     static update(dt: number) {
         this.graphicsWorldspace.clear();
         if (this.editorMode) {
-            const camSpeed = 1000;
+            this.log("Editor Mode");
+            if (game.timeScale == 0) this.log("Game paused");
+            const camSpeed = 1000 / game.camera.zoom;
             if (game.input.key("a")) game.camera.customTarget!.x -= camSpeed * dt;
             if (game.input.key("d")) game.camera.customTarget!.x += camSpeed * dt;
             if (game.input.key("w")) game.camera.customTarget!.y -= camSpeed * dt;
             if (game.input.key("s")) game.camera.customTarget!.y += camSpeed * dt;
+            if (game.input.mouse.getButton(MouseButton.Wheel)) game.camera.customTarget?.sub(game.input.mouse.delta.clone().mult(1 / game.camera.zoom));
             if (game.input.keyUp(" ")) game.timeScale = game.timeScale == 1 ? 0 : 1;
+            if (game.input.mouse.scroll) game.camera.zoom = clamp(game.camera.zoom * (1 - game.input.mouse.scroll * .2), .25, 4);
 
             //draw grid
-            this.drawGrid(10);
-            this.drawGrid(40, { width: .25, color: 0xffffff, alpha: .1 });
+            this.drawGrid(10, { width: .5, color: 0xffffff, alpha: .1 * game.camera.zoom });
+            this.drawGrid(40, { width: 1, color: 0xffffff, alpha: .1 * game.camera.zoom });
 
             //draw origin lines at world 0
             this.graphicsWorldspace.moveTo(0, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2);
             this.graphicsWorldspace.lineTo(0, game.camera.worldPosition.y + game.camera.pixelScreen.y / 2);
-            this.graphicsWorldspace.stroke({ width: .5, color: 0x00ff00, alpha: .2 });
+            this.graphicsWorldspace.stroke({ width: .5 / game.camera.zoom, color: 0x00ff00, alpha: .4 });
             this.graphicsWorldspace.moveTo(game.camera.worldPosition.x - game.camera.pixelScreen.x / 2, 0);
             this.graphicsWorldspace.lineTo(game.camera.worldPosition.x + game.camera.pixelScreen.x / 2, 0);
-            this.graphicsWorldspace.stroke({ width: .5, color: 0xff0000, alpha: .2 });
+            this.graphicsWorldspace.stroke({ width: .5 / game.camera.zoom, color: 0xff0000, alpha: .4 });
 
         }
         if (this.debugView || this.editorMode) {
@@ -69,15 +78,17 @@ export class Debug {
                 }
             }
             this.graphicsWorldspace.stroke({ width: 1, color: 0xaaaaaa });
-            for (let x = 0; x < game.terrain.nodes.length; x++) {
-                const node = game.terrain.nodes[x];
-                const tdata = game.terrain.getProperties(node.x);
-                const adata = game.atmo.getProperties(node.x);
-                if (tdata == undefined) continue;
-                this.graphicsWorldspace.circle(node.x, node.y, adata.pollution * 10);
-                this.graphicsWorldspace.stroke({ width: 1, color: new Color({ r: 255, g: 100, b: 0, a: 1 }) });
+            if (game.activeScene.hasTerrain) {
+                for (let x = 0; x < game.terrain.nodes.length; x++) {
+                    const node = game.terrain.nodes[x];
+                    const tdata = game.terrain.getProperties(node.x);
+                    const adata = game.atmo.getProperties(node.x);
+                    if (tdata == undefined) continue;
+                    this.graphicsWorldspace.circle(node.x, node.y, adata.pollution * 10);
+                    this.graphicsWorldspace.stroke({ width: 1, color: new Color({ r: 255, g: 100, b: 0, a: 1 }) });
+                }
             }
-            if (nearestEntity && nearestEntity.transform.position.distance(game.worldMouse) < 100) {
+            if (nearestEntity && nearestEntity.transform.position.distance(game.worldMouse) < entityDistance) {
                 this.graphicsWorldspace.moveTo(nearestEntity.transform.position.x, nearestEntity.transform.position.y);
                 this.graphicsWorldspace.lineTo(game.worldMouse.x, game.worldMouse.y);
                 this.graphicsWorldspace.stroke({ color: 0x999999, width: 0.25 });
@@ -90,23 +101,23 @@ export class Debug {
                 if (hitbox && !this.hitboxEditor.editing) {
                     this.drawHitbox(hitbox)
                 }
+                if (game.input.mouse.getButtonDown(MouseButton.Left) && !UI.mouseOverUI) {
+                    if (game.input.key("shift")) this.movingEntity = this.duplicateEntity(nearestEntity);
+                    else this.movingEntity = nearestEntity;
+                }
             }
             if (game.input.mouse.getButtonUp(MouseButton.Right)) {
                 const buttons = [];
                 const header = new UIElement("div", "header");
                 buttons.push(header);
-                if (nearestEntity && nearestEntity.transform.position.distance(game.worldMouse) < 100) {
+                if (nearestEntity && nearestEntity.transform.position.distance(game.worldMouse) < entityDistance) {
                     header.htmlElement.innerText = nearestEntity.name;
                     buttons.push(new UIButton("Delete", () => nearestEntity.remove()));
-                    buttons.push(new UIButton("Move", () => { this.movingEntity = nearestEntity }));
                     buttons.push(new UIButton("Copy to Clipboard", () => {
                         navigator.clipboard.writeText(JSON.stringify(nearestEntity.toData()));
                     }));
                     buttons.push(new UIButton("Duplicate", () => {
-                        const data = nearestEntity.toData();
-                        const entity = Entity.fromData(data as any, game.activeScene);
-                        entity.transform.position.set(game.worldMouse,0);
-                        this.movingEntity = entity;
+                        this.movingEntity = this.duplicateEntity(nearestEntity);
                     }))
                     buttons.push(new UIButton("Paste from Clipboard", async () => {
                         try {
@@ -128,7 +139,7 @@ export class Debug {
                         try {
                             const data = JSON.parse(await navigator.clipboard.readText());
                             const entity = Entity.fromData(data, game.activeScene);
-                            entity.transform.position.set(game.worldMouse,0);
+                            entity.transform.position.set(game.worldMouse);
                             this.movingEntity = entity;
 
                         } catch (error: any) {
@@ -147,9 +158,13 @@ export class Debug {
             this.debugTooltip();
         }
         if (this.movingEntity) {
+            this.movingElapsed += dt;
             this.movingEntity.transform.position.x = game.worldMouse.x;
             this.movingEntity.transform.position.y = game.worldMouse.y;
-            if (game.input.mouse.getButtonDown(MouseButton.Left)) this.movingEntity = undefined;
+            if (game.input.mouse.getButtonUp(MouseButton.Left) && this.movingElapsed > 0.2) {
+                this.movingEntity = undefined
+                this.movingElapsed = 0;
+            }
         }
         this.hitboxEditor.update();
         this.debugTextElement.innerText = this.debugText;
@@ -180,24 +195,32 @@ export class Debug {
             { columns: columns }
         )
     }
-    static drawHitbox(hitbox: Hitbox, style: StrokeInput = { color: 0xff0000, width: 1 }) {
+    static drawHitbox(hitbox: Hitbox, style: StrokeStyle = { color: 0xff0000, width: 1 }) {
         this.graphicsWorldspace.moveTo(hitbox.nodes[0].x + hitbox.transform.position.x, hitbox.nodes[0].y + hitbox.transform.position.y);
         for (const node of hitbox.nodes) {
             this.graphicsWorldspace.lineTo(node.x + hitbox.transform.position.x, node.y + hitbox.transform.position.y);
         };
         this.graphicsWorldspace.stroke(style);
     }
-    static drawGrid(gridSize: number = 10, style: StrokeInput = { width: .25, color: 0xffffff, alpha: .1 }) {
+    static drawGrid(gridSize: number = 10, style: StrokeStyle = { width: .25, color: 0xffffff, alpha: .1 }) {
+        const offset = 0;
         for (let x = game.camera.worldPosition.x - game.camera.pixelScreen.x / 2; x < game.camera.worldPosition.x + game.camera.pixelScreen.x / 2; x += gridSize) {
             x = Math.floor(x / gridSize) * gridSize;
-            this.graphicsWorldspace.moveTo(x, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2);
-            this.graphicsWorldspace.lineTo(x, game.camera.worldPosition.y + game.camera.pixelScreen.y / 2);
+            this.graphicsWorldspace.moveTo(x - offset, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2 - offset);
+            this.graphicsWorldspace.lineTo(x - offset, game.camera.worldPosition.y + game.camera.pixelScreen.y / 2 - offset);
         }
         for (let y = game.camera.worldPosition.y - game.camera.pixelScreen.y / 2; y < game.camera.worldPosition.y + game.camera.pixelScreen.y / 2; y += gridSize) {
             y = Math.floor(y / gridSize) * gridSize;
-            this.graphicsWorldspace.moveTo(game.camera.worldPosition.x - game.camera.pixelScreen.x / 2, y);
-            this.graphicsWorldspace.lineTo(game.camera.worldPosition.x + game.camera.pixelScreen.x / 2, y);
+            this.graphicsWorldspace.moveTo(game.camera.worldPosition.x - game.camera.pixelScreen.x / 2 - offset, y - offset);
+            this.graphicsWorldspace.lineTo(game.camera.worldPosition.x + game.camera.pixelScreen.x / 2 - offset, y - offset);
         }
+        style.width! /= game.camera.zoom;
         this.graphicsWorldspace.stroke(style);
+    }
+    static duplicateEntity(entity: Entity) {
+        const data = entity.toData();
+        const newEntity = Entity.fromData(data as any, game.activeScene);
+        newEntity.transform.position.set(game.worldMouse);
+        return newEntity;
     }
 }

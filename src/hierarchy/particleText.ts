@@ -20,15 +20,15 @@ export class ParticleText {
         this.graphics.style.fontFamily = "monogram";
         this.graphics.style.align = "center";
         game.pixelLayer.container.addChild(this.graphics);
-        this.position = position.result();
+        this.position = position.clone();
         this.graphics.position.set(this.position.x, this.position.y);
         ParticleText.list.push(this);
     }
     update(dt: number) {
         this.age += dt;
         this.graphics.alpha = 1 - (this.age / this.lifespan);
-        this.position.add(this.velocity.result().mult(dt));
-        const rounded = this.position.result().floor();
+        this.position.add(this.velocity.clone().mult(dt));
+        const rounded = this.position.clone().floor();
         this.graphics.position.set(rounded.x, rounded.y);
         if (this.age > this.lifespan) { this.graphics.destroy(); ParticleText.list.splice(ParticleText.list.indexOf(this), 1); }
     }

@@ -31,7 +31,7 @@ export class Button extends Component {
 
     activate() {
         game.progressDatabase.db.set(this.dbName, 0);
-        new ParticleText("Activated " + this.dbName, this.transform.position.result().add(new Vector(0, -40)));
+        new ParticleText("Activated " + this.dbName, this.transform.position.clone().add(new Vector(0, -40)));
     }
 
     update(dt: number) {

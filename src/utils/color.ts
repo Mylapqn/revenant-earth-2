@@ -76,4 +76,7 @@ export class CustomColor {
     static black(){
         return new CustomColor(0,0,0);
     }
+    static gray(luma: number){
+        return new CustomColor(luma,luma,luma);
+    }
 }

@@ -56,11 +56,12 @@ export class Component {
         this.entity.on(event, callback);
     }
 
-    debugOptions(buttons: UIElement[]): UIElement[] {
+    debugOptions(buttons: UIElement[],headerAppend?: string): UIElement[] {
         //prepend element to buttons
         if(buttons.length > 0){
             const header = new UIElement("div", "header");
             header.htmlElement.innerText = this.componentType;
+            if(headerAppend) header.htmlElement.innerText += ` ${headerAppend}`;
             buttons.unshift(header);
         }
         return buttons;

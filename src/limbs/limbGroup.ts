@@ -13,14 +13,14 @@ export class LimbGroup {
 
     constructor(system: LimbSystem, offset: Vector, maxDistance: number) {
         this.system = system;
-        this.target = offset.result();
+        this.target = offset.clone();
         this.maxDistance = maxDistance;
     }
     update(dt: number, moved: Vector) {
-        let actualTarget = this.target.result();
+        let actualTarget = this.target.clone();
         //TODO This produces wrong results for moving left because it doesn't remember the direction
         if (moved.x > 20 * dt) actualTarget.x *= -1;
-        let hit = game.collisionSystem.raycast(actualTarget.result().add(this.system.origin).add({ x: 0, y: -5 }), actualTarget.result().add(this.system.origin).add({ x: 0, y: 5 }));
+        let hit = game.collisionSystem.raycast(actualTarget.clone().add(this.system.origin).add({ x: 0, y: -5 }), actualTarget.clone().add(this.system.origin).add({ x: 0, y: 5 }));
         if (hit) actualTarget.y = hit.point.y - this.system.origin.y;
         //if(hit) console.log(hit.point);
         let groundedLimbs = 0;
@@ -44,7 +44,7 @@ export class LimbGroup {
         }
         this.passingPhase = this.passingPhase * this.passingPhase * (3 - 2 * this.passingPhase);
         if ((tooFarAwayLimbs === this.limbs.length || farthestDistance > this.maxDistance * 10) && farthestLimb && groundedLimbs > this.minLimbsStand) {
-            farthestLimb.startStep(actualTarget.result());
+            farthestLimb.startStep(actualTarget.clone());
             groundedLimbs--;
         }
     }

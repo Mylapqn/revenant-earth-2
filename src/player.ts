@@ -125,7 +125,7 @@ export class Player implements ISerializable {
             this.playerHitbox.updateBody(true);
         });
 
-        this.limbSystem.update(dt, this.position.result(), this.grounded);
+        this.limbSystem.update(dt, this.position.clone(), this.grounded);
         let offset = 0;
         if (this.limbSystem.limbGroups[0].passingPhase > 0) offset = Math.round(this.limbSystem.limbGroups[0].passingPhase * 2);
         if (Math.abs(this.velocity.x) < 0.1) offset = 1;
@@ -157,8 +157,8 @@ export class Player implements ISerializable {
             this.legGraphics.moveTo(limb.origin.x, limb.origin.y);
             this.legGraphics.lineTo(limb.joint.x, limb.joint.y);
             this.legGraphics.lineTo(limb.end.x, limb.end.y);
-            let vec = limb.end.result();
-            vec.add(limb.target.result().sub(limb.end).normalize(4));
+            let vec = limb.end.clone();
+            vec.add(limb.target.clone().sub(limb.end).normalize(4));
             this.legGraphics.lineTo(vec.x, vec.y);
             //let col = limb.group == this.limbSystem.limbGroups[1] ? 0xff0000 : 0x0000ff;
             this.legGraphics.stroke({ color: 0x000000, width: 2 });

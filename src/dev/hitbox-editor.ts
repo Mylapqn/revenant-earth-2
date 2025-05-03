@@ -21,6 +21,12 @@ export class HitboxEditor {
         this.editedHitbox = hitbox;
         this.editing = true;
     }
+    stopEditing() {
+        if (!this.editing) return;
+        this.editing = false;
+        this.editedHitbox = undefined;
+        this.editedNodes = [];
+    }
     update() {
         if (!this.editing || !this.editedHitbox) return;
         Debug.drawHitbox(this.editedHitbox, { color: 0xffffff, width: .5 });
@@ -67,7 +73,7 @@ export class HitboxEditor {
             const nearestMiddle = this.nearestMiddle(offsetMouse);
             const nearestNode = this.editedNodes[Vector.nearestPositionIndex(offsetMouse, this.editedNodes.map(node => new Vector(node.x, node.y)))];
             const nearestNodeDistance = Vector.fromLike(nearestNode).distance(offsetMouse);
-            if (nearestNodeDistance < nearestMiddle.distance && nearestNodeDistance < 30) {
+            if (nearestNodeDistance < nearestMiddle.distance && nearestNodeDistance < 10) {
                 Debug.graphicsWorldspace.circle(nearestNode.x + offset.x, nearestNode.y + offset.y, 2);
                 Debug.graphicsWorldspace.stroke(0xffff00);
                 if (game.input.mouse.getButtonDown(MouseButton.Left)) {
@@ -92,9 +98,12 @@ export class HitboxEditor {
         if (game.input.mouse.getButtonUp(MouseButton.Left)) {
             this.editedHitbox.applyNodes(this.editedNodes);
             const output = JSON.stringify(this.editedNodes.map(node => { return { x: parseFloat(displayNumber(node.x, 1)), y: parseFloat(displayNumber(node.y, 1)) } }));
-            console.log(output);
+            //console.log(output);
             //clipboard output
             navigator.clipboard.writeText(output);
+        }
+        if(game.input.keyUp("escape")){
+            this.stopEditing();
         }
     }
     nearestMiddle(position: Vectorlike) {

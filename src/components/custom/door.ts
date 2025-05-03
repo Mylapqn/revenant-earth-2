@@ -33,9 +33,9 @@ export class Door extends Component {
         game.loadScene(this.targetScene);
         const targetDoor = game.activeScene.findComponents(Door).find(comp => comp.doorId === this.doorId);
         if (targetDoor) {
-            game.player.position = targetDoor.transform.position.result();
-            game.camera.position = targetDoor.transform.position.result();
-            if (game.camera.customTarget) game.camera.customTarget = targetDoor.transform.position.result();
+            game.player.position = targetDoor.transform.position.clone();
+            game.camera.position = targetDoor.transform.position.clone();
+            if (game.camera.customTarget) game.camera.customTarget = targetDoor.transform.position.clone();
         }
     }
 

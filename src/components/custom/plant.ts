@@ -128,7 +128,7 @@ export class Plant extends Component {
             }
             if (seedValid) {
                 let newtree = Prefab.Plant({ species: this.species.name, scene: this.entity.scene });
-                new ParticleText("seed", this.transform.position.result().add(new Vector(0, -40)));
+                new ParticleText("seed", this.transform.position.clone().add(new Vector(0, -40)));
                 newtree.transform.position.x = seedPos;
                 newtree.transform.position.y = this.transform.position.y;
             }
@@ -142,7 +142,7 @@ export class Plant extends Component {
         if (this.health <= 0 && !this.dead) {
             this.dead = true;
             this.drawPlant();
-            new ParticleText("died from " + reason, this.transform.position.result().add(new Vector(0, -40)));
+            new ParticleText("died from " + reason, this.transform.position.clone().add(new Vector(0, -40)));
             this.tooltipComponent?.tooltipData.clear();
             this.tooltipComponent?.tooltipData.set("status", "died from " + reason);
         }
@@ -164,7 +164,7 @@ export class Plant extends Component {
                 let angleOffset = (newRandom.float() - .5) * .6 * Math.PI;
                 thickness = Math.max(2, thickness);
                 if (i > growth * .2) {
-                    this.branch({ angle: angle + angleOffset, length: length, position: pos.result(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * .5 });
+                    this.branch({ angle: angle + angleOffset, length: length, position: pos.clone(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * .5 });
                 }
                 angle -= angleOffset;
                 thickness /= 2;
@@ -195,7 +195,7 @@ export class Plant extends Component {
     }
 
     drawPlant() {
-        let hit = game.collisionSystem.raycast(this.entity.transform.position.result().add({ x: 0, y: -200 }), this.entity.transform.position.result().add({ x: 0, y: 200 }), (body) => { return body.userData?.terrain });
+        let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -200 }), this.entity.transform.position.clone().add({ x: 0, y: 200 }), (body) => { return body.userData?.terrain });
         if (hit) {
             this.entity.transform.position.y = hit.point.y;
         }

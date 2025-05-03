@@ -68,7 +68,7 @@ export const scene2data = [
             {
                 componentType: "Hitbox",
                 data: {
-                    nodes: doorHitbox,
+                    hitboxName: "dungeon-1",
                     interior: true,
                 },
             },

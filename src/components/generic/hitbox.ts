@@ -30,6 +30,7 @@ export class Hitbox extends Component {
     edgeTexture!: Texture;
     bgTexture!: Texture;
     bgSprite: TilingSprite;
+    hitboxName?: string;
 
     constructor(entity: Entity) {
         super(entity);
@@ -62,18 +63,23 @@ export class Hitbox extends Component {
     }
 
     override toData(): ComponentData {
-        const data = { nodes: this.originalNodes as Vectorlike[], interior: this.isInterior };
+        const data: any = { interior: this.isInterior };
+        if (this.hitboxName) data.hitboxName = this.hitboxName;
+        else data.nodes = this.nodes;
         return super.toData(data);
     }
 
-    override applyData(data: { nodes: Vectorlike[], interior?: boolean }): void {
+    override applyData(data: { nodes?: Vectorlike[], interior?: boolean, hitboxName?: string }): void {
         this.isInterior = data.interior ?? false;
+        const nodes = data.hitboxName ? game.hitboxLibrary.get(data.hitboxName) : data.nodes;
+        if (!nodes) throw new Error(`Hitbox not loaded`);
+        this.hitboxName = data.hitboxName;
 
         game.bgContainer.addChild(this.bgSprite);
         game.pixelLayer.container.addChild(this.graphics);
         game.pixelLayer.container.addChild(this.hitboxMesh);
 
-        this.applyNodes(data.nodes);
+        this.applyNodes(nodes);
     }
 
     override remove() {
@@ -92,7 +98,7 @@ export class Hitbox extends Component {
     debugOptions(): UIElement[] {
         const buttons = [];
         buttons.push(new UIButton(`Edit hitbox`, () => { Debug.hitboxEditor.startEditing(this) }));
-        return super.debugOptions(buttons);
+        return super.debugOptions(buttons, this.hitboxName ? `(${this.hitboxName})` : "(custom)");
     }
 
     applyNodes(originalNodes: Vectorlike[]) {
@@ -146,6 +152,7 @@ export class Hitbox extends Component {
             points.splice(points.length - 5, 5);
             points.push(points[1]);
             points.push(points[2]);
+            this.bgSprite.position.set(-1000 + this.transform.position.x, -1000 + this.transform.position.y);
         }
         const hbGeo = new HitboxGeometry({
             points: points,

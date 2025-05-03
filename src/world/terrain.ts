@@ -84,7 +84,10 @@ export class Terrain implements ISerializable, ISceneObject {
         game.terrain.terrainData = data.terrainData;
 
         game.terrain.considerNodes();
-        if (scene) scene.register(game.terrain);
+        if (scene) {
+            scene.register(game.terrain);
+            scene.hasTerrain = true;
+        }
     }
 
     defaultTerrain() {
@@ -136,6 +139,7 @@ export class Terrain implements ISerializable, ISceneObject {
 
     update() {
         this.graphics.clear();
+        if (!game.activeScene.hasTerrain) return;
 
         const editedNodes = new Set<TerrainNode>();
         let prev = this.nodes[0];
@@ -185,12 +189,13 @@ export class Terrain implements ISerializable, ISceneObject {
         }
     }
 
-    getProperties(x: number | Vectorlike) {
+    getProperties(x: number | Vectorlike): TerrainData {
         if (typeof x === "object") x = x.x;
         let index = Math.round(x / this.dataWidth);
         if (index >= this.terrainData.length) index = this.terrainData.length - 1;
         if (index < 0) index = 0;
-        const a = this.terrainData[index];
+        let a = this.terrainData[index];
+        if(a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0 };
         return a;
     }
 
@@ -302,7 +307,7 @@ export class Terrain implements ISerializable, ISceneObject {
             this.graphics.lineTo(node.x, node.y);
         }
 
-        this.graphics.fill(0x050403);
+        this.graphics.fill(0x151008);
 
         const terrainStats: number[] = [];
         const terrainInspect: number[] = [];

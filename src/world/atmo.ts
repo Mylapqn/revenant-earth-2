@@ -116,7 +116,8 @@ export class Atmo implements ISerializable, ISceneObject {
         if (typeof x === "object") x = x.x;
         let index = Math.round(x / this.dataWidth);
         if (index < 0) index = 0;
-        const a = this.atmoData[index];
+        let a = this.atmoData[index];
+        if(a === undefined) a = { pollution: 0 };
         return a;
     }
 

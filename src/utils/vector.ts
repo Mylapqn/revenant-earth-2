@@ -22,9 +22,12 @@ export class Vector {
         return { x: this.x, y: this.y };
     }
 
-    set(x: number | Vectorlike, y: number): Vector {
-        if (typeof x === "object") [x, y] = [x.x, x.y];
-        this.x = x;
+    set(x: number, y: number): Vector;
+    set(vector: Vectorlike): Vector;
+    set(xOrVector: number | Vectorlike, y?: number): Vector {
+        if (typeof xOrVector === "object") [xOrVector, y] = [xOrVector.x, xOrVector.y];
+        this.x = xOrVector;
+        if (y === undefined) return this;
         this.y = y;
         return this;
     }
@@ -76,6 +79,18 @@ export class Vector {
         return this;
     }
 
+    vecmult(vector: Vectorlike): Vector {
+        this.x = this.x * vector.x;
+        this.y = this.y * vector.y;
+        return this;
+    }
+
+    vecdiv(vector: Vectorlike): Vector {
+        this.x = this.x / vector.x;
+        this.y = this.y / vector.y;
+        return this;
+    }
+
     floor(): Vector {
         this.x = Math.floor(this.x);
         this.y = Math.floor(this.y);
@@ -94,7 +109,14 @@ export class Vector {
         return Math.atan2(this.y, this.x);
     }
 
+    /**
+     * @deprecated Use clone() instead.
+     */
     result() {
+        return this.clone();
+    }
+
+    clone() {
         return new Vector(this.x, this.y);
     }
 
@@ -106,7 +128,7 @@ export class Vector {
         return "[X: " + this.x.toFixed(3) + " Y: " + this.y.toFixed(3) + "]";
     }
 
-    
+
 
     /**
      * @param {Vector} v1

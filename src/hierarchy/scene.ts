@@ -21,6 +21,7 @@ export class Scene implements ISerializable {
     stateManager: StateManager;
     name: string = "Scene";
     data: Array<KindedObject> = [];
+    hasTerrain: boolean = false;
 
     constructor() {
         this.stateManager = new StateManager();
@@ -58,6 +59,12 @@ export class Scene implements ISerializable {
         if (game.activeScene !== this) game.activeScene.unload();
         game.activeScene = this;
         this.stateManager.deserialise(this.data, this);
+        if (!this.hasTerrain) {
+            game.terrainContainer.visible = false;
+        }
+        else {
+            game.terrainContainer.visible = true;
+        }
         return this;
     }
 
