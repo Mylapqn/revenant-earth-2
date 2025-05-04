@@ -15,6 +15,7 @@ import { Entity } from "../hierarchy/entity";
 import { Vector } from "../utils/vector";
 import { ParticleText } from "../hierarchy/particleText";
 import { StateMode } from "../hierarchy/serialise";
+import { objcount } from "../utils/counter";
 
 const entityDistance = 50;
 
@@ -45,6 +46,13 @@ export class Debug {
     static log(text: string | number) { this.debugText += text + "\n"; };
     static update(dt: number) {
         this.graphicsWorldspace.clear();
+        if(this.memtext == "") this.snapMemory();
+        if (game.input.keyDown(";")) {
+            this.memtext = "";
+            this.snapMemory();
+            navigator.clipboard.writeText(this.memtext);
+        }
+
         if (this.editorMode) {
             this.log("Editor Mode");
             if (game.timeScale == 0) this.log("Game paused");
@@ -222,5 +230,32 @@ export class Debug {
         const newEntity = Entity.fromData(data as any, game.activeScene);
         newEntity.transform.position.set(game.worldMouse);
         return newEntity;
+    }
+
+
+    private static lastMem = new Map<string, number>();
+    private static memBenchmark = new Map<string, number>();
+
+    static memtext = "";
+
+    static snapMemory() {
+        const path = ["game"];
+        const score = new Map<string, number>();
+        objcount(game, path, [], score, 5);
+        const display = new Array<{ string: string; count: number }>();
+        score.forEach((v, k) => display.push({ string: k, count: v - (this.memBenchmark.get(k) ?? 0) }));
+        display.sort((a, b) => b.count - a.count);
+        for (let index = 0; index < display.length; index++) {
+            const difference = score.get(display[index].string)! - this.lastMem.get(display[index].string)!;
+
+
+            const count = display[index].count
+
+            const path = display[index].string;
+
+            this.memtext += count + "\t" + path + "\t" + difference + "\n";
+        }
+        //if (game.input.key("m")) this.memBenchmark = score;
+        this.lastMem = score;
     }
 }
