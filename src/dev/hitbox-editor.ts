@@ -38,25 +38,29 @@ export class HitboxEditor {
         }
 
         if (this.selectedNode) {
+            const gridSnap = game.input.key("control") ? 10 : 1;
             this.selectedNode.x = offsetMouse.x;
             this.selectedNode.y = offsetMouse.y;
+            this.selectedNode.x = Math.floor(this.selectedNode.x / gridSnap) * gridSnap;
+            this.selectedNode.y = Math.floor(this.selectedNode.y / gridSnap) * gridSnap;
             //snap to next and prev node axis
             const index = this.editedNodes.indexOf(this.selectedNode);
             const prevNode = this.getNode(index - 1);
             const nextNode = this.getNode(index + 1);
-            if (Math.abs(this.selectedNode.x - prevNode.x) < 5) {
-                this.selectedNode.x = prevNode.x;
+            if (gridSnap == 1) {
+                if (Math.abs(this.selectedNode.x - prevNode.x) < 5) {
+                    this.selectedNode.x = prevNode.x;
+                }
+                if (Math.abs(this.selectedNode.x - nextNode.x) < 5) {
+                    this.selectedNode.x = nextNode.x;
+                }
+                if (Math.abs(this.selectedNode.y - prevNode.y) < 5) {
+                    this.selectedNode.y = prevNode.y;
+                }
+                if (Math.abs(this.selectedNode.y - nextNode.y) < 5) {
+                    this.selectedNode.y = nextNode.y;
+                }
             }
-            if (Math.abs(this.selectedNode.x - nextNode.x) < 5) {
-                this.selectedNode.x = nextNode.x;
-            }
-            if (Math.abs(this.selectedNode.y - prevNode.y) < 5) {
-                this.selectedNode.y = prevNode.y;
-            }
-            if (Math.abs(this.selectedNode.y - nextNode.y) < 5) {
-                this.selectedNode.y = nextNode.y;
-            }
-
             if (game.input.mouse.getButtonUp(MouseButton.Left)) {
                 //test if nodes merged
                 if (Vector.fromLike(this.selectedNode).distance(nextNode) < 5) {
@@ -102,7 +106,7 @@ export class HitboxEditor {
             //clipboard output
             navigator.clipboard.writeText(output);
         }
-        if(game.input.keyUp("escape")){
+        if (game.input.keyUp("escape")) {
             this.stopEditing();
         }
     }

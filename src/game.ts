@@ -5,7 +5,7 @@ import { System } from "detect-collisions";
 import { Player } from "./player";
 import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./utils/vector";
-import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
+import { initHandlers, KindedObject, StateManager, StateMode } from "./hierarchy/serialise";
 import { Entity } from "./hierarchy/entity";
 import { Scene } from "./hierarchy/scene";
 import { initComponents } from "./components/componentIndex";
@@ -27,6 +27,7 @@ import { Debug } from "./dev/debug";
 import { scene2data } from "./environment/scene2data";
 import { HitboxLibrary } from "./environment/hitboxLibrary";
 import { displayNumber } from "./utils/utils";
+import { Ambience } from "./hierarchy/ambience";
 
 export let game: Game;
 
@@ -76,6 +77,7 @@ export class Game {
     hitboxLibrary = new HitboxLibrary();
 
     frameHistory: number[] = [];
+    ambience!: Ambience;
 
     public get inputEnabled(): boolean {
         return !Debug.editorMode && !this.hacking
@@ -118,13 +120,23 @@ export class Game {
     }
 
     async init() {
+        (window as any).__PIXI_DEVTOOLS__ = {
+            app: this.app
+        };
         await Assets.load("./font/monogram.ttf");
+        await Assets.add({ alias: "bg", src: "./bg2.png" });
+        await Assets.load("bg");
+        await Assets.add({ alias: "space", src: "./space.png" });
+        await Assets.load("space");
         await this.hitboxLibrary.init();
+        await this.soundManager.loadSounds();
+
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
         this.stateManager.register(this.progressDatabase);
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
+        Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg" } }, this.activeScene);
 
         initHandlers();
         initComponents();
@@ -160,7 +172,9 @@ export class Game {
         const s2t = new Array(1000).fill({ x: 0, y: 0 }).map((n, i) => ({ x: i * 10, y: 0 }));
         const s2td = new Array(1000).fill({ pollution: 0, fertility: 0, erosion: 0, moisture: 0 });
 
-        scene2.data = scene2data as any;
+        scene2.data = await Assets.load("./scenes/scene-2.json");
+
+        const sceneSpace = Scene.deserialise({ name: "Space Station", kind: "Scene", active: false, data: await Assets.load("./scenes/space-station.json") });
 
         this.skyLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.skyContainer, worldSpace: false });
         const a = new Sprite(await Assets.load("./tree.png"));
@@ -256,6 +270,38 @@ export class Game {
             this.activeScene
         );
 
+        Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Door Space",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 1150, y: -20 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./door-space.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Door",
+                        data: {
+                            target: "Space Station",
+                            doorId: "space-door-1",
+                        },
+                    },
+                ],
+            },
+            this.activeScene
+        );
+
         Prefab.Plant({ scene: this.activeScene, x: 100, y: 100, species: "Tree" });
         Prefab.Plant({ scene: this.activeScene, x: 300, y: 100, species: "Tree" });
 
@@ -269,7 +315,7 @@ export class Game {
         this.app.ticker.add(this.update, this);
         UI.init();
         Debug.init();
-        await this.soundManager.loadSounds();
+        //game.loadScene("Space Station");
     }
 
     update(ticker: Ticker) {
@@ -304,8 +350,7 @@ export class Game {
         }
 
         const address = "http://localhost:3000/state.json";
-
-        if (this.input.keyUp("tab")) {
+        if (this.input.keyUp("tab") && !this.input.key("alt")) {
             Debug.editorMode = !Debug.editorMode;
         }
 

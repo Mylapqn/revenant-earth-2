@@ -4,7 +4,7 @@ import { Entity } from "../../hierarchy/entity";
 import { MouseButton } from "../../input";
 import { BasicSprite } from "./basicSprite";
 import { Interactable } from "./interactable";
-import { ShaderMeshRenderer } from "./shaderMesh";
+import { ShaderMeshRenderer } from "./shaderMeshRenderer";
 
 export class EntityTooltip extends Component {
     static componentType = "EntityTooltip";

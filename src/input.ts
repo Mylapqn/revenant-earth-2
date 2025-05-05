@@ -6,6 +6,7 @@ export class Input {
     heldKeys: Map<string, boolean>;
     keysUp: Map<string, boolean>;
     keysDown: Map<string, boolean>;
+    focusFrame = 0;
     constructor() {
         this.mouse = new Mouse();
         this.heldKeys = new Map<string, boolean>();
@@ -13,18 +14,28 @@ export class Input {
         this.keysDown = new Map<string, boolean>();
         window.addEventListener("keydown", e => this.onKeyDown(e));
         window.addEventListener("keyup", e => this.onKeyUp(e));
+        window.addEventListener("focus", () => this.onFocus());
+    }
+    private onFocus() {
+        this.keysDown = new Map<string, boolean>();
+        this.heldKeys = new Map<string, boolean>();
+        this.keysUp = new Map<string, boolean>();
+        this.focusFrame = 10;
     }
     private onKeyDown(e: KeyboardEvent) {
+        if (this.focusFrame > 0) return;
         if (e.repeat) return;
         const key = e.key.toLowerCase();
         this.heldKeys.set(key, true);
         this.keysDown.set(key, true);
         switch (key) {
             case "tab":
+            case "alt":
                 e.preventDefault();
         }
     }
     private onKeyUp(e: KeyboardEvent) {
+        if (this.focusFrame > 0) return;
         const key = e.key.toLowerCase();
         this.heldKeys.set(key, false);
         this.keysUp.set(key, true);
@@ -42,6 +53,7 @@ export class Input {
         this.mouse.update();
         this.keysUp = new Map<string, boolean>();
         this.keysDown = new Map<string, boolean>();
+        this.focusFrame = Math.max(this.focusFrame - 1, 0);
     }
 }
 

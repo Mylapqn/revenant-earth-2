@@ -10,7 +10,7 @@ import { placeholderGeometry } from "../../utils/utils";
 
 import vertex from "../../shaders/vert.vert?raw";
 import fragment from "../../shaders/frag.frag?raw";
-import { HitboxGeometry } from "../../shaders/hitboxMesh";
+import { HitboxGeometry } from "../../shaders/hitboxGeometry";
 import { UIElement } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
 import { Debug } from "../../dev/debug";

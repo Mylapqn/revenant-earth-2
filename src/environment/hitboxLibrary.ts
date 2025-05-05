@@ -5,6 +5,7 @@ export class HitboxLibrary {
     private library: Map<string, Vectorlike[]> = new Map();
     async init() {
         await this.add("dungeon-1");
+        await this.add("space-station");
     }
     async add(name: string, fileName?: string) {
         if (!fileName) fileName = name;

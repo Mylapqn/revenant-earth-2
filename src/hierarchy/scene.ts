@@ -86,7 +86,7 @@ export class Scene implements ISerializable {
         }
     }
 
-    serialise(mode: StateMode): SceneData | false {
+    serialise(mode: StateMode): SceneData {
         if (this.isActive) this.data = this.stateManager.serialise(StateMode.scene);
         return {
             kind: "Scene",
@@ -105,6 +105,7 @@ export class Scene implements ISerializable {
         if (data.active) {
             scene.load();
         }
+        return scene;
     }
 }
 

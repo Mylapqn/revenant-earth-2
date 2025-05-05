@@ -31,13 +31,19 @@ export class Weather implements ISerializable, ISceneObject {
     serialise(mode: StateMode): KindedObject | false {
         return { kind: "Weather", weatherData: this.weatherData };
     }
-    static deserialise(raw: any, scene?: Scene) {
-        const data = raw as { kind: string; weatherData: WeatherData };
+    static deserialise(raw: { kind: string; weatherData: WeatherData }, scene?: Scene) {
+        const data = raw;
         game.weather.weatherData = data.weatherData;
+        if(data.weatherData.rainIntensity > 0){
+            game.soundManager.soundLibrary.play("rain_heavy");
+            game.soundManager.soundLibrary.play("rain_light");
+        }
         if (scene) scene.register(game.weather);
     }
     unload(): void {
         game.activeScene.unregister(this);
+        game.soundManager.soundLibrary.pause("rain_heavy");
+        game.soundManager.soundLibrary.pause("rain_light");
     }
     update(dt: number): void {
         if (this.weatherData.rainThreshold === 0) this.weatherData.rainThreshold = this.random.range(10, 40);
@@ -46,7 +52,7 @@ export class Weather implements ISerializable, ISceneObject {
             const rainMult = rainRatio + .01;
             game.soundManager.soundLibrary.volume("rain_heavy", VolumeCurve.curves.rainHeavy.apply(1 - rainRatio));
             game.soundManager.soundLibrary.volume("rain_light", VolumeCurve.curves.rainLight.apply(1 - rainRatio));
-            
+
             Debug.log("rainRatio:      " + displayNumber(rainRatio));
             Debug.log("rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)));
             Debug.log("rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)));
@@ -76,7 +82,8 @@ export class Weather implements ISerializable, ISceneObject {
         else {
             this.weatherData.rainBuildup += dt * game.atmo.temp * .002;
             const rainBuildupRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
-            game.soundManager.soundLibrary.volume("wind", VolumeCurve.curves.windFromRainBuildup.apply(rainBuildupRatio));
+            if (game.ambience.sound != "")
+                game.soundManager.soundLibrary.volume(game.ambience.sound, VolumeCurve.curves.windFromRainBuildup.apply(rainBuildupRatio));
         }
     }
     draw(dt: number): void {

@@ -70,7 +70,7 @@ vec3 PBRNeutralToneMapping(vec3 color) {
     return mix(color, newPeak * vec3(1, 1, 1), g);
 }
 
-vec2 perspectiveUV(vec2 uv, float speed) {
+vec2 perspectiveTimeUV(vec2 uv, float speed) {
     uv.y *= 2.f;
     uv.x = 0.5f + (uv.x - .5f) * (1.f / (1.f - uv.y)) * .2f;
     uv.y *= uv.y * 3.f;
@@ -86,7 +86,7 @@ void main() {
     vec2 sunPosition = uSunPosition;
     sunPosition.x /= ratio;
     vec2 originalUV = uv;
-    uv = perspectiveUV(originalUV, 1.f);
+    uv = perspectiveTimeUV(originalUV, .2f);
     float noise1 = fractalNoise(uv, 5, 2.f,.8*(1.-originalUV.y*.5));
     //vec2 puv = perspectiveUV(originalUV,.5f);
     //float noise2 = fractalNoise(puv, 8, 2.f);

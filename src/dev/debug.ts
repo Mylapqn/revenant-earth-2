@@ -34,6 +34,7 @@ export class Debug {
             game.camera.customTarget = undefined;
             game.camera.zoom = 1;
             this.hitboxEditor?.stopEditing();
+            game.timeScale = 1;
         }
 
     }
@@ -70,7 +71,7 @@ export class Debug {
             this.graphicsWorldspace.stroke({ width: .5 / game.camera.zoom, color: 0xff0000, alpha: .4 });
 
         }
-        if (this.debugView || this.editorMode) {
+        if (this.editorMode && !this.hitboxEditor.editing) {
             const nearestEntity = game.nearestEntity(game.worldMouse);
             for (const entity of game.activeScene.objects) {
                 if (entity instanceof Entity) {
@@ -147,7 +148,7 @@ export class Debug {
                         }
                     }))
                     buttons.push(new UIButton("Copy scene", async () => {
-                        navigator.clipboard.writeText(JSON.stringify(game.activeScene.serialise(StateMode.scene)));
+                        navigator.clipboard.writeText(JSON.stringify(game.activeScene.serialise(StateMode.scene).data));
                     }))
                 }
 
@@ -159,8 +160,12 @@ export class Debug {
         }
         if (this.movingEntity) {
             this.movingElapsed += dt;
-            this.movingEntity.transform.position.x = game.worldMouse.x;
-            this.movingEntity.transform.position.y = game.worldMouse.y;
+
+            const snapSize = game.input.key("control") ? 10 : 1;
+
+            this.movingEntity.transform.position.x = Math.round(game.worldMouse.x / snapSize) * snapSize;
+            this.movingEntity.transform.position.y = Math.round(game.worldMouse.y / snapSize) * snapSize;
+
             if (game.input.mouse.getButtonUp(MouseButton.Left) && this.movingElapsed > 0.2) {
                 this.movingEntity = undefined
                 this.movingElapsed = 0;

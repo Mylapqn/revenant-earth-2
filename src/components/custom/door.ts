@@ -1,4 +1,4 @@
-import { game } from "../../game";
+import { Game, game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { UIElement, UIPanel } from "../../ui/ui";
@@ -34,8 +34,8 @@ export class Door extends Component {
         const targetDoor = game.activeScene.findComponents(Door).find(comp => comp.doorId === this.doorId);
         if (targetDoor) {
             game.player.position = targetDoor.transform.position.clone();
-            game.camera.position = targetDoor.transform.position.clone();
-            if (game.camera.customTarget) game.camera.customTarget = targetDoor.transform.position.clone();
+            game.camera.position = targetDoor.transform.position.clone().mult(Game.pixelScale);
+            if (game.camera.customTarget) game.camera.customTarget = targetDoor.transform.position.clone().mult(Game.pixelScale);
         }
     }
 

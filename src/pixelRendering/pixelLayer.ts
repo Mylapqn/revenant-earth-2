@@ -1,15 +1,10 @@
-import { Container, Graphics, Rectangle, RenderTexture, Sprite, Texture } from "pixi.js";
+import { Container, Graphics, RenderTexture, Sprite } from "pixi.js";
 import { Game, game } from "../game";
-import { PixelSprite } from "./pixelSprite";
-import { BackgroundFilter } from "../shaders/terrainFilter";
-import { lerp } from "../utils/utils";
 import { ShaderMesh, Uniforms } from "../shaders/shaderMesh";
-import vertexShaderDefault from "../shaders/vert.vert?raw";
 import fragmentShaderBackground from "../shaders/background.frag?raw";
 import fragmentShaderForeground from "../shaders/foreground.frag?raw";
 import fragmentShaderDefault from "../shaders/frag.frag?raw";
 import { CustomColor } from "../utils/color";
-import { Debug } from "../dev/debug";
 
 export type PixelLayerOptions = ({
     autoResize: true;
@@ -69,7 +64,7 @@ export class PixelLayer {
             fragmentShader = fragmentShaderForeground;
             uniforms.uPlayerPosition = { type: "vec2<f32>", value: new Float32Array([0, 0]) };
         }
-        this.renderMesh = new ShaderMesh(this.renderTexture, vertexShaderDefault, fragmentShader, uniforms);
+        this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms });
         this.renderMesh.scale.set(Game.pixelScale);
         this.initialResolution = { x: width, y: height };
         if (options.parent) {

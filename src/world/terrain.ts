@@ -11,7 +11,7 @@ import { Input, MouseButton } from "../input";
 import vertex from "../shaders/terrainSurface.vert?raw";
 import fragment from "../shaders/terrainSurface.frag?raw";
 import { placeholderGeometry, lerp } from "../utils/utils";
-import { HitboxGeometry } from "../shaders/hitboxMesh";
+import { HitboxGeometry } from "../shaders/hitboxGeometry";
 import { Debug } from "../dev/debug";
 
 export enum TerrainInspectMode {
@@ -47,7 +47,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.terrainMesh = new TerrainMesh();
         this.surfaceMesh = new Mesh({
             geometry: placeholderGeometry, shader: new Shader({
-                glProgram: new GlProgram({ vertex, fragment }),
+                glProgram: GlProgram.from({ vertex, fragment }),
                 resources: {
                     group: {
                         uInspectMode: {

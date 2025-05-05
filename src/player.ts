@@ -95,12 +95,19 @@ export class Player implements ISerializable {
         this.oxygenBar.progress = (this.oxygen / 100);
         //console.log(Atmo.displayValues(game.atmo.getProperties(this.position)));
 
+        let maxSpeed = 60;
+        let accel = 1000;
+        let jumpSpeed = 300;
         if (game.inputEnabled) {
-            if (game.input.key("d") && this.velocity.x < 40) this.velocity.x += 300 * dt;
-            else if (game.input.key("a") && this.velocity.x > -40) this.velocity.x -= 300 * dt;
+            if(game.input.key("shift")){
+                maxSpeed *= 2.5;
+                accel *= 2.5;
+            }
+            if (game.input.key("d") && this.velocity.x < maxSpeed) this.velocity.x += accel * dt;
+            else if (game.input.key("a") && this.velocity.x > -maxSpeed) this.velocity.x -= accel * dt;
             else if (this.grounded) this.velocity.x *= 0.9;
             if (game.input.key(" ") && this.grounded) {
-                this.velocity.y = -300;
+                this.velocity.y = -jumpSpeed;
                 this.groundedTimer = 0;
             }
         }
@@ -163,11 +170,11 @@ export class Player implements ISerializable {
             //let col = limb.group == this.limbSystem.limbGroups[1] ? 0xff0000 : 0x0000ff;
             this.legGraphics.stroke({ color: 0x000000, width: 2 });
             if (limb.moving) {
-                this.legGraphics.circle(limb.target.x, limb.target.y, 3);
-                this.legGraphics.stroke({ color: 0xffff00, width: 1 });
+                //this.legGraphics.circle(limb.target.x, limb.target.y, 3);
+                //this.legGraphics.stroke({ color: 0xffff00, width: 1 });
             }
         }
-        this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y, 2);
+        /*this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y, 2);
         this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
 
         this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y - 5, 1);
@@ -175,6 +182,7 @@ export class Player implements ISerializable {
 
         this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y + 5, 1);
         this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
+        */
     }
 
     serialise(mode: StateMode): false | PlayerData {

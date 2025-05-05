@@ -3,8 +3,8 @@
         "kind": "Ambience",
         "ambienceData": {
             "music": "",
-            "sound": "",
-            "background": "bg"
+            "sound": "space",
+            "background": "space"
         }
     },
     {
@@ -13,31 +13,31 @@
         "name": "Door",
         "component": [
             {
-                "id": 4,
+                "id": 12,
                 "componentType": "BasicSprite",
                 "data": {
-                    "asset": "./door.png"
+                    "asset": "./door-space.png"
                 }
             },
             {
-                "id": 5,
+                "id": 13,
                 "componentType": "Interactable"
             },
             {
-                "id": 6,
+                "id": 14,
                 "componentType": "Door",
                 "data": {
                     "target": "Scene",
-                    "doorId": "dungeon-door-1"
+                    "doorId": "space-door-1"
                 }
             },
             {
-                "id": 7,
+                "id": 15,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 40,
-                        "y": 20
+                        "x": 0,
+                        "y": 11
                     },
                     "velocity": {
                         "x": 0,
@@ -53,29 +53,29 @@
         "name": "Entity 8",
         "component": [
             {
-                "id": 4,
+                "id": 12,
                 "componentType": "BasicSprite",
                 "data": {
                     "asset": "./robo.png"
                 }
             },
             {
-                "id": 5,
+                "id": 13,
                 "componentType": "Interactable"
             },
             {
-                "id": 6,
+                "id": 14,
                 "componentType": "Button",
                 "data": {
                     "dbName": "pollutionSpeed"
                 }
             },
             {
-                "id": 7,
+                "id": 15,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 10,
+                        "x": 290,
                         "y": 20
                     },
                     "velocity": {
@@ -92,7 +92,7 @@
         "name": "Dungeon Hitbox",
         "component": [
             {
-                "id": 2,
+                "id": 6,
                 "componentType": "Transform",
                 "data": {
                     "position": {
@@ -106,11 +106,11 @@
                 }
             },
             {
-                "id": 3,
+                "id": 7,
                 "componentType": "Hitbox",
                 "data": {
                     "interior": true,
-                    "hitboxName": "dungeon-1"
+                    "hitboxName": "space-station"
                 }
             }
         ]
@@ -118,69 +118,13 @@
     {
         "kind": "Player",
         "position": {
-            "x": 40,
-            "y": 32.087649674107624
+            "x": 9.169364149877922e-42,
+            "y": 24.087649674107624
         },
         "velocity": {
-            "x": 0,
+            "x": 2.5694857729384606e-43,
             "y": 0
         }
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 2,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 3,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -175.9855594867576,
-                        "y": -36.19020999791623
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 4,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 5,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -108.13428823752798,
-                        "y": -36.47410653033974
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
     },
     {
         "kind": "Entity",
@@ -199,8 +143,120 @@
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -39.47719949419101,
-                        "y": -36.292003220459364
+                        "x": -240,
+                        "y": 10
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 10,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 11,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 160,
+                        "y": 10
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 12,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 13,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 240,
+                        "y": 10
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 10,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 11,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -160,
+                        "y": 10
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 14,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_wall.png"
+                }
+            },
+            {
+                "id": 15,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 0,
+                        "y": -40
                     },
                     "velocity": {
                         "x": 0,

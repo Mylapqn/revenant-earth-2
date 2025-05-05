@@ -32,7 +32,8 @@ export class SoundManager {
         this.loadOneshotRange("footstep", "./sound/muddry_footsteps/footsmuddry_%.wav", 5, 1);
         this.soundLibrary.add("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true });
         this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true });
-        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, autoPlay: true, singleInstance: true });
+        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false });
+        this.soundLibrary.add("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false });
     }
 }
 

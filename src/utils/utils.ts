@@ -40,6 +40,5 @@ export function clamp(n: number, min = 0, max = 1) {
 export function displayNumber(n: number, digits = 2) {
     return parseFloat(n.toFixed(digits)).toString();
 }
-
-export const placeholderGeometry = new Geometry({ attributes: { aPosition: [0, 1], aUV: [0, 1] } });
+export const placeholderGeometry = new Geometry({ attributes: { aPosition: [0, 1], aUV: [0, 1] ,aTerrainStats: [0, 0, 0], aTerrainInspect: [0]} });
 
