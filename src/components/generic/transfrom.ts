@@ -8,6 +8,7 @@ export class Transform extends Component {
     static componentType = "Transform";
     position = new Vector(0, 0);
     velocity = new Vector(0, 0);
+    rotation = 0;
 
     constructor(entity: Entity) {
         super(entity);
@@ -33,5 +34,9 @@ export class Transform extends Component {
     update(dt: number) {
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
+    }
+
+    worldCoords(vector: Vectorlike): Vector {
+        return new Vector(this.position.x + vector.x, this.position.y + vector.y);
     }
 }

@@ -12,6 +12,7 @@ import { clamp, lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
+import { Debug } from "../../dev/debug";
 
 export class Plant extends Component {
     static componentType = "Plant";
@@ -65,10 +66,13 @@ export class Plant extends Component {
 
         const dt = realDt * plantSimulationSpeed;
 
-        this.timeSinceDraw += realDt;
-        if (this.timeSinceDraw > this.secondsPerDraw && !this.dead) {
-            this.timeSinceDraw = 0;
-            this.drawPlant();
+        if (game.camera.inView(this.transform.position, 50)) {
+            this.timeSinceDraw += realDt;
+            Debug.log(this.timeSinceDraw);
+            if (this.timeSinceDraw > this.secondsPerDraw && !this.dead) {
+                this.timeSinceDraw = 0;
+                this.drawPlant();
+            }
         }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
         if (this.dead) return;

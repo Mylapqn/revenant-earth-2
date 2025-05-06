@@ -7,6 +7,8 @@ import { Component, ComponentData } from "../../hierarchy/component";
 import { ShaderMesh } from "../../shaders/shaderMesh";
 import { Vector } from "../../utils/vector";
 import { SpriteDirection } from "./spriteDirection";
+import { Lightmap } from "../../shaders/lighting/lightmap";
+import { Light } from "../../shaders/lighting/light";
 
 export class WindowRenderer extends Component {
     static componentType = "WindowRenderer";
@@ -33,6 +35,7 @@ export class WindowRenderer extends Component {
 
     override init(): void {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
+        new Light({position:this.transform.position.clone().add({x:0,y:-10}),width:2.5,range:150,angle:Math.PI/2,intensity:1.5});
     }
     override toData(): ComponentData {
         const data = { asset: this.asset }
@@ -64,9 +67,10 @@ export class WindowRenderer extends Component {
         //console.log(this.renderMesh.shader!.resources.group.uniforms.uBackgroundResolution);
         //console.log(this.renderMesh.shader!.resources.resolutionGroup.uniforms.uWindowResolution);
     }
-    //Doesn't draw automatically, expensive
     draw(dt: number) {
         if (this.directionComponent != undefined) this.renderMesh.scale.x = this.directionComponent.direction;
         this.renderMesh.position.set(this.transform.position.x, this.transform.position.y);
+        //TODO Emissive texture?
+        //game.app.renderer.render({ container: this.renderMesh,target:Lightmap.texture,clear:false,transform:this.renderMesh.worldTransform });
     }
 }

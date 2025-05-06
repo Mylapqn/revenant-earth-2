@@ -79,7 +79,7 @@ export class Camera {
         game.playerContainer.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
         //game.terrainContainer.position.set(this.subpixelOffset.x, this.subpixelOffset.y);
         Debug.graphicsWorldspace.position.set(this.screenPixelOffset.x, this.screenPixelOffset.y);
-        if(this.oldZoom != this.zoom) game.resize();
+        if (this.oldZoom != this.zoom) game.resize();
         this.oldZoom = this.zoom;
         game.app.stage.scale.set(this.zoom);
 
@@ -89,6 +89,16 @@ export class Camera {
         return new Vector(v.x, v.y).mult(Game.pixelScale).sub(this.position).add(this.middle);
     }
     screenToWorld(v: Vectorlike) {
-        return new Vector(v.x, v.y).mult(1/this.zoom).add(this.position).sub(this.middle).mult(1 / Game.pixelScale);
+        return new Vector(v.x, v.y).mult(1 / this.zoom).add(this.position).sub(this.middle).mult(1 / Game.pixelScale);
+    }
+    screenToRender(v: Vectorlike) {
+        return new Vector(v.x, v.y).vecdiv(this.viewport)
+    }
+    worldToRender(v: Vectorlike) {
+        return this.screenToRender(this.worldToScreen(v));
+    }
+    inView(v: Vectorlike, padding = 0) {
+        const screenPos = this.worldToScreen(v);
+        return screenPos.x > -padding && screenPos.x < this.screen.x + padding && screenPos.y > -padding && screenPos.y < this.screen.y + padding;
     }
 }

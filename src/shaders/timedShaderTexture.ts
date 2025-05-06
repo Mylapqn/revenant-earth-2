@@ -1,7 +1,7 @@
 import { Shader, ShaderWithResources, Texture, TextureShader, TextureSource } from "pixi.js";
 import { TimedShader } from "./timedShader";
 
-export class TimedShaderTexture extends TimedShader implements TextureShader {
+export class TimedTextureShader extends TimedShader implements TextureShader {
     private _texture: Texture;
     public get texture(): Texture {
         return this._texture;

@@ -13,6 +13,7 @@ import fragment from "../shaders/terrainSurface.frag?raw";
 import { placeholderGeometry, lerp } from "../utils/utils";
 import { HitboxGeometry } from "../shaders/hitboxGeometry";
 import { Debug } from "../dev/debug";
+import { Shadowmap } from "../shaders/lighting/shadowmap";
 
 export enum TerrainInspectMode {
     none = 0,
@@ -195,7 +196,7 @@ export class Terrain implements ISerializable, ISceneObject {
         if (index >= this.terrainData.length) index = this.terrainData.length - 1;
         if (index < 0) index = 0;
         let a = this.terrainData[index];
-        if(a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0 };
+        if (a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0 };
         return a;
     }
 
@@ -342,6 +343,7 @@ export class Terrain implements ISerializable, ISceneObject {
 
         this.surfaceMesh.geometry = hitboxGeometry;
         this.surfaceMesh.shader!.resources.group.uniforms.uInspectMode = this.inspectMode != 0 ? 1 : 0;
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform });
     }
 
     changeFixer(affectedNodes: Set<TerrainNode>) {

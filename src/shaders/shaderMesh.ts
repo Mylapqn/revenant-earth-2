@@ -1,10 +1,8 @@
-import { Mesh, Texture, MeshGeometry, GlProgram, Sprite, Geometry, DestroyOptions, TextureSource } from "pixi.js";
-import { game } from "../game";
-import { TimedShader } from "./timedShader";
+import { Mesh, Texture, MeshGeometry, GlProgram, DestroyOptions } from "pixi.js";
 import { Vector } from "../utils/vector";
 import defaultVert from "../shaders/vert.vert?raw";
 import defaultFrag from "../shaders/frag.frag?raw";
-import { TimedShaderTexture } from "./timedShaderTexture";
+import { TimedTextureShader } from "./timedShaderTexture";
 
 const array = [
     0, 0,
@@ -52,7 +50,7 @@ export class ShaderMesh extends Mesh {
         resources.group = options.customUniforms ? Object.assign({}, options.customUniforms) : {};
         const vertex = options.vert ?? defaultVert;
         const fragment = options.frag ?? defaultFrag;
-        const shader = new TimedShaderTexture({
+        const shader = new TimedTextureShader({
             glProgram: GlProgram.from({ vertex, fragment }),
             resources,
         });

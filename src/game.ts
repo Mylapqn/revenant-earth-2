@@ -5,7 +5,7 @@ import { System } from "detect-collisions";
 import { Player } from "./player";
 import { Camera } from "./camera";
 import { Vector, Vectorlike } from "./utils/vector";
-import { initHandlers, KindedObject, StateManager, StateMode } from "./hierarchy/serialise";
+import { initHandlers, StateManager, StateMode } from "./hierarchy/serialise";
 import { Entity } from "./hierarchy/entity";
 import { Scene } from "./hierarchy/scene";
 import { initComponents } from "./components/componentIndex";
@@ -20,14 +20,15 @@ import { Atmo } from "./world/atmo";
 import { PlantSpecies } from "./plants/plantSpecies";
 import { Plant } from "./components/custom/plant";
 import { Weather } from "./world/weather";
-import { CustomColor } from "./utils/color";
 import { UI } from "./ui/ui";
 import { SoundManager } from "./sound/sound";
 import { Debug } from "./dev/debug";
-import { scene2data } from "./environment/scene2data";
 import { HitboxLibrary } from "./environment/hitboxLibrary";
 import { displayNumber } from "./utils/utils";
 import { Ambience } from "./hierarchy/ambience";
+import { Light } from "./shaders/lighting/light";
+import { Lightmap } from "./shaders/lighting/lightmap";
+import { Shadowmap } from "./shaders/lighting/shadowmap";
 
 export let game: Game;
 
@@ -117,12 +118,15 @@ export class Game {
         for (const layer of PixelLayer.resizeLayers) {
             layer.resize(game.camera.pixelScreen.x, game.camera.pixelScreen.y);
         }
+        Lightmap.resize();
+        Shadowmap.resize();
     }
 
     async init() {
         (window as any).__PIXI_DEVTOOLS__ = {
             app: this.app
         };
+        this.app.renderer.canvas.getContext("webgl2")?.getExtension("EXT_color_buffer_float");
         await Assets.load("./font/monogram.ttf");
         await Assets.add({ alias: "bg", src: "./bg2.png" });
         await Assets.load("bg");
@@ -140,6 +144,8 @@ export class Game {
 
         initHandlers();
         initComponents();
+
+
 
         new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1, maxGrowth: 50 },
             { pollution: 1, water: 1, pollutionDamage: 1 }, {
@@ -313,13 +319,17 @@ export class Game {
         this.weather = new Weather();
 
         this.app.ticker.add(this.update, this);
+
+        Light.init();
+        Lightmap.init();
+
         UI.init();
         Debug.init();
         //game.loadScene("Space Station");
     }
 
     update(ticker: Ticker) {
-        const realDt = ticker.elapsedMS / 1000;
+        const realDt = Math.min(ticker.elapsedMS / 1000, .1);
         this.frameHistory.push(realDt);
         const avgFrame = this.frameHistory.reduce((a, b) => a + b, 0) / this.frameHistory.length;
         while (this.frameHistory.length > 10)
@@ -328,6 +338,7 @@ export class Game {
         const dt = realDt * this.timeScale;
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);
+        Lightmap.update();
 
         this.tooltip.update(realDt);
 

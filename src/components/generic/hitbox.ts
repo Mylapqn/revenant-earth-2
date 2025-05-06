@@ -14,6 +14,7 @@ import { HitboxGeometry } from "../../shaders/hitboxGeometry";
 import { UIElement } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
 import { Debug } from "../../dev/debug";
+import { Shadowmap } from "../../shaders/lighting/shadowmap";
 
 
 
@@ -162,6 +163,7 @@ export class Hitbox extends Component {
         });
         this.hitboxMesh.geometry = hbGeo;
 
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform });
 
     }
 

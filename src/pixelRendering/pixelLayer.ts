@@ -1,10 +1,12 @@
-import { Container, Graphics, RenderTexture, Sprite } from "pixi.js";
+import { CLEAR, Container, Graphics, RenderTexture, Sprite } from "pixi.js";
 import { Game, game } from "../game";
 import { ShaderMesh, Uniforms } from "../shaders/shaderMesh";
 import fragmentShaderBackground from "../shaders/background.frag?raw";
 import fragmentShaderForeground from "../shaders/foreground.frag?raw";
 import fragmentShaderDefault from "../shaders/frag.frag?raw";
+import fragmentShaderMain from "../shaders/mainLayer.frag?raw";
 import { CustomColor } from "../utils/color";
+import { Lightmap } from "../shaders/lighting/lightmap";
 
 export type PixelLayerOptions = ({
     autoResize: true;
@@ -22,7 +24,6 @@ export type PixelLayerOptions = ({
 export class PixelLayer {
     container: Container;
     renderTexture: RenderTexture;
-    sprite: Sprite;
     renderMesh: ShaderMesh;
     worldSpace: boolean;
     autoResize: boolean;
@@ -46,12 +47,10 @@ export class PixelLayer {
         this.worldSpace = options.worldSpace ?? true;
         this.container = new Container();
         this.renderTexture = RenderTexture.create({ width, height, antialias: false, scaleMode: 'nearest' });
-        this.sprite = new Sprite();
-        this.sprite.texture = this.renderTexture;
-        this.sprite.scale.set(Game.pixelScale);
         this.depth = options.depth ?? 1;
         this.autoRender = options.autoRender ?? true;
         let fragmentShader = fragmentShaderDefault;
+        let customTextures = [];
         let uniforms: Uniforms = {
             uDepth: { type: "f32", value: this.depth },
             uPosition: { type: "vec2<f32>", value: new Float32Array([0, 0]) },
@@ -64,7 +63,11 @@ export class PixelLayer {
             fragmentShader = fragmentShaderForeground;
             uniforms.uPlayerPosition = { type: "vec2<f32>", value: new Float32Array([0, 0]) };
         }
-        this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms });
+        else if (this.depth === 1 && this.worldSpace && this.autoResize) {
+            fragmentShader = fragmentShaderMain;
+            customTextures.push({ name: "uLightMap", texture: Lightmap.texture });
+        }
+        this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms, customTextures: customTextures });
         this.renderMesh.scale.set(Game.pixelScale);
         this.initialResolution = { x: width, y: height };
         if (options.parent) {
@@ -89,20 +92,16 @@ export class PixelLayer {
                 offsets.remainder.y -= 1;
             }
             this.container.position.set(offsets.offset.x, offsets.offset.y);
-            if (this.sprite.filters instanceof Array && this.sprite.filters.length > 0) {
-                this.sprite.filters[0].resources.terrainGroup.uniforms.uPosition = [offsets.offset.x / this.sprite.width * Game.pixelScale, offsets.offset.y / this.sprite.height * Game.pixelScale];
-            }
-            this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.sprite.width * Game.pixelScale, offsets.offset.y / this.sprite.height * Game.pixelScale]);
-            if (this.depth > 1) this.renderMesh.setUniform("uPlayerPosition", game.camera.worldToScreen(game.player.position).vecdiv(game.camera.viewport).xy());
+            this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.renderTexture.width * Game.pixelScale, offsets.offset.y / this.renderTexture.height * Game.pixelScale]);
+            if (this.depth > 1) this.renderMesh.setUniform("uPlayerPosition", game.camera.worldToRender(game.player.position).xy());
             //this.shaderMesh.position.set(game.input.mouse.position.x, game.input.mouse.position.y);
             this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
             //console.log(this.sprite.position);
         }
+
+        //TODO pixelLayer final stage is rendered in full resolution but it should be in pixel scale
         game.app.renderer.render({ container: this.container, target: this.renderTexture });
         this.renderTexture.update();
-        if (this.sprite.filters instanceof Array && this.sprite.filters.length > 0) {
-            this.sprite.filters[0].resources.timeGroup.uniforms.uTime = game.elapsedTime;
-        }
     }
     resize(width: number, height: number) {
         if (this.autoResize) {
@@ -113,7 +112,6 @@ export class PixelLayer {
             //this.sprite.height = Math.floor(Game.pixelScale * height * height / this.initialResolution.y);
         }
         this.renderMesh.setUniform("uResolution", [width, height]);
-
         this.renderTexture.resize(width, height);
         this.renderMesh.resize(width, height);
         if (this.onResize) {
