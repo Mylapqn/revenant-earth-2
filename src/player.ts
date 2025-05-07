@@ -1,6 +1,6 @@
 import { Ellipse } from "detect-collisions";
 import { Game, game } from "./game";
-import { Graphics, Sprite } from "pixi.js";
+import { Assets, Graphics, Sprite, Spritesheet } from "pixi.js";
 import { Vector, Vectorlike } from "./utils/vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
@@ -8,6 +8,10 @@ import { ISerializable, StateMode } from "./hierarchy/serialise";
 import { Scene } from "./hierarchy/scene";
 import { Atmo } from "./world/atmo";
 import { UIProgressBar } from "./ui/progressBar";
+import { LegSystem } from "./limbs/legSystem";
+import { Debug } from "./dev/debug";
+import { displayNumber } from "./utils/utils";
+import { DynamicAnimatedSprite } from "./pixelRendering/dynamicAnimatedSprite";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -17,7 +21,6 @@ export class Player implements ISerializable {
     legGraphics: Graphics;
     velocity = new Vector();
     pixelLayer: PixelLayer;
-    limbSystem = new LimbSystem();
     get grounded() {
         return this.groundedTimer > 0;
     }
@@ -29,6 +32,7 @@ export class Player implements ISerializable {
     statsDisplay: HTMLDivElement;
     healthBar: UIProgressBar;
     oxygenBar: UIProgressBar;
+    animatedSprite: DynamicAnimatedSprite;
 
     constructor() {
         this.statsDisplay = document.createElement("div");
@@ -40,14 +44,15 @@ export class Player implements ISerializable {
 
         game.activeScene.register(this);
         this.pixelLayer = new PixelLayer({ width: 64, height: 64, autoRender: true, parent: game.playerContainer, worldSpace: false });
+        this.animatedSprite = new DynamicAnimatedSprite(Assets.get("player_anim") as Spritesheet);
+        this.animatedSprite.anchor.set(0.5, 0.5);
+        this.animatedSprite.scale.set(.7);
+        this.animatedSprite.position.set(32);
 
         this.graphics = new Graphics();
         this.legGraphics = new Graphics();
         this.legGraphics.position = new Vector(32, 32);
 
-        let limbGroup = this.limbSystem.addGroup(new Vector(7, 18), 40);
-        limbGroup.addLimb(new Vector(5, 0), 9).origin = new Vector(-1, 0);
-        limbGroup.addLimb(new Vector(-5, 0), 9).origin = new Vector(1, 0);
         /*
         const kok = 30;
         let limbGroup2 = this.limbSystem.addGroup(new Vector(30, 20), 40);
@@ -56,7 +61,7 @@ export class Player implements ISerializable {
         limbGroup2.addLimb(new Vector(-5, 0), kok);
         limbGroup2.addLimb(new Vector(5, 0), kok);
         limbGroup2.addLimb(new Vector(-5, 0), kok);
-
+        
         let limbGroup3 = this.limbSystem.addGroup(new Vector(-30, 20), 40);
         limbGroup3.minLimbsStand = 3;
         limbGroup3.addLimb(new Vector(5, 0), kok);
@@ -64,7 +69,7 @@ export class Player implements ISerializable {
         limbGroup3.addLimb(new Vector(5, 0), kok);
         limbGroup3.addLimb(new Vector(-5, 0), kok);
         */
-        this.playerHitbox = game.collisionSystem.createEllipse({ x: 0, y: 0 }, 10, 16);
+        this.playerHitbox = game.collisionSystem.createEllipse({ x: 0, y: 0 }, 8, 24);
 
         this.sprite = new Sprite();
         this.sprite.anchor.set(0.5);
@@ -76,10 +81,11 @@ export class Player implements ISerializable {
         this.pixelLayer.container.addChild(this.graphics);
         //this.pixelLayer.container.addChild(this.sprite);
         this.pixelLayer.container.addChild(this.legGraphics);
+        this.pixelLayer.addChild(this.animatedSprite);
     }
 
     update(dt: number) {
-
+        //Debug.log(this.position.y);
         const tdata = game.terrain.getProperties(this.position.x);
         const adata = game.atmo.getProperties(this.position.x);
 
@@ -98,21 +104,41 @@ export class Player implements ISerializable {
         let maxSpeed = 60;
         let accel = 1000;
         let jumpSpeed = 300;
+        let input = new Vector(0, 0);
         if (game.inputEnabled) {
-            if(game.input.key("shift")){
-                maxSpeed *= 2.5;
-                accel *= 2.5;
-            }
-            if (game.input.key("d") && this.velocity.x < maxSpeed) this.velocity.x += accel * dt;
-            else if (game.input.key("a") && this.velocity.x > -maxSpeed) this.velocity.x -= accel * dt;
-            else if (this.grounded) this.velocity.x *= 0.9;
-            if (game.input.key(" ") && this.grounded) {
-                this.velocity.y = -jumpSpeed;
-                this.groundedTimer = 0;
+            if (game.input.key("d")) input.x += 1;
+            if (game.input.key("a")) input.x -= 1;
+            if (game.input.key(" ") || game.input.key("w")) input.y += 1;
+            if (game.input.key("s")) input.y -= 1;
+            if (game.input.key("shift")) {
+                maxSpeed *= 2;
+                accel *= 2;
             }
         }
-
-        if (!this.grounded) this.velocity.y += 1000 * dt;
+        input.clamp(-1, 1);
+        if (input.x == 0) {
+            if (this.grounded) this.velocity.x *= 1 - dt * 100;
+            this.animatedSprite.swapAnimation("idle");
+        }
+        else {
+            this.animatedSprite.swapAnimation("run");
+            this.animatedSprite.animationSpeed = game.input.key("shift") ? .15 : .1;
+            this.animatedSprite.scale.x = input.x * .7;
+            if (input.x > 0 && this.velocity.x < maxSpeed || input.x < 0 && this.velocity.x > -maxSpeed) {
+                this.velocity.x += accel * dt * input.x;
+            }
+            if(this.velocity.x > maxSpeed) this.velocity.x = maxSpeed;
+            if(this.velocity.x < -maxSpeed) this.velocity.x = -maxSpeed;
+        }
+        if (input.y > 0 && this.grounded) {
+            this.velocity.y = -jumpSpeed;
+            this.groundedTimer = 0;
+        }
+        if (!this.grounded) {
+            this.velocity.y += 1000 * dt;
+            if(this.groundedTimer < -.1)
+            this.animatedSprite.swapAnimation("jump_sprint");
+        }
 
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
@@ -121,68 +147,40 @@ export class Player implements ISerializable {
         this.playerHitbox.updateBody(true);
 
         this.groundedTimer -= dt;
-
+        this.graphics.clear();
         game.collisionSystem.checkOne(this.playerHitbox, (response) => {
-            this.groundedTimer = 0.1;
+            if (response.overlapV.y > 0) {
+                //colliding with ground
+                this.groundedTimer = 0.1;
+                this.velocity.y = 0;
+            }
+            else {
+                //colliding with ceiling
+                response.overlapV.y -= .1;
+                response.overlapV.x += Math.sign(response.overlapV.x);
+                if (Math.sign(this.velocity.x) == Math.sign(response.overlapV.x)) this.velocity.x *= -.1;
+                if (Math.sign(this.velocity.y) == Math.sign(response.overlapV.y)) this.velocity.y *= -.1;
+            }
             this.velocity.x -= response.overlapV.x;
-            this.velocity.y = 0;
             this.position.x -= response.overlapV.x;
             this.position.y -= response.overlapV.y;
             this.playerHitbox.setPosition(this.position.x, this.position.y);
             this.playerHitbox.updateBody(true);
+            this.graphics.moveTo(0, 0);
+            this.graphics.lineTo(response.overlapN.x * 10, response.overlapN.y * 10);
+            this.graphics.stroke({ color: 0xffffff, width: 1 });
         });
 
-        this.limbSystem.update(dt, this.position.clone(), this.grounded);
-        let offset = 0;
-        if (this.limbSystem.limbGroups[0].passingPhase > 0) offset = Math.round(this.limbSystem.limbGroups[0].passingPhase * 2);
-        if (Math.abs(this.velocity.x) < 0.1) offset = 1;
-        for (const limb of this.limbSystem.limbs) {
-            limb.origin.y = -offset;
-        }
         //console.log(this.limbSystem.limbGroups[0].passingPhase);
         this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
         this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();
 
-        this.graphics.clear();
+
+        this.graphics.position.set(32, 32);
         //this.graphics.ellipse(0, 0, this.playerHitbox.radiusX, this.playerHitbox.radiusY);
         //this.graphics.fill(0xff0000);
 
-        this.graphics.position = new Vector(32, 32 - offset);
-
-        this.graphics.circle(0, -17, 3);
-        this.graphics.fill(0x000000);
-        this.graphics.moveTo(0, offset);
-        this.graphics.lineTo(0, -14);
-        this.graphics.moveTo(-1, 0);
-        this.graphics.lineTo(-2, -12);
-        this.graphics.lineTo(2, -12);
-        this.graphics.lineTo(1, 0);
-        this.graphics.stroke({ color: 0x000000, width: 2 });
-        this.legGraphics.clear();
-        for (const limb of this.limbSystem.limbs) {
-            this.legGraphics.moveTo(limb.origin.x, limb.origin.y);
-            this.legGraphics.lineTo(limb.joint.x, limb.joint.y);
-            this.legGraphics.lineTo(limb.end.x, limb.end.y);
-            let vec = limb.end.clone();
-            vec.add(limb.target.clone().sub(limb.end).normalize(4));
-            this.legGraphics.lineTo(vec.x, vec.y);
-            //let col = limb.group == this.limbSystem.limbGroups[1] ? 0xff0000 : 0x0000ff;
-            this.legGraphics.stroke({ color: 0x000000, width: 2 });
-            if (limb.moving) {
-                //this.legGraphics.circle(limb.target.x, limb.target.y, 3);
-                //this.legGraphics.stroke({ color: 0xffff00, width: 1 });
-            }
-        }
-        /*this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y, 2);
-        this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
-
-        this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y - 5, 1);
-        this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
-
-        this.legGraphics.circle(this.limbSystem.limbGroups[0].target.x, this.limbSystem.limbGroups[0].target.y + 5, 1);
-        this.legGraphics.stroke({ color: 0x00ff00, width: 1 });
-        */
     }
 
     serialise(mode: StateMode): false | PlayerData {

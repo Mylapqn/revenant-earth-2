@@ -128,6 +128,10 @@ export class Vector {
         return "[X: " + this.x.toFixed(3) + " Y: " + this.y.toFixed(3) + "]";
     }
 
+    clamp(min: number, max: number): Vector {
+        return new Vector(Math.max(min, Math.min(max, this.x)), Math.max(min, Math.min(max, this.y)));
+    }
+
 
 
     /**

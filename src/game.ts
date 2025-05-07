@@ -132,6 +132,8 @@ export class Game {
         await Assets.load("bg");
         await Assets.add({ alias: "space", src: "./space.png" });
         await Assets.load("space");
+        await Assets.add({ alias: "player_anim", src: "./anim/player.json" })
+        await Assets.load("player_anim");
         await this.hitboxLibrary.init();
         await this.soundManager.loadSounds();
 
@@ -335,7 +337,7 @@ export class Game {
         while (this.frameHistory.length > 10)
             this.frameHistory.shift();
         Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
-        const dt = realDt * this.timeScale;
+        const dt = realDt * this.timeScale * (!this.input.key("g") ? 1 : .2);
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);
         Lightmap.update();
