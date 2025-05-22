@@ -1,213 +1,24 @@
-[
-    {
-        "kind": "Ambience",
-        "ambienceData": {
-            "music": "",
-            "sound": "",
-            "background": "bg"
-        }
-    },
-    {
-        "kind": "Entity",
-        "id": 7,
-        "name": "Door",
-        "component": [
-            {
-                "id": 4,
-                "componentType": "BasicSprite",
-                "data": {
-                    "asset": "./door.png"
-                }
-            },
-            {
-                "id": 5,
-                "componentType": "Interactable"
-            },
-            {
-                "id": 6,
-                "componentType": "Door",
-                "data": {
-                    "target": "Scene",
-                    "doorId": "dungeon-door-1"
-                }
-            },
-            {
-                "id": 7,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": 40,
-                        "y": 20
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 8,
-        "name": "Entity 8",
-        "component": [
-            {
-                "id": 4,
-                "componentType": "BasicSprite",
-                "data": {
-                    "asset": "./robo.png"
-                }
-            },
-            {
-                "id": 5,
-                "componentType": "Interactable"
-            },
-            {
-                "id": 6,
-                "componentType": "Button",
-                "data": {
-                    "dbName": "pollutionSpeed"
-                }
-            },
-            {
-                "id": 7,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": 10,
-                        "y": 20
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 9,
-        "name": "Dungeon Hitbox",
-        "component": [
-            {
-                "id": 2,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": 0,
-                        "y": 0
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            },
-            {
-                "id": 3,
-                "componentType": "Hitbox",
-                "data": {
-                    "interior": true,
-                    "hitboxName": "dungeon-1"
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Player",
-        "position": {
-            "x": 40,
-            "y": 32.087649674107624
+{
+    "kind": "Entity",
+    "id": 5,
+    "name": "Plant",
+    "component": [
+        {
+            "id": 0,
+            "componentType": "ShaderMesh"
         },
-        "velocity": {
-            "x": 0,
-            "y": 0
+        {
+            "id": 1,
+            "componentType": "Plant",
+            "data": {
+                "growth": 40,
+                "species": "Tree",
+                "health": 0
+            }
+        },
+        {
+            "id": 2,
+            "componentType": "EntityTooltip"
         }
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 2,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 3,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -175.9855594867576,
-                        "y": -36.19020999791623
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 4,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 5,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -108.13428823752798,
-                        "y": -36.47410653033974
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 6,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 7,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -39.47719949419101,
-                        "y": -36.292003220459364
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    }
-]
+    ]
+}

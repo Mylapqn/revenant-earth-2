@@ -163,7 +163,7 @@ export class Hitbox extends Component {
         });
         this.hitboxMesh.geometry = hbGeo;
 
-        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform });
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform,clear:false });
 
     }
 

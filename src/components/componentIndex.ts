@@ -12,6 +12,7 @@ import { SpriteDirection } from "./generic/spriteDirection";
 import { EntityTooltip } from "./generic/entityTooltip";
 import { Transform } from "./generic/transfrom";
 import { WindowRenderer } from "./generic/windowRenderer";
+import { LightComponent } from "./generic/lightComponent";
 
 
 export function initComponents(){
@@ -28,4 +29,5 @@ export function initComponents(){
     Component.register(EntityTooltip);
     Component.register(ShaderMeshRenderer);
     Component.register(WindowRenderer);
+    Component.register(LightComponent);
 }

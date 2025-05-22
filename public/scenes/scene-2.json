@@ -4,7 +4,12 @@
         "ambienceData": {
             "music": "",
             "sound": "",
-            "background": "bg"
+            "background": "bg",
+            "ambientColor": [
+                0,
+                0,
+                0
+            ]
         }
     },
     {
@@ -151,6 +156,27 @@
                         "y": 0
                     }
                 }
+            },
+            {
+                "id": 2,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
             }
         ]
     },
@@ -179,6 +205,26 @@
                         "y": 0
                     }
                 }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
             }
         ]
     },
@@ -205,6 +251,26 @@
                     "velocity": {
                         "x": 0,
                         "y": 0
+                    }
+                }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
                     }
                 }
             }

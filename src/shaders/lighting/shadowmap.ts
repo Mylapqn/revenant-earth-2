@@ -1,6 +1,6 @@
 import fragment from './shadowmap.frag?raw';
 import vertex from '../vert.vert?raw';
-import { RenderTexture, Sprite } from 'pixi.js';
+import { Container, RenderTexture, Sprite } from 'pixi.js';
 import { Vector } from '../../utils/vector';
 import { CustomColor } from '../../utils/color';
 import { game } from '../../game';
@@ -49,6 +49,9 @@ export class Shadowmap {
         this.shaderMesh.setUniform("viewport", [...game.camera.position.xy(), game.camera.pixelScreen.x, game.camera.pixelScreen.y]);
 
         game.app.renderer.render({ target: this.shadowDataTexture, container: this.shaderMesh });
+
+        game.app.renderer.render({ target: this.occluderTexture,clearColor:[0,0,0,0],container:new Container() });
+        Shadowmap.occluderTexture.source.update();
     }
     static resize(){
         this.occluderTexture.resize(game.camera.pixelScreen.x+2, game.camera.pixelScreen.y+2);

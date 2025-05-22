@@ -1,6 +1,6 @@
 import { Ellipse } from "detect-collisions";
 import { Game, game } from "./game";
-import { Assets, Graphics, Sprite, Spritesheet } from "pixi.js";
+import { Assets, Graphics, Matrix, Sprite, Spritesheet } from "pixi.js";
 import { Vector, Vectorlike } from "./utils/vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
@@ -12,6 +12,7 @@ import { LegSystem } from "./limbs/legSystem";
 import { Debug } from "./dev/debug";
 import { displayNumber } from "./utils/utils";
 import { DynamicAnimatedSprite } from "./pixelRendering/dynamicAnimatedSprite";
+import { Shadowmap } from "./shaders/lighting/shadowmap";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -46,7 +47,7 @@ export class Player implements ISerializable {
         this.pixelLayer = new PixelLayer({ width: 64, height: 64, autoRender: true, parent: game.playerContainer, worldSpace: false });
         this.animatedSprite = new DynamicAnimatedSprite(Assets.get("player_anim") as Spritesheet);
         this.animatedSprite.anchor.set(0.5, 0.5);
-        this.animatedSprite.scale.set(.7);
+        this.animatedSprite.scale.set(1);
         this.animatedSprite.position.set(32);
 
         this.graphics = new Graphics();
@@ -123,12 +124,12 @@ export class Player implements ISerializable {
         else {
             this.animatedSprite.swapAnimation("run");
             this.animatedSprite.animationSpeed = game.input.key("shift") ? .15 : .1;
-            this.animatedSprite.scale.x = input.x * .7;
+            this.animatedSprite.scale.x = input.x;
             if (input.x > 0 && this.velocity.x < maxSpeed || input.x < 0 && this.velocity.x > -maxSpeed) {
                 this.velocity.x += accel * dt * input.x;
             }
-            if(this.velocity.x > maxSpeed) this.velocity.x = maxSpeed;
-            if(this.velocity.x < -maxSpeed) this.velocity.x = -maxSpeed;
+            if (this.velocity.x > maxSpeed) this.velocity.x = maxSpeed;
+            if (this.velocity.x < -maxSpeed) this.velocity.x = -maxSpeed;
         }
         if (input.y > 0 && this.grounded) {
             this.velocity.y = -jumpSpeed;
@@ -136,8 +137,8 @@ export class Player implements ISerializable {
         }
         if (!this.grounded) {
             this.velocity.y += 1000 * dt;
-            if(this.groundedTimer < -.1)
-            this.animatedSprite.swapAnimation("jump_sprint");
+            if (this.groundedTimer < -.1)
+                this.animatedSprite.swapAnimation("jump_sprint");
         }
 
         this.position.x += this.velocity.x * dt;
@@ -166,9 +167,9 @@ export class Player implements ISerializable {
             this.position.y -= response.overlapV.y;
             this.playerHitbox.setPosition(this.position.x, this.position.y);
             this.playerHitbox.updateBody(true);
-            this.graphics.moveTo(0, 0);
+            /* this.graphics.moveTo(0, 0);
             this.graphics.lineTo(response.overlapN.x * 10, response.overlapN.y * 10);
-            this.graphics.stroke({ color: 0xffffff, width: 1 });
+            this.graphics.stroke({ color: 0xffffff, width: 1 }); */
         });
 
         //console.log(this.limbSystem.limbGroups[0].passingPhase);
@@ -180,6 +181,8 @@ export class Player implements ISerializable {
         this.graphics.position.set(32, 32);
         //this.graphics.ellipse(0, 0, this.playerHitbox.radiusX, this.playerHitbox.radiusY);
         //this.graphics.fill(0xff0000);
+        game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x)/4+game.camera.pixelScreen.x/2, (this.pixelLayer.renderMesh.y - game.camera.position.y)/4+game.camera.pixelScreen.y/2), clear: false });
+Debug.log(this.pixelLayer.renderMesh.x - game.camera.position.x);
 
     }
 

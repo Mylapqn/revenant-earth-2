@@ -3,6 +3,7 @@ import { Entity } from '../../hierarchy/entity';
 import { CustomColor } from '../../utils/color';
 import { Vector } from '../../utils/vector';
 import { game } from '../../game';
+import { ISerializable, KindedObject, StateMode } from '../../hierarchy/serialise';
 
 export type LightOptions = { position: Vector; angle?: number; width?: number; color?: CustomColor; range?: number; intensity?: number; parent?: Entity; };
 

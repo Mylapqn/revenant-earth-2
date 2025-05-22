@@ -64,6 +64,12 @@ export class CustomColor {
             return new CustomColor(255 * f(0), 255 * f(8), 255 * f(4))
         }
     }
+    static fromPixi(color: number): CustomColor {
+        return new CustomColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+    }
+    static fromShader(color: [number, number, number]): CustomColor {
+        return new CustomColor(color[0] * 255, color[1] * 255, color[2] * 255);
+    }
     static random(generator: RandomGenerator) {
         return new CustomColor(generator.int(0, 255), generator.int(0, 255), generator.int(0, 255));
     }

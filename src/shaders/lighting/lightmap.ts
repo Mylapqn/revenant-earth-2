@@ -6,6 +6,7 @@ import { Light } from './light';
 import { Shadowmap } from './shadowmap';
 import { Vector } from '../../utils/vector';
 import { ShaderMesh } from '../shaderMesh';
+import { Debug } from '../../dev/debug';
 
 const defaultUniforms = {
     viewport: {

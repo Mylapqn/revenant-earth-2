@@ -35,7 +35,7 @@ export class WindowRenderer extends Component {
 
     override init(): void {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
-        new Light({position:this.transform.position.clone().add({x:0,y:-10}),width:2.5,range:150,angle:Math.PI/2,intensity:1.5});
+        //new Light({position:this.transform.position.clone().add({x:0,y:-10}),width:2.5,range:150,angle:Math.PI/2,intensity:1.5});
     }
     override toData(): ComponentData {
         const data = { asset: this.asset }

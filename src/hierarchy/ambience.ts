@@ -2,8 +2,9 @@ import { Assets, Texture } from "pixi.js";
 import { ISerializable, KindedObject, ObjectKind, StateMode } from "./serialise";
 import { game } from "../game";
 import { ISceneObject, Scene } from "./scene";
+import { CustomColor } from "../utils/color";
 
-export type AmbienceData = { music: string; sound: string; background: string };
+export type AmbienceData = { music: string; sound: string; background: string; ambientColor: number[] };
 
 export class Ambience implements ISceneObject, ISerializable {
     kind: ObjectKind = "Ambience";

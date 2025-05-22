@@ -132,7 +132,7 @@ export class Game {
         await Assets.load("bg");
         await Assets.add({ alias: "space", src: "./space.png" });
         await Assets.load("space");
-        await Assets.add({ alias: "player_anim", src: "./anim/player.json" })
+        await Assets.add({ alias: "player_anim", src: "./anim/player2.json" })
         await Assets.load("player_anim");
         await this.hitboxLibrary.init();
         await this.soundManager.loadSounds();
@@ -142,7 +142,7 @@ export class Game {
         this.stateManager.register(this.progressDatabase);
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
-        Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg" } }, this.activeScene);
+        Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg", ambientColor: [2, 2, 2] } }, this.activeScene);
 
         initHandlers();
         initComponents();

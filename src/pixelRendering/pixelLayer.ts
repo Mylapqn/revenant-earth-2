@@ -7,6 +7,7 @@ import fragmentShaderDefault from "../shaders/frag.frag?raw";
 import fragmentShaderMain from "../shaders/mainLayer.frag?raw";
 import { CustomColor } from "../utils/color";
 import { Lightmap } from "../shaders/lighting/lightmap";
+import { Debug } from "../dev/debug";
 
 export type PixelLayerOptions = ({
     autoResize: true;
@@ -66,6 +67,7 @@ export class PixelLayer {
         else if (this.depth === 1 && this.worldSpace && this.autoResize) {
             fragmentShader = fragmentShaderMain;
             customTextures.push({ name: "uLightMap", texture: Lightmap.texture });
+            uniforms.uAmbient = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
         }
         this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms, customTextures: customTextures });
         this.renderMesh.scale.set(Game.pixelScale);
@@ -98,6 +100,10 @@ export class PixelLayer {
             this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
             //console.log(this.sprite.position);
         }
+        if (this.depth === 1 && this.worldSpace && this.autoResize) {
+            this.renderMesh.setUniform("uAmbient", game.ambience.data.ambientColor);
+        }
+
 
         //TODO pixelLayer final stage is rendered in full resolution but it should be in pixel scale
         game.app.renderer.render({ container: this.container, target: this.renderTexture });

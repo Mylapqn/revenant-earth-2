@@ -343,7 +343,7 @@ export class Terrain implements ISerializable, ISceneObject {
 
         this.surfaceMesh.geometry = hitboxGeometry;
         this.surfaceMesh.shader!.resources.group.uniforms.uInspectMode = this.inspectMode != 0 ? 1 : 0;
-        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform });
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform,clear:false });
     }
 
     changeFixer(affectedNodes: Set<TerrainNode>) {

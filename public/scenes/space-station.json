@@ -4,7 +4,8 @@
         "ambienceData": {
             "music": "",
             "sound": "space",
-            "background": "space"
+            "background": "space",
+            "ambientColor": [0.1, 0.15, 0.3]
         }
     },
     {
@@ -151,6 +152,26 @@
                         "y": 0
                     }
                 }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
             }
         ]
     },
@@ -177,6 +198,26 @@
                     "velocity": {
                         "x": 0,
                         "y": 0
+                    }
+                }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
                     }
                 }
             }
@@ -207,6 +248,26 @@
                         "y": 0
                     }
                 }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
             }
         ]
     },
@@ -235,6 +296,26 @@
                         "y": 0
                     }
                 }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
             }
         ]
     },
@@ -261,6 +342,26 @@
                     "velocity": {
                         "x": 0,
                         "y": 0
+                    }
+                }
+            },
+            {
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": -0,
+                            "y": -20
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 6,
+                        "color": [
+                            0.6,
+                            0.7,
+                            1
+                        ],
+                        "range": 180,
+                        "intensity": 20
                     }
                 }
             }
