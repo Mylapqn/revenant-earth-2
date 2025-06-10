@@ -5,6 +5,9 @@ uniform float uTime;
 uniform float uDepth;
 uniform vec2 uPosition;
 
+uniform vec3 uDistanceFogColor;
+uniform vec3 uGroundFogColor;
+uniform vec3 uAmbient;
 
 in vec2 vUV;
 out vec4 color;
@@ -39,9 +42,10 @@ void main() {
     color.rgb *= 0.f;
     float groundFog = ((worldUv.y * 4.f * depth * depth) + .2f) * tex.a;
     groundFog = clamp(groundFog, 0.f, 1.f);
-    float distanceFog = depth * depth +.3;
-    color.rgb += distanceFog * alpha * vec3(.8f, .6f, .4f);
-    color.rgb += groundFog * alpha * vec3(.7f, .4f, .2f);
+    float distanceFog = depth * depth + .3f;
+    color.rgb += distanceFog * alpha * uDistanceFogColor;
+    color.rgb += groundFog * alpha * uGroundFogColor;
+    color.rgb *= uAmbient;
     //if(uv.x < .5f)
-        color.rgb = PBRNeutralToneMapping(color.rgb);
+    color.rgb = PBRNeutralToneMapping(color.rgb);
 }

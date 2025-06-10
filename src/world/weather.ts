@@ -13,7 +13,9 @@ export class Weather implements ISerializable, ISceneObject {
         rainBuildup: 0,
         rainThreshold: 0,
         rainIntensity: 0,
+        dayTime: 0
     }
+    dayLength = 200;
     rainAngle: number = 0;
     rainRenderer: RainRenderer = new RainRenderer();
     random: RandomGenerator = new RandomGenerator();
@@ -34,7 +36,7 @@ export class Weather implements ISerializable, ISceneObject {
     static deserialise(raw: { kind: string; weatherData: WeatherData }, scene?: Scene) {
         const data = raw;
         game.weather.weatherData = data.weatherData;
-        if(data.weatherData.rainIntensity > 0){
+        if (data.weatherData.rainIntensity > 0) {
             game.soundManager.soundLibrary.play("rain_heavy");
             game.soundManager.soundLibrary.play("rain_light");
         }
@@ -46,6 +48,8 @@ export class Weather implements ISerializable, ISceneObject {
         game.soundManager.soundLibrary.pause("rain_light");
     }
     update(dt: number): void {
+        this.weatherData.dayTime += dt;
+        while (this.weatherData.dayTime > this.dayLength) this.weatherData.dayTime -= this.dayLength;
         if (this.weatherData.rainThreshold === 0) this.weatherData.rainThreshold = this.random.range(10, 40);
         if (this.weatherData.rainIntensity > 0) {
             const rainRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
@@ -89,8 +93,13 @@ export class Weather implements ISerializable, ISceneObject {
     draw(dt: number): void {
         this.rainRenderer.draw(dt);
         this.cloudMesh.setUniform("uClouds", 1 - (this.weatherData.rainBuildup / this.weatherData.rainThreshold));
-        this.cloudMesh.setUniform("uSunPosition", [game.input.mouse.position.x / game.camera.screen.x, game.input.mouse.position.y / game.camera.screen.y]);
+        let sunAngle = (this.weatherData.dayTime / this.dayLength+.5) * Math.PI * 2;
+        let sunVector = Vector.fromAngle(sunAngle);
+        sunVector.vecmult({ x: .4, y: .4 });
+        sunVector.add({ x: .5, y: .5 });
+        this.cloudMesh.setUniform("uSunPosition", [sunVector.x, sunVector.y]);
         this.cloudMesh.setUniform("uResolution", [game.camera.pixelScreen.x, game.camera.pixelScreen.y]);
+        this.cloudMesh.setUniform("uAmbient", game.ambience.currentAmbience().toShader());
 
     }
 }
@@ -98,7 +107,8 @@ export class Weather implements ISerializable, ISceneObject {
 export type WeatherData = {
     rainBuildup: number,
     rainThreshold: number,
-    rainIntensity: number
+    rainIntensity: number,
+    dayTime: number
 }
 
 class RainRenderer {

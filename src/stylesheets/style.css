@@ -1,0 +1,400 @@
+:root {
+    --unera-color: rgb(26, 118, 238);
+    --under-panel: #0C68D6;
+    --hacking-color: rgb(23, 238, 62);
+    --hacking-color-muted: rgba(12, 189, 33, 0.5);
+    --bg-color: #1F2730;
+    --highlight-color: #3d4955;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: "monogram";
+    src: url(public/font/monogram.ttf) format("truetype");
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.uiContainer {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    user-select: none;
+}
+
+.debugText {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: "monogram";
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    padding: 20px;
+}
+
+.hacking {
+    position: absolute;
+    width: 1000px;
+    height: 800px;
+    background-color: black;
+    top: 0;
+    left: 0;
+    font-family: "monogram";
+    font-size: 32px;
+    color: var(--hacking-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+.hacking #textArea {
+    flex-grow: 1;
+    overflow-x: hidden;
+}
+
+.hacking .buttonArea {
+    min-height: 64px;
+    display: flex;
+    background-color: rgb(20, 20, 20);
+    margin-bottom: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.buttonArea button {
+    height: fit-content;
+    width: fit-content;
+}
+
+.hacking button {
+
+    text-wrap: nowrap;
+    font-size: inherit;
+    font-family: inherit;
+    background-color: transparent;
+    color: var(--hacking-color);
+    border: 2px solid var(--hacking-color-muted);
+    background-color: black;
+    color: inherit;
+    margin-right: 10px;
+    padding: 0 10px 4px 10px;
+}
+
+.hacking button:hover {
+    background-color: var(--hacking-color-muted);
+    color: white;
+}
+
+.buttonBorderless button {
+    border: none;
+    margin: 0;
+    background: transparent;
+    color: white;
+}
+
+#hackingTooltip {
+    position: absolute;
+    background-color: rgb(0, 0, 0);
+    top: 0;
+    left: 0;
+    font-family: "monogram";
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    padding: 20px;
+    display: none;
+    z-index: 2;
+}
+
+#tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 2;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+#tooltip .panel {
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    background-color: #1F2730;
+    font-weight: normal;
+    text-transform: uppercase;
+    padding: 15px 20px;
+    line-height: 1.6em;
+    display: flex;
+    flex-direction: column;
+}
+
+#tooltip .panel h1 {
+    font-size: 16px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+#tooltip .panel p {
+    margin: 0;
+    text-transform: none;
+}
+
+#tooltip .panel.columns {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+}
+
+#tooltip .panel.columns .panel {
+    flex-grow: 1;
+    flex-shrink: 0;
+    min-width: 150px;
+}
+
+#tooltip .panel.title {
+    background-color: #0C68D6;
+}
+
+#tooltip .panel.highlight {
+    background-color: #3d4955;
+}
+
+.stats {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    padding: 10px 15px;
+    line-height: 24px;
+    text-shadow: black 2px 2px 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.progressBar {
+    display: flex;
+    align-items: center;
+}
+
+.progressBar .bar {
+    background-color: rgba(0, 0, 0, 0.214);
+    width: 200px;
+    height: 16px;
+    margin-left: 5px;
+}
+
+.progressBar .fill {
+    height: 100%;
+    background-color: rgb(98, 149, 216);
+    border-right: 2px solid white;
+}
+
+.fullscreenMenu {
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #18467E;
+    background: radial-gradient(circle, #1E3753 0%, #0D1825 80%);
+    background: radial-gradient(circle, #194880 0%, #12335C 80%);
+    mask-image: radial-gradient(black 50%, transparent 51%);
+    mask-repeat: no-repeat;
+    mask-position: 50% 50%;
+    mask-size: 0 0;
+    width: 100vw;
+    height: 100vh;
+    animation-duration: .4s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: both;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: none;
+    padding: 10px;
+}
+
+.menuAppear {
+    display: flex;
+    animation-name: menuAppear;
+}
+
+.menuHide {
+    display: flex;
+    animation-name: menuAppear2;
+    animation-direction: reverse;
+}
+
+@keyframes menuAppear {
+    0% {
+        display: none;
+        mask-size: 0 0;
+        mask-position: 50% 50%;
+    }
+
+    1% {
+        display: flex;
+    }
+
+    99% {
+        mask-size: 200vw 200vw;
+        mask-position: 50% 50%;
+    }
+
+    100% {
+        mask-size: 500vw 500vw;
+    }
+}
+
+@keyframes menuAppear2 {
+    0% {
+        display: none;
+        mask-size: 0 0;
+        mask-position: 50% 50%;
+    }
+
+    1% {
+        display: flex;
+    }
+
+    99% {
+        mask-size: 200vw 200vw;
+        mask-position: 50% 50%;
+    }
+
+    100% {
+        mask-size: 500vw 500vw;
+    }
+}
+
+.menuBG {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.menuBorder {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ffffff48;
+    padding: 10px;
+    border-radius: 2px;
+}
+
+.menuPattern {
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, #ffffff4f 8%, transparent 10%);
+    background-size: 15px 15px;
+}
+
+.drop-menu {
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    left: 100px;
+    overflow: hidden;
+    text-align: left;
+}
+
+.drop-menu .header {
+    width: 100%;
+    padding: .5rem;
+    text-align: left;
+    background-color: var(--under-panel);
+    font-weight: bold;
+}
+
+.drop-menu button {
+    width: 100%;
+    padding: .5rem;
+    text-align: left;
+}
+
+.drop-menu button+button {
+    margin-top: .2rem;
+}
+
+button {
+    color: inherit;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.1s;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background-color: var(--highlight-color);
+}
+
+.basic {
+    background-color: var(--bg-color);
+    color: #e9e9e9;
+    border-radius: 0.1rem;
+    font-family: "Chakra Petch";
+    font-size: 16px;
+}
+
+.score {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: "Chakra Petch";
+    font-size: 32px;
+    margin: 10px;
+    color: white;
+}
+
+.milestone {
+    position: absolute;
+    top:25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "Chakra Petch";
+    font-size: 32px;
+    margin: 10px;
+    color: white;
+    text-align: center;
+    transition: all 3s ease-out;
+    opacity: 0;
+}
+
+.milestone * {
+    transition: all 3s ease-out;
+    letter-spacing: normal;
+    opacity: 0;
+}
+
+.milestone .appear {
+    letter-spacing: .1em;
+    opacity: 1;
+}
+
+.milestone.appear {
+    opacity: 1;
+}

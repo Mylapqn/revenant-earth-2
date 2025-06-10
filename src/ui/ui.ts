@@ -24,11 +24,11 @@ export class UI {
             }
         }
     }
-    static init(){
+    static init() {
         UI.container = UI.customDiv(document.body, "uiContainer");
         UI.fullscreenMenu = new UIFullscreenMenu();
     }
-    static fullscreenMenu:UIFullscreenMenu;
+    static fullscreenMenu: UIFullscreenMenu;
 }
 
 export class UIElement {
@@ -69,6 +69,12 @@ export class UIElement {
             element.parent = this;
             this.children.push(element);
         }
+    }
+    static create(options: { type: string, classes?: string[], parent: HTMLElement, content?: string }) {
+        const element = new UIElement(options.type, ...(options.classes ?? []));
+        options.parent.appendChild(element.htmlElement);
+        if (options.content) element.htmlElement.innerHTML = options.content;
+        return element;
     }
 }
 
@@ -146,4 +152,3 @@ export class UIContextMenu extends UIPanel {
         super.remove();
     }
 }
-

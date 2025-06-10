@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Graphics, Sprite, Ticker } from "pixi.js";
+import { Application, Assets, AssetsManifest, Container, Graphics, Sprite, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -29,6 +29,9 @@ import { Ambience } from "./hierarchy/ambience";
 import { Light } from "./shaders/lighting/light";
 import { Lightmap } from "./shaders/lighting/lightmap";
 import { Shadowmap } from "./shaders/lighting/shadowmap";
+import { Score } from "./hierarchy/score";
+import { GameEventSystem } from "./hierarchy/eventSystem";
+import { MilestoneManager } from "./hierarchy/milestones";
 
 export let game: Game;
 
@@ -80,6 +83,11 @@ export class Game {
     frameHistory: number[] = [];
     ambience!: Ambience;
 
+    events = new GameEventSystem();
+    milestones = new MilestoneManager();
+
+    score: Score;
+
     public get inputEnabled(): boolean {
         return !Debug.editorMode && !this.hacking
     }
@@ -112,6 +120,8 @@ export class Game {
                 //if (nearest) DevSync.trigger(nearest.toData());
             }
         });
+
+        this.score = new Score();
     }
 
     resize() {
@@ -127,13 +137,22 @@ export class Game {
             app: this.app
         };
         this.app.renderer.canvas.getContext("webgl2")?.getExtension("EXT_color_buffer_float");
-        await Assets.load("./font/monogram.ttf");
-        await Assets.add({ alias: "bg", src: "./bg2.png" });
-        await Assets.load("bg");
-        await Assets.add({ alias: "space", src: "./space.png" });
-        await Assets.load("space");
-        await Assets.add({ alias: "player_anim", src: "./anim/player2.json" })
-        await Assets.load("player_anim");
+        const manifest: AssetsManifest = {
+            bundles: [
+                {
+                    name: "bundle", assets: [
+                        { alias: "player_anim", src: "./anim/player2.json" },
+                        { alias: "bg", src: "./bg2.png" },
+                        { alias: "space", src: "./space.png" },
+                        { alias: "monogram", src: "./font/monogram.ttf" },
+                        { alias: "biochar", src: "./gfx/building/biochar.png" },
+                    ]
+                }
+            ]
+        }
+        Assets.init({ manifest });
+        await Assets.loadBundle("bundle");
+
         await this.hitboxLibrary.init();
         await this.soundManager.loadSounds();
 
@@ -142,7 +161,7 @@ export class Game {
         this.stateManager.register(this.progressDatabase);
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
-        Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg", ambientColor: [2, 2, 2] } }, this.activeScene);
+        Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg", ambientColor: [1.5, 1, .5] } }, this.activeScene);
 
         initHandlers();
         initComponents();
@@ -326,6 +345,8 @@ export class Game {
         Lightmap.init();
 
         UI.init();
+        this.score.init();
+        this.milestones.init();
         Debug.init();
         //game.loadScene("Space Station");
     }
@@ -341,6 +362,8 @@ export class Game {
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);
         Lightmap.update();
+
+        this.score.update(dt);
 
         this.tooltip.update(realDt);
 
@@ -442,6 +465,10 @@ export class Game {
                 }
             }
 
+            if (this.input.keyDown("c")) {
+                Prefab.BiocharKiln({ x: this.worldMouse.x, y: this.worldMouse.y, scene: this.activeScene });
+            }
+
             if (this.input.keyDown("+")) {
                 if (this.activeScene.name != "Scene") {
                     this.loadScene("Scene");
@@ -449,6 +476,9 @@ export class Game {
             }
             if (this.input.keyDown("r")) {
                 this.weather.weatherData.rainBuildup += 2;
+            }
+            if (this.input.keyDown("č")) {
+                this.weather.weatherData.dayTime += this.weather.dayLength / 4;
             }
             if (this.input.keyDown("q")) {
                 this.terrain.inspectMode++;
@@ -462,6 +492,7 @@ export class Game {
                     let tree = Prefab.Plant({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
                     tree.getComponent(Plant)!.growth = 2;
                     this.selectedSeed = undefined;
+                    this.events.emit("playerBuild", tree);
                 }
                 if (this.input.mouse.getButtonUp(MouseButton.Right)) {
                     this.selectedSeed = undefined;

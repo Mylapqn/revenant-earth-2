@@ -13,6 +13,7 @@ import { EntityTooltip } from "./generic/entityTooltip";
 import { Transform } from "./generic/transfrom";
 import { WindowRenderer } from "./generic/windowRenderer";
 import { LightComponent } from "./generic/lightComponent";
+import { BiocharKiln } from "./custom/biocharKiln";
 
 
 export function initComponents(){
@@ -30,4 +31,5 @@ export function initComponents(){
     Component.register(ShaderMeshRenderer);
     Component.register(WindowRenderer);
     Component.register(LightComponent);
+    Component.register(BiocharKiln);
 }

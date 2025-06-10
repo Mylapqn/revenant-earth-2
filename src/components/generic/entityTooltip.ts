@@ -13,7 +13,7 @@ export class EntityTooltip extends Component {
     shaderMeshComponent?: ShaderMeshRenderer;
     highlighted = false;
     tooltipData = new Map<string, string>();
-    tooltipName = "entity name";
+    tooltipName = "";
 
     constructor(parent: Entity) {
         super(parent);
@@ -73,6 +73,7 @@ export class EntityTooltip extends Component {
     getTooltip() {
         let tooltipText = "";
         this.tooltipData.forEach((value, key) => tooltipText += `${key}: ${value}\n`);
+        if(this.tooltipName == "") this.tooltipName = this.entity.name;
         return {title: this.tooltipName, text: tooltipText}; //this.tooltipName + "\n" + tooltipText;
     }
 

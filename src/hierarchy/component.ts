@@ -1,5 +1,5 @@
 import { UIElement } from "../ui/ui";
-import { Callback, Entity, KnownEvents } from "./entity";
+import { Callback, Entity, EntityEvents } from "./entity";
 import { primitiveObject } from "./serialise";
 
 export type Constructor<T> = { new(parent: Entity): T, componentType: string };
@@ -9,7 +9,7 @@ export class Component {
     static constructors = new Map<string, Constructor<Component>>();
     id = -1;
     entity: Entity;
-    subscribedEvents = new Set<{ type: keyof KnownEvents, callback: Callback<any> }>();
+    subscribedEvents = new Set<{ type: keyof EntityEvents, callback: Callback<any> }>();
 
     get componentType() { return (this.constructor as typeof Component).componentType; }
     get factory() { return (this.constructor as Constructor<typeof this>); }
@@ -51,7 +51,7 @@ export class Component {
     }
 
 
-    onEntity<T extends keyof KnownEvents>(event: T, callback: Callback<T>) {
+    onEntity<T extends keyof EntityEvents>(event: T, callback: Callback<T>) {
         this.subscribedEvents.add({ type: event, callback });
         this.entity.on(event, callback);
     }

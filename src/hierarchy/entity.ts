@@ -1,9 +1,11 @@
 import { Transform } from "../components/generic/transfrom";
+import { game } from "../game";
 import { Component, ComponentData, Constructor } from "./component";
 import { ISceneObject, Scene } from "./scene";
 import { ISerializable, KindedObject, StateMode } from "./serialise";
 
-export type KnownEvents = {
+export type EntityEvents = {
+    firstUpdate: [];
     update: [number];
     draw: [number];
     unload: [];
@@ -12,17 +14,18 @@ export type KnownEvents = {
     hoverOff: [];
 };
 
-export type Callback<T extends keyof KnownEvents> = (...args: KnownEvents[T]) => void;
+export type Callback<T extends keyof EntityEvents> = (...args: EntityEvents[T]) => void;
 
 export class Entity implements ISerializable, ISceneObject {
     id: number;
     components = new Map<number, Component>();
     typeLookup = new Map<Constructor<Component>, Set<Component>>();
-    events = new Map<keyof KnownEvents, Set<Function>>();
+    events = new Map<keyof EntityEvents, Set<Function>>();
     componentIndex = 0;
     transform!: Transform;
     scene?: Scene;
     name: string;
+    private _updated = false;
 
     static entityId = 0; //TODO save+load global next entity id
 
@@ -31,17 +34,17 @@ export class Entity implements ISerializable, ISceneObject {
         this.name = "Entity " + id;
     }
 
-    on<T extends keyof KnownEvents>(event: T, callback: Callback<T>) {
+    on<T extends keyof EntityEvents>(event: T, callback: Callback<T>) {
         if (this.events.has(event) === false) this.events.set(event, new Set());
         this.events.get(event)!.add(callback);
     }
 
-    off<T extends keyof KnownEvents>(event: T, callback: Callback<T>) {
+    off<T extends keyof EntityEvents>(event: T, callback: Callback<T>) {
         if (this.events.has(event) === false) return;
         this.events.get(event)!.delete(callback);
     }
 
-    emit<T extends keyof KnownEvents>(event: T, ...args: KnownEvents[T]) {
+    emit<T extends keyof EntityEvents>(event: T, ...args: EntityEvents[T]) {
         if (this.events.has(event) === false) return;
         for (const callback of this.events.get(event)!) {
             callback(...args);
@@ -88,7 +91,16 @@ export class Entity implements ISerializable, ISceneObject {
     }
 
     update(dt: number) {
+        if (this._updated === false) {
+            this.firstUpdate();
+            this._updated = true;
+        }
         this.emit("update", dt);
+    }
+
+    firstUpdate() {
+        game.events.emit("entityCreate", this);
+        this.emit("firstUpdate");
     }
 
     draw(dt: number) {
@@ -96,6 +108,7 @@ export class Entity implements ISerializable, ISceneObject {
     }
 
     remove() {
+        game.events.emit("entityRemove", this);
         this.scene?.unregister(this);
         for (const component of this.components.values()) {
             component.remove();
@@ -110,7 +123,7 @@ export class Entity implements ISerializable, ISceneObject {
 
     static fromData(data: EntityData, scene?: Scene) {
         const entity = new Entity(data.id ?? this.entityId++);
-        if(data.name) entity.name = data.name;
+        if (data.name) entity.name = data.name;
         entity.componentIndex = data.component.reduce((max, c) => Math.max(max, c.id ?? -1), -1) + 1;
 
         for (const component of data.component) {

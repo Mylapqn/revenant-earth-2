@@ -45,6 +45,8 @@ export class Plant extends Component {
         this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
 
+
+        game.score.add(100);
         Plant.list.push(this);
         this.drawPlant();
     }
@@ -68,7 +70,7 @@ export class Plant extends Component {
 
         if (game.camera.inView(this.transform.position, 50)) {
             this.timeSinceDraw += realDt;
-            Debug.log(this.timeSinceDraw);
+            //Debug.log(this.timeSinceDraw);
             if (this.timeSinceDraw > this.secondsPerDraw && !this.dead) {
                 this.timeSinceDraw = 0;
                 this.drawPlant();
@@ -103,6 +105,7 @@ export class Plant extends Component {
         if (tdata.fertility > 0 && tdata.moisture > .1 && this.health > .1 && this.growth < this.species.statsPerGrowth.maxGrowth) {
             let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * .2;
             this.growth += addedGrowth;
+            game.score.add(addedGrowth);
             tdata.fertility -= addedGrowth * this.species.statsPerGrowth.nutrients * .1;
             game.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
             tdata.erosion -= addedGrowth * this.species.statsPerGrowth.erosion * .1;

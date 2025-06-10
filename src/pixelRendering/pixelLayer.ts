@@ -55,10 +55,13 @@ export class PixelLayer {
         let uniforms: Uniforms = {
             uDepth: { type: "f32", value: this.depth },
             uPosition: { type: "vec2<f32>", value: new Float32Array([0, 0]) },
-            uResolution: { type: "vec2<f32>", value: new Float32Array([0, 0]) }
+            uResolution: { type: "vec2<f32>", value: new Float32Array([0, 0]) },
+            uAmbient: { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) }
         };
         if (this.depth < 1 && this.worldSpace) {
             fragmentShader = fragmentShaderBackground;
+            uniforms.uGroundFogColor = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
+            uniforms.uDistanceFogColor = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
         }
         else if (this.depth > 1 && this.worldSpace) {
             fragmentShader = fragmentShaderForeground;
@@ -67,7 +70,6 @@ export class PixelLayer {
         else if (this.depth === 1 && this.worldSpace && this.autoResize) {
             fragmentShader = fragmentShaderMain;
             customTextures.push({ name: "uLightMap", texture: Lightmap.texture });
-            uniforms.uAmbient = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
         }
         this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms, customTextures: customTextures });
         this.renderMesh.scale.set(Game.pixelScale);
@@ -95,13 +97,20 @@ export class PixelLayer {
             }
             this.container.position.set(offsets.offset.x, offsets.offset.y);
             this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.renderTexture.width * Game.pixelScale, offsets.offset.y / this.renderTexture.height * Game.pixelScale]);
+            this.renderMesh.setUniform("uAmbient", game.ambience.currentAmbience().toShader());
             if (this.depth > 1) this.renderMesh.setUniform("uPlayerPosition", game.camera.worldToRender(game.player.position).xy());
+            if (this.depth < 1) {
+                this.renderMesh.setUniform("uDistanceFogColor", [.8, .5, .3]);
+                this.renderMesh.setUniform("uGroundFogColor", [.9, .9, .9]);
+            }
             //this.shaderMesh.position.set(game.input.mouse.position.x, game.input.mouse.position.y);
             this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
             //console.log(this.sprite.position);
         }
         if (this.depth === 1 && this.worldSpace && this.autoResize) {
-            this.renderMesh.setUniform("uAmbient", game.ambience.data.ambientColor);
+            let col = CustomColor.fromShader(game.ambience.data.ambientColor);
+            col = col.mix(new CustomColor(40, 20, 0), game.input.mouse.position.y / game.app.renderer.screen.height);
+            this.renderMesh.setUniform("uAmbient", game.ambience.currentAmbience().toShader());
         }
 
 

@@ -13,6 +13,7 @@ import { Debug } from "./dev/debug";
 import { displayNumber } from "./utils/utils";
 import { DynamicAnimatedSprite } from "./pixelRendering/dynamicAnimatedSprite";
 import { Shadowmap } from "./shaders/lighting/shadowmap";
+import { CustomColor } from "./utils/color";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -34,6 +35,8 @@ export class Player implements ISerializable {
     healthBar: UIProgressBar;
     oxygenBar: UIProgressBar;
     animatedSprite: DynamicAnimatedSprite;
+
+    footstepProgress = 0;
 
     constructor() {
         this.statsDisplay = document.createElement("div");
@@ -117,9 +120,15 @@ export class Player implements ISerializable {
             }
         }
         input.clamp(-1, 1);
+        this.footstepProgress += Math.abs(input.x) * dt * 1.11 * (game.input.key("shift") ? 2 : 1);
+        if (this.footstepProgress > 1) {
+            this.footstepProgress = 0;
+            game.soundManager.playOneshot("footstep");
+        }
         if (input.x == 0) {
             if (this.grounded) this.velocity.x *= 1 - dt * 100;
             this.animatedSprite.swapAnimation("idle");
+            this.animatedSprite.scale.x = game.input.mouse.position.x > game.camera.worldToScreen(this.position).x ? 1 : -1;
         }
         else {
             this.animatedSprite.swapAnimation("run");
@@ -137,10 +146,10 @@ export class Player implements ISerializable {
         }
         if (!this.grounded) {
             this.velocity.y += 1000 * dt;
-            if (this.groundedTimer < -.1)
-                this.animatedSprite.swapAnimation("jump_sprint");
+            if (this.groundedTimer < -.1) {
+                //this.animatedSprite.swapAnimation("jump_sprint");
+            }
         }
-
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
 
@@ -176,13 +185,14 @@ export class Player implements ISerializable {
         this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
         this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();
-
+        this.animatedSprite.tint = game.ambience.currentAmbience().add(CustomColor.gray(game.activeScene.hasTerrain ? 0 : 200)).toPixi();
 
         this.graphics.position.set(32, 32);
+
         //this.graphics.ellipse(0, 0, this.playerHitbox.radiusX, this.playerHitbox.radiusY);
         //this.graphics.fill(0xff0000);
-        game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x)/4+game.camera.pixelScreen.x/2, (this.pixelLayer.renderMesh.y - game.camera.position.y)/4+game.camera.pixelScreen.y/2), clear: false });
-Debug.log(this.pixelLayer.renderMesh.x - game.camera.position.x);
+        game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.pixelLayer.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
+        //Debug.log(this.pixelLayer.renderMesh.x - game.camera.position.x);
 
     }
 

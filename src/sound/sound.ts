@@ -34,6 +34,8 @@ export class SoundManager {
         this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true });
         this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false });
         this.soundLibrary.add("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false });
+        this.soundLibrary.add("score", { url: "./sound/ui/score.mp3", loop: false, singleInstance: false, speed: 2, autoPlay: false });
+        this.soundLibrary.add("milestone", { url: "./sound/ui/milestone.mp3", loop: false, singleInstance: false, autoPlay: false });
     }
 }
 

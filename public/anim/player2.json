@@ -185,9 +185,6 @@
    { "name": "shoot", "from": 18, "to": 18, "direction": "forward" }
   ],
   "layers": [
-   { "name": "Clothes Bottom", "opacity": 255, "blendMode": "normal" },
-   { "name": "Clothes", "opacity": 255, "blendMode": "normal" },
-   { "name": "tie", "opacity": 255, "blendMode": "normal" },
    { "name": "Layer 7", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [

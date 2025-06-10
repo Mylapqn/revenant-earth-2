@@ -13,6 +13,7 @@ export class CustomColor {
         return [this.r / 255, this.g / 255, this.b / 255];
     }
     toPixi(): number {
+        this.clamp();
         return (this.r << 16) + (this.g << 8) + this.b
     }
     toHSL() {
@@ -50,6 +51,15 @@ export class CustomColor {
     }
     copy() {
         return new CustomColor(this.r, this.g, this.b);
+    }
+    clamp(){
+        if(this.r < 0) this.r = 0;
+        if(this.g < 0) this.g = 0;
+        if(this.b < 0) this.b = 0;
+        if(this.r > 255) this.r = 255;
+        if(this.g > 255) this.g = 255;
+        if(this.b > 255) this.b = 255;
+        return this;
     }
     static fromHsl(h: number, s: number, l: number) {
         //H: 0 - 360; S: 0 - 1; L:0 - 1;

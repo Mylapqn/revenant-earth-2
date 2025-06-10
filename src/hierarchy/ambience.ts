@@ -4,7 +4,7 @@ import { game } from "../game";
 import { ISceneObject, Scene } from "./scene";
 import { CustomColor } from "../utils/color";
 
-export type AmbienceData = { music: string; sound: string; background: string; ambientColor: number[] };
+export type AmbienceData = { music: string; sound: string; background: string; ambientColor: [number, number, number] };
 
 export class Ambience implements ISceneObject, ISerializable {
     kind: ObjectKind = "Ambience";
@@ -31,5 +31,12 @@ export class Ambience implements ISceneObject, ISerializable {
     unload(): void {
         if (this.sound != "")
             game.soundManager.soundLibrary.pause(this.sound);
+    }
+    currentAmbience() {
+        const dayRatio = (Math.sin((game.weather.weatherData.dayTime / game.weather.dayLength + .5) * Math.PI * 2) * .5 + .5) || 0;
+        let ambientColor = CustomColor.fromShader(game.ambience.data.ambientColor);
+        ambientColor = ambientColor.mix(ambientColor.mult(new CustomColor(150, 160, 180)), (game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold) || 0);
+
+        return ambientColor.mix(new CustomColor(60, 10, 100), dayRatio);
     }
 }

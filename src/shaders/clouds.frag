@@ -7,6 +7,7 @@ uniform float uTime;
 uniform float uClouds;
 uniform vec2 uSunPosition;
 uniform vec2 uResolution;
+uniform vec3 uAmbient;
 
 vec3 permute(vec3 x) {
     return mod(((x * 34.0f) + 1.0f) * x, 289.0f);
@@ -42,7 +43,7 @@ float fractalNoise(vec2 uv, int octaves, float lacunarity, float roughness) {
     float contribution = 1.f;
     for(int i = 0; i < octaves; i++) {
         float result = snoise(uv * scale);
-        result *= .3f*contribution;
+        result *= .3f * contribution;
         base += result;
         scale *= lacunarity;
         contribution *= roughness;
@@ -87,7 +88,7 @@ void main() {
     sunPosition.x /= ratio;
     vec2 originalUV = uv;
     uv = perspectiveTimeUV(originalUV, .2f);
-    float noise1 = fractalNoise(uv, 5, 2.f,.8*(1.-originalUV.y*.5));
+    float noise1 = fractalNoise(uv, 5, 2.f, .8f * (1.f - originalUV.y * .5f));
     //vec2 puv = perspectiveUV(originalUV,.5f);
     //float noise2 = fractalNoise(puv, 8, 2.f);
     float noise = noise1;
@@ -96,19 +97,26 @@ void main() {
     float originalNoise = noise;
     //noise = smoothstep(uClouds,uClouds+.1,noise);
     noise = step(uClouds, noise);
-    noise *= 1.f - originalUV.y * 1.5f;
-    vec3 sky = vec3(.3f, .5f, .5f) * pow(originalUV.y * 2.f, 2.f) + vec3(.7f, .4f, .2f);
+    vec3 skyColor = vec3(.8f, .5f, .3f);
+    vec3 sunColor = vec3(1.f, .9f, .8f);
+    vec3 sunShineColor = vec3(0.99f, 0.37f, 0.23f);
+    vec3 altSkyColor = vec3(.3f, .5f, .5f);
+    vec3 sky = skyColor * pow(originalUV.y * 2.f, 2.f) + vec3(.7f, .4f, .2f);
+    sky *= uAmbient;
     float sun = 1.f - length(originalUV - sunPosition);
-    float sunShine = pow(smoothstep(.2f, .95f, sun), 2.f);
-    float sunDisk = pow(smoothstep(.97f, .98f, sun), 2.f);
-    float totalSun = sunDisk * 2.f + sunShine * .5f;
-    totalSun -= noise * 1.f;
+    vec3 sunShine = pow(smoothstep(.2f, .95f, sun), 4.f) * sunShineColor;
+    vec3 sunDisk = pow(smoothstep(.97f, .98f, sun), 2.f) * sunColor;
+    vec3 totalSun = sunDisk * 2.f + sunShine * 5.f;
+    totalSun -= noise * 10.f;
     totalSun = clamp(totalSun, 0.f, 2.f);
     sky += totalSun;
     vec3 cloudColor = vec3(.5f, .2f, .1f) + vec3(.3f, .2f, .1f) * (floor(smoothstep(.9f, .2f, originalNoise) * 3.f) / 3.f);
+    cloudColor *= uAmbient;
+    cloudColor += sunShine * sunShine * (1.f - smoothstep(uClouds + .09f, uClouds + .12f, originalNoise)) * 4.f;
+    cloudColor += sunShine * sunShine * .8 * uClouds;
     //if(noise1 < .5) cloudColor += .03;
+    noise *= 1.f - originalUV.y * 1.5f;
     color = vec4(mix(sky, cloudColor, noise), 1.f);
     color.rgb = PBRNeutralToneMapping(color.rgb);
-    //color.rgb = vec3(noise1);
     //color = vec4(uClouds,uClouds,uClouds,1.);
 }

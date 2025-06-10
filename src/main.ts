@@ -1,6 +1,6 @@
 import { Application } from 'pixi.js';
 import { Game } from './game';
-import './style.css'
+import './stylesheets/style.css'
 import { DevSync } from './dev/devsync';
 
 async function init() {
