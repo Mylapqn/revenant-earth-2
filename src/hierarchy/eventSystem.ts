@@ -1,9 +1,11 @@
+import { Plant } from "../components/custom/plant";
 import { Entity } from "./entity";
 
 export type GameEvents = {
     entityCreate: [Entity],
     entityRemove: [Entity],
     playerBuild: [Entity],
+    plantGrow: [Plant],
 }
 
 export type Callback<T extends keyof GameEvents> = (...args: GameEvents[T]) => void;

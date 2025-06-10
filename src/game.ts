@@ -218,7 +218,7 @@ export class Game {
 
         this.pixelLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1, parent: this.mainContainer, worldSpace: true });
         this.fgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1.5, parent: this.fgContainer, worldSpace: true });
-        this.fgLayer.randomTerrain();
+        this.fgLayer.randomTerrain(40);
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
@@ -357,7 +357,7 @@ export class Game {
         const avgFrame = this.frameHistory.reduce((a, b) => a + b, 0) / this.frameHistory.length;
         while (this.frameHistory.length > 10)
             this.frameHistory.shift();
-        Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
+        //Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
         const dt = realDt * this.timeScale * (!this.input.key("g") ? 1 : .2);
         this.elapsedTime += dt;
         TimedShader.update(this.elapsedTime);

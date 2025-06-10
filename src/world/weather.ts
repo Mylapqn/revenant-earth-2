@@ -57,9 +57,9 @@ export class Weather implements ISerializable, ISceneObject {
             game.soundManager.soundLibrary.volume("rain_heavy", VolumeCurve.curves.rainHeavy.apply(1 - rainRatio));
             game.soundManager.soundLibrary.volume("rain_light", VolumeCurve.curves.rainLight.apply(1 - rainRatio));
 
-            Debug.log("rainRatio:      " + displayNumber(rainRatio));
-            Debug.log("rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)));
-            Debug.log("rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)));
+            //Debug.log("rainRatio:      " + displayNumber(rainRatio));
+            //Debug.log("rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)));
+            //Debug.log("rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)));
 
             this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity;
             const pos = game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5;

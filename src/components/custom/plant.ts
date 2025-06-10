@@ -29,6 +29,7 @@ export class Plant extends Component {
     dead = false;
     species!: PlantSpecies;
     generator!: PlantGenerator;
+    fullyGrown = false;
 
     constructor(parent: Entity) {
         super(parent);
@@ -119,6 +120,10 @@ export class Plant extends Component {
                 tdata.moisture = 0;
             }
             else if (this.growth >= this.species.statsPerGrowth.maxGrowth) {
+                if (!this.fullyGrown) {
+                    this.fullyGrown = true;
+                    game.events.emit("plantGrow", this);
+                }
                 this.seedProgress += dt * this.health * .1;
             }
         }

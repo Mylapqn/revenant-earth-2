@@ -136,9 +136,9 @@ export class PixelLayer {
     addChild(child: Container) {
         this.container.addChild(child);
     }
-    randomTerrain() {
+    randomTerrain(startY?: number) {
         const bgg = new Graphics({ parent: this.container });
-        let y = 0;
+        let y = startY ?? 0;
         bgg.moveTo(0, 1000);
         bgg.lineTo(0, y);
         const width = 180 + 400 * this.depth;
