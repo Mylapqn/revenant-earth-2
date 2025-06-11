@@ -420,7 +420,15 @@ button:hover {
     margin-bottom: 10px;
 }
 
-.quest-list div {
+.quest-list p {
     margin-bottom: 5px;
     text-align: left;
+}
+
+.quest>p {
+    font-weight: bold;
+}
+
+.quest .sub-quest {
+    margin-left: 10px;
 }

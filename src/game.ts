@@ -66,6 +66,8 @@ export class Game {
     mainContainer!: Container;
     fgContainer!: Container;
     weatherContainer!: Container;
+    uiContainer!: Container;
+    uiGraphics!: Graphics;
 
     skyLayer!: PixelLayer;
     bgLayers: PixelLayer[] = [];
@@ -230,6 +232,9 @@ export class Game {
         this.app.stage.addChild((Debug.graphicsWorldspace = new Graphics()));
         Debug.graphicsWorldspace.scale.set(Game.pixelScale);
 
+        this.uiContainer = new Container({ parent: this.app.stage });
+        this.uiGraphics = new Graphics({ parent: this.uiContainer });
+
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
 
@@ -363,6 +368,8 @@ export class Game {
         TimedShader.update(this.elapsedTime);
         Lightmap.update();
 
+        this.uiGraphics.clear();
+
         this.score.update(dt);
 
         this.tooltip.update(realDt);
@@ -400,6 +407,8 @@ export class Game {
         Debug.update(realDt);
 
         UI.update();
+
+
 
         //clears input
         this.input.update();

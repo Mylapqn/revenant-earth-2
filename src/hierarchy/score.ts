@@ -1,11 +1,15 @@
 import { game } from "../game";
 import { UI, UIElement } from "../ui/ui";
 import { lerp } from "../utils/utils";
+import { Vector, Vectorlike } from "../utils/vector";
 
 export class Score {
     display!: UIElement;
     currentDisplay: number = 0;
     accumulation = 0;
+    particles: Vector[] = [];
+    particlesQueue: Vectorlike[] = [];
+    particleAccumulation = 0;
     set score(score: number) {
         game.progressDatabase.db.set("score", score);
     }
@@ -21,6 +25,12 @@ export class Score {
     }
     add(amount: number) {
         this.score += amount;
+    }
+    addWithFx(amount: number, screenPosition: Vectorlike) {
+        this.score += amount;
+        for (let i = 0; i < amount / 5; i++) {
+            this.particlesQueue.push(Vector.fromLike(screenPosition).add(new Vector(Math.random() - .5, Math.random() - .5).mult(.05)));
+        }
     }
     init() {
         this.display = UIElement.create({ type: "div", classes: ["score"], parent: UI.container });
@@ -47,5 +57,25 @@ export class Score {
             //game.soundManager.soundLibrary.play("score", { volume: 0.01 });
         }
         this.display.htmlElement.textContent = this.currentDisplay.toString();
+        this.updateParticles(dt);
+    }
+    updateParticles(dt: number) {
+        if (this.particlesQueue.length > 0) {
+            this.particleAccumulation += dt * this.particlesQueue.length * 2;
+            while (this.particleAccumulation > 1 && this.particlesQueue.length > 0) {
+                this.particles.push(game.camera.renderToScreen(this.particlesQueue.shift()!));
+                this.particleAccumulation -= 1;
+                game.soundManager.soundLibrary.play("score", { volume: 0.1 });
+            }
+        }
+        for (let i = 0; i < this.particles.length; i++) {
+            this.particles[i] = Vector.lerp(this.particles[i], game.camera.renderToScreen({ x: 1, y: 0 }), dt * 3);
+            game.uiGraphics.circle(this.particles[i].x, this.particles[i].y, 10);
+            if (game.camera.renderToScreen({ x: 1, y: 0 }).distance(this.particles[i]) < 100) {
+                this.particles.splice(i, 1);
+                i--;
+            }
+        }
+        game.uiGraphics.fill(0x55ee11);
     }
 }

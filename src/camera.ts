@@ -94,6 +94,9 @@ export class Camera {
     screenToRender(v: Vectorlike) {
         return new Vector(v.x, v.y).vecdiv(this.viewport)
     }
+    renderToScreen(v: Vectorlike) {
+        return new Vector(v.x, v.y).vecmult(this.viewport)
+    }
     worldToRender(v: Vectorlike) {
         return this.screenToRender(this.worldToScreen(v));
     }
