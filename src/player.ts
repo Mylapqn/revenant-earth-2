@@ -185,14 +185,13 @@ export class Player implements ISerializable {
         this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
         this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();
-        this.animatedSprite.tint = game.ambience.currentAmbience().add(CustomColor.gray(game.activeScene.hasTerrain ? 0 : 200)).toPixi();
+        this.animatedSprite.tint = game.ambience.ambientColor().add(CustomColor.gray(game.activeScene.hasTerrain ? 0 : 200)).toPixi();
 
         this.graphics.position.set(32, 32);
 
-        //this.graphics.ellipse(0, 0, this.playerHitbox.radiusX, this.playerHitbox.radiusY);
-        //this.graphics.fill(0xff0000);
-        game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.pixelLayer.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
-        //Debug.log(this.pixelLayer.renderMesh.x - game.camera.position.x);
+        const shadowEnabled = false;
+        if (shadowEnabled)
+            game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.pixelLayer.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
 
     }
 

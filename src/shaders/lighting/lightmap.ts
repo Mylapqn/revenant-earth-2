@@ -53,6 +53,7 @@ export class Lightmap {
     }
 
     static resize(){
+        if(game.camera)
         this.texture.resize(game.camera.pixelScreen.x+2, game.camera.pixelScreen.y+2);
         this.shaderMesh.resize(game.camera.pixelScreen.x+2, game.camera.pixelScreen.y+2);
     }

@@ -27,6 +27,9 @@ export class RandomGenerator {
     child() {
         return new RandomGenerator(this.float() * 10000);
     }
+    bool(probability = 0.5) {
+        return this.float() < probability
+    }
 }
 
 export function lerp(a: number, b: number, t: number) {

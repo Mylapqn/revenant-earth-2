@@ -3,7 +3,7 @@ import { Game, game } from "../game";
 import { ISceneObject, Scene } from "../hierarchy/scene";
 import { ISerializable, KindedObject, StateMode } from "../hierarchy/serialise";
 import { Vector } from "../utils/vector";
-import { displayNumber, RandomGenerator } from "../utils/utils";
+import { clamp, displayNumber, RandomGenerator } from "../utils/utils";
 import { CloudMesh } from "./cloudMesh";
 import { VolumeCurve } from "../sound/sound";
 import { Debug } from "../dev/debug";
@@ -19,6 +19,10 @@ export class Weather implements ISerializable, ISceneObject {
     rainAngle: number = 0;
     rainRenderer: RainRenderer = new RainRenderer();
     random: RandomGenerator = new RandomGenerator();
+    currentThunder: number = 0;
+    thunderBuildup: number = 0;
+    thunderThreshold: number = 0;
+    thunderCount: number = 0;
 
     cloudMesh: CloudMesh;
 
@@ -54,14 +58,15 @@ export class Weather implements ISerializable, ISceneObject {
         if (this.weatherData.rainIntensity > 0) {
             const rainRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
             const rainMult = rainRatio + .01;
-            game.soundManager.soundLibrary.volume("rain_heavy", VolumeCurve.curves.rainHeavy.apply(1 - rainRatio));
-            game.soundManager.soundLibrary.volume("rain_light", VolumeCurve.curves.rainLight.apply(1 - rainRatio));
+            const rainVolume = clamp(1 - rainRatio, 0, 1);
+            game.soundManager.soundLibrary.volume("rain_heavy", VolumeCurve.curves.rainHeavy.apply(rainVolume));
+            game.soundManager.soundLibrary.volume("rain_light", VolumeCurve.curves.rainLight.apply(rainVolume));
 
             //Debug.log("rainRatio:      " + displayNumber(rainRatio));
             //Debug.log("rainCurveHeavy: " + displayNumber(VolumeCurve.curves.rainHeavy.apply(1 - rainRatio)));
             //Debug.log("rainCurveLight: " + displayNumber(VolumeCurve.curves.rainLight.apply(1 - rainRatio)));
 
-            this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity;
+            this.weatherData.rainBuildup -= dt * this.weatherData.rainIntensity * .1;
             const pos = game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5;
             if (pos > 0) {
                 game.terrain.addMoisture(pos, dt * this.weatherData.rainIntensity * rainMult);
@@ -75,9 +80,32 @@ export class Weather implements ISerializable, ISceneObject {
                 this.weatherData.rainIntensity = 0;
                 this.weatherData.rainThreshold = this.random.range(10, 40);
             }
+            if (this.weatherData.rainIntensity > 1) {
+                this.thunderBuildup += dt * rainRatio;
+                if (this.thunderBuildup > this.thunderThreshold) {
+                    //thunder
+                    this.currentThunder = 1;
+                    this.thunderBuildup = 0;
+                    this.thunderCount = this.random.int(1, 3);
+                    game.soundManager.playOneshot("thunder");
+                }
+                if (this.currentThunder > 0) {
+                    this.currentThunder *= 1 - dt * 2;
+                    if (this.currentThunder < .3 && this.thunderCount > 0) {
+                        this.currentThunder = 1;
+                        this.thunderCount--;
+                    }
+                    else if (this.currentThunder <= .01) {
+                        this.currentThunder = 0;
+                    }
+                }
+            }
+
         }
         else if (this.weatherData.rainBuildup > this.weatherData.rainThreshold) {
             //start rain
+            this.thunderBuildup = this.random.range(10, 40);
+            this.thunderThreshold = this.random.range(10, 20);
             this.weatherData.rainIntensity = this.random.range(.2, 2);
             this.rainAngle = this.random.range(-.5, .5);
             game.soundManager.soundLibrary.play("rain_heavy");
@@ -93,13 +121,16 @@ export class Weather implements ISerializable, ISceneObject {
     draw(dt: number): void {
         this.rainRenderer.draw(dt);
         this.cloudMesh.setUniform("uClouds", 1 - (this.weatherData.rainBuildup / this.weatherData.rainThreshold));
-        let sunAngle = (this.weatherData.dayTime / this.dayLength+.5) * Math.PI * 2;
+        let sunAngle = (this.weatherData.dayTime / this.dayLength + .5) * Math.PI * 2;
         let sunVector = Vector.fromAngle(sunAngle);
-        sunVector.vecmult({ x: .4, y: .4 });
+        sunVector.vecmult({ x: .25, y: .4 });
         sunVector.add({ x: .5, y: .5 });
         this.cloudMesh.setUniform("uSunPosition", [sunVector.x, sunVector.y]);
         this.cloudMesh.setUniform("uResolution", [game.camera.pixelScreen.x, game.camera.pixelScreen.y]);
-        this.cloudMesh.setUniform("uAmbient", game.ambience.currentAmbience().toShader());
+        this.cloudMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
+        this.cloudMesh.setUniform("uDistanceFogColor", game.ambience.fogColor().distance);
+        this.cloudMesh.setUniform("uGroundFogColor", game.ambience.fogColor().ground);
+        this.cloudMesh.setUniform("uCloudColor", game.ambience.fogColor().cloud);
 
     }
 }

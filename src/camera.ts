@@ -104,4 +104,11 @@ export class Camera {
         const screenPos = this.worldToScreen(v);
         return screenPos.x > -padding && screenPos.x < this.screen.x + padding && screenPos.y > -padding && screenPos.y < this.screen.y + padding;
     }
+    inViewBox(pos: Vectorlike, min: Vectorlike, max: Vectorlike, padding = 0) {
+        const topLeft = { x: pos.x + min.x, y: pos.y + min.y };
+        const topRight = { x: pos.x + max.x, y: pos.y + min.y };
+        const bottomRight = { x: pos.x + max.x, y: pos.y + max.y };
+        const bottomLeft = { x: pos.x + min.x, y: pos.y + max.y };
+        return this.inView(topLeft, padding) || this.inView(bottomRight, padding) || this.inView(topRight, padding) || this.inView(bottomLeft, padding);
+    }
 }

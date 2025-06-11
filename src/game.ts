@@ -24,7 +24,7 @@ import { UI } from "./ui/ui";
 import { SoundManager } from "./sound/sound";
 import { Debug } from "./dev/debug";
 import { HitboxLibrary } from "./environment/hitboxLibrary";
-import { displayNumber } from "./utils/utils";
+import { displayNumber, RandomGenerator } from "./utils/utils";
 import { Ambience } from "./hierarchy/ambience";
 import { Light } from "./shaders/lighting/light";
 import { Lightmap } from "./shaders/lighting/lightmap";
@@ -334,8 +334,7 @@ export class Game {
             this.activeScene
         );
 
-        Prefab.Plant({ scene: this.activeScene, x: 100, y: 100, species: "Tree" });
-        Prefab.Plant({ scene: this.activeScene, x: 300, y: 100, species: "Tree" });
+
 
         this.tooltip = new UITooltip();
 
@@ -354,6 +353,13 @@ export class Game {
         this.milestones.init();
         Debug.init();
         //game.loadScene("Space Station");
+
+        for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 300 + 50) {
+            Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Tree", growth: 30, health: 0 });
+        }
+        for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 80 + 10) {
+            Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Grass", growth: 5, health: 0 });
+        }
     }
 
     update(ticker: Ticker) {
@@ -487,7 +493,7 @@ export class Game {
                 this.weather.weatherData.rainBuildup += 2;
             }
             if (this.input.keyDown("č")) {
-                this.weather.weatherData.dayTime += this.weather.dayLength / 4;
+                this.weather.weatherData.dayTime += this.weather.dayLength / 8;
             }
             if (this.input.keyDown("q")) {
                 this.terrain.inspectMode++;

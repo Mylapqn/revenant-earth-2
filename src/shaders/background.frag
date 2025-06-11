@@ -40,12 +40,13 @@ void main() {
     float depth = 1.f - uDepth;
     color = tex;
     color.rgb *= 0.f;
-    float groundFog = ((worldUv.y * 4.f * depth * depth) + .2f) * tex.a;
-    groundFog = clamp(groundFog, 0.f, 1.f);
+    float groundFog = (((worldUv.y) * 4.f * depth * depth) + .2f) * tex.a;
+    groundFog = clamp(groundFog, 0.f, 1.f) * 1.f;
     float distanceFog = depth * depth + .3f;
     color.rgb += distanceFog * alpha * uDistanceFogColor;
     color.rgb += groundFog * alpha * uGroundFogColor;
     color.rgb *= uAmbient;
     //if(uv.x < .5f)
     color.rgb = PBRNeutralToneMapping(color.rgb);
+    //color.rgb = vec3(worldUv.y+0.) * tex.a;
 }

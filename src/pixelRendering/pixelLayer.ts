@@ -96,12 +96,12 @@ export class PixelLayer {
                 offsets.remainder.y -= 1;
             }
             this.container.position.set(offsets.offset.x, offsets.offset.y);
-            this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.renderTexture.width * Game.pixelScale, offsets.offset.y / this.renderTexture.height * Game.pixelScale]);
-            this.renderMesh.setUniform("uAmbient", game.ambience.currentAmbience().toShader());
+            this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.renderTexture.width, offsets.offset.y / this.renderTexture.height]);
+            this.renderMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
             if (this.depth > 1) this.renderMesh.setUniform("uPlayerPosition", game.camera.worldToRender(game.player.position).xy());
             if (this.depth < 1) {
-                this.renderMesh.setUniform("uDistanceFogColor", [.8, .5, .3]);
-                this.renderMesh.setUniform("uGroundFogColor", [.9, .9, .9]);
+                this.renderMesh.setUniform("uDistanceFogColor", game.ambience.fogColor().distance);
+                this.renderMesh.setUniform("uGroundFogColor", game.ambience.fogColor().ground);
             }
             //this.shaderMesh.position.set(game.input.mouse.position.x, game.input.mouse.position.y);
             this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
@@ -110,7 +110,7 @@ export class PixelLayer {
         if (this.depth === 1 && this.worldSpace && this.autoResize) {
             let col = CustomColor.fromShader(game.ambience.data.ambientColor);
             col = col.mix(new CustomColor(40, 20, 0), game.input.mouse.position.y / game.app.renderer.screen.height);
-            this.renderMesh.setUniform("uAmbient", game.ambience.currentAmbience().toShader());
+            this.renderMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
         }
 
 

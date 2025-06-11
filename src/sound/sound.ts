@@ -30,6 +30,7 @@ export class SoundManager {
     async loadSounds() {
         pixiSound.volumeAll = .5;
         this.loadOneshotRange("footstep", "./sound/muddry_footsteps/footsmuddry_%.wav", 5, 1);
+        this.loadOneshotRange("thunder", "./sound/sfx/thunder/thunder_%.mp3", 3, 1);
         this.soundLibrary.add("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true });
         this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true });
         this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false });

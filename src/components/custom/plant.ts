@@ -30,6 +30,7 @@ export class Plant extends Component {
     species!: PlantSpecies;
     generator!: PlantGenerator;
     fullyGrown = false;
+    inView = false;
 
     constructor(parent: Entity) {
         super(parent);
@@ -42,12 +43,13 @@ export class Plant extends Component {
         if (this.species.generatorConstructor === undefined) throw new Error("co se doje?");
         this.generator = new this.species.generatorConstructor(this);
         this.tooltipComponent = this.entity.getComponent(EntityTooltip);
-        if (this.tooltipComponent) this.tooltipComponent.tooltipName = "Tree";
+        if (this.tooltipComponent) this.tooltipComponent.tooltipName = this.species.name ?? "Tree";
         this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
 
-
-        game.score.add(100);
+        if(this.health > 0){
+            game.score.add(100);
+        }
         Plant.list.push(this);
         this.drawPlant();
     }
@@ -69,7 +71,17 @@ export class Plant extends Component {
 
         const dt = realDt * plantSimulationSpeed;
 
-        if (game.camera.inView(this.transform.position, 50)) {
+        const bounds = this.shaderMeshComponent.container.getLocalBounds();
+        const minBox = { x: bounds.minX, y: bounds.minY };
+        const maxBox = { x: bounds.maxX, y: bounds.maxY };
+
+        if (game.camera.inViewBox(this.transform.position, minBox, maxBox, 50)) {
+            if (!this.inView) {
+                this.inView = true;
+                this.drawPlant();
+                this.timeSinceDraw = 0;
+                return;
+            }
             this.timeSinceDraw += realDt;
             //Debug.log(this.timeSinceDraw);
             if (this.timeSinceDraw > this.secondsPerDraw && !this.dead) {
@@ -77,8 +89,16 @@ export class Plant extends Component {
                 this.drawPlant();
             }
         }
+        else {
+            this.inView = false;
+        }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
         if (this.dead) return;
+        if (this.health <= 0) {
+            //if already dead
+            this.damage(1, "unknown reasons");
+            return;
+        }
         let tdata = game.terrain.getProperties(this.transform.position.x);
         let adata = game.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
@@ -149,11 +169,13 @@ export class Plant extends Component {
 
     damage(amount: number, reason: string) {
         amount = Math.min(.9, amount);
+        const oldHealth = this.health;
         this.health = Math.max(0, this.health - amount);
         if (this.health <= 0 && !this.dead) {
             this.dead = true;
             this.drawPlant();
-            new ParticleText("died from " + reason, this.transform.position.clone().add(new Vector(0, -40)));
+            if (oldHealth > 0)
+                new ParticleText("died from " + reason, this.transform.position.clone().add(new Vector(0, -40)));
             this.tooltipComponent?.tooltipData.clear();
             this.tooltipComponent?.tooltipData.set("status", "died from " + reason);
         }
@@ -206,7 +228,7 @@ export class Plant extends Component {
     }
 
     drawPlant() {
-        let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -200 }), this.entity.transform.position.clone().add({ x: 0, y: 200 }), (body) => { return body.userData?.terrain });
+        let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -1000 }), this.entity.transform.position.clone().add({ x: 0, y: 1000 }), (body) => { return body.userData?.terrain });
         if (hit) {
             this.entity.transform.position.y = hit.point.y;
         }

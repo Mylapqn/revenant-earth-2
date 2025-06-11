@@ -8,7 +8,7 @@ export type PrefabParams = {
     y?: number;
     scene?: Scene;
 };
-export type PrefabTreeParams = { species: string } & PrefabParams;
+export type PrefabTreeParams = { species: string, growth?: number, health?: number } & PrefabParams;
 export class Prefab {
     static Plant(params: PrefabTreeParams) {
         let newtree = Entity.fromData(
@@ -23,7 +23,8 @@ export class Prefab {
                         componentType: "Plant",
                         data: {
                             species: params.species,
-                            growth: 1,
+                            growth: params.growth ?? 1,
+                            health: params.health ?? 1
                         },
                     },
                     {

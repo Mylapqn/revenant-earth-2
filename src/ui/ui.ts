@@ -45,7 +45,6 @@ export class UIElement {
         });
         this.htmlElement.addEventListener("mouseleave", () => {
             UI.mouseOverUI = UI.mouseOverUI > 0 ? UI.mouseOverUI - 1 : 0;
-            console.log("mouse leave", UI.mouseOverUI);
             if (UI.mouseOverUI == 0)
                 UI.lastHoveredElement = undefined;
         });
