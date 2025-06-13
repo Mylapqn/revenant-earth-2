@@ -1,13 +1,15 @@
-import { CLEAR, Container, Graphics, RenderTexture, Sprite } from "pixi.js";
+import { CLEAR, Container, Graphics, RenderTexture, Sprite, Texture } from "pixi.js";
 import { Game, game } from "../game";
 import { ShaderMesh, Uniforms } from "../shaders/shaderMesh";
-import fragmentShaderBackground from "../shaders/background.frag?raw";
-import fragmentShaderForeground from "../shaders/foreground.frag?raw";
+import fragmentShaderBackground from "../shaders/terrain/background.frag?raw";
+import fragmentShaderForeground from "../shaders/terrain/foreground.frag?raw";
 import fragmentShaderDefault from "../shaders/frag.frag?raw";
-import fragmentShaderMain from "../shaders/mainLayer.frag?raw";
+import fragmentShaderMain from "../shaders/terrain/mainLayer.frag?raw";
 import { CustomColor } from "../utils/color";
 import { Lightmap } from "../shaders/lighting/lightmap";
 import { Debug } from "../dev/debug";
+import { Vector, Vectorlike } from "../utils/vector";
+import { MouseButton } from "../input";
 
 export type PixelLayerOptions = ({
     autoResize: true;
@@ -20,6 +22,7 @@ export type PixelLayerOptions = ({
     depth?: number;
     parent?: Container;
     autoRender?: boolean;
+    lighting?: boolean;
 }
 
 export class PixelLayer {
@@ -30,6 +33,7 @@ export class PixelLayer {
     autoResize: boolean;
     autoRender: boolean;
     depth: number = 1;
+    lighting: boolean = true;
     onResize?: (width: number, height: number) => void;
     initialResolution: { x: number, y: number };
     constructor(options: PixelLayerOptions) {
@@ -45,6 +49,7 @@ export class PixelLayer {
             height = options.height;
             this.autoResize = false;
         }
+        this.lighting = options.lighting ?? true;
         this.worldSpace = options.worldSpace ?? true;
         this.container = new Container();
         this.renderTexture = RenderTexture.create({ width, height, antialias: false, scaleMode: 'nearest' });
@@ -55,21 +60,27 @@ export class PixelLayer {
         let uniforms: Uniforms = {
             uDepth: { type: "f32", value: this.depth },
             uPosition: { type: "vec2<f32>", value: new Float32Array([0, 0]) },
+            uRemainder: { type: "vec2<f32>", value: new Float32Array([0, 0]) },
             uResolution: { type: "vec2<f32>", value: new Float32Array([0, 0]) },
             uAmbient: { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) }
         };
-        if (this.depth < 1 && this.worldSpace) {
-            fragmentShader = fragmentShaderBackground;
-            uniforms.uGroundFogColor = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
-            uniforms.uDistanceFogColor = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
-        }
-        else if (this.depth > 1 && this.worldSpace) {
-            fragmentShader = fragmentShaderForeground;
-            uniforms.uPlayerPosition = { type: "vec2<f32>", value: new Float32Array([0, 0]) };
-        }
-        else if (this.depth === 1 && this.worldSpace && this.autoResize) {
-            fragmentShader = fragmentShaderMain;
-            customTextures.push({ name: "uLightMap", texture: Lightmap.texture });
+        if (this.worldSpace) {
+            if (this.depth < 1) {
+                fragmentShader = fragmentShaderBackground;
+                uniforms.uGroundFogColor = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
+                uniforms.uDistanceFogColor = { type: "vec3<f32>", value: new Float32Array([0, 0, 0]) };
+            }
+            else if (this.depth > 1) {
+                fragmentShader = fragmentShaderForeground;
+                uniforms.uPlayerPosition = { type: "vec2<f32>", value: new Float32Array([0, 0]) };
+            }
+            else if (this.depth === 1 && this.autoResize && this.lighting) {
+                fragmentShader = fragmentShaderMain;
+                customTextures.push({ name: "uLightMap", texture: Lightmap.texture });
+            }
+            else if (this.depth === 1) {
+                fragmentShader = fragmentShaderDefault;
+            }
         }
         this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms, customTextures: customTextures });
         this.renderMesh.scale.set(Game.pixelScale);
@@ -95,8 +106,15 @@ export class PixelLayer {
                 offsets.remainder.x -= 1;
                 offsets.remainder.y -= 1;
             }
+            let delta = Vector.fromLike(offsets.remainder).mult(Game.pixelScale).sub(this.renderMesh.position.clone()).mult(1 / Game.pixelScale);
+            let deltaPixel = Vector.fromLike(offsets.offset).sub(this.container.position.clone()).mult(-1);
+            delta.add(deltaPixel);
             this.container.position.set(offsets.offset.x, offsets.offset.y);
+            this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
+            //if (game.input.mouse.getButton(MouseButton.Right)) delta.set({ x: 0, y: 0 });
+            //Debug.log(delta.x);
             this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.renderTexture.width, offsets.offset.y / this.renderTexture.height]);
+            this.renderMesh.setUniform("uRemainder", [delta.x / this.renderTexture.width, delta.y / this.renderTexture.height]);
             this.renderMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
             if (this.depth > 1) this.renderMesh.setUniform("uPlayerPosition", game.camera.worldToRender(game.player.position).xy());
             if (this.depth < 1) {
@@ -104,10 +122,9 @@ export class PixelLayer {
                 this.renderMesh.setUniform("uGroundFogColor", game.ambience.fogColor().ground);
             }
             //this.shaderMesh.position.set(game.input.mouse.position.x, game.input.mouse.position.y);
-            this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
             //console.log(this.sprite.position);
         }
-        if (this.depth === 1 && this.worldSpace && this.autoResize) {
+        if (this.depth === 1 && this.worldSpace && this.autoResize && this.lighting) {
             let col = CustomColor.fromShader(game.ambience.data.ambientColor);
             col = col.mix(new CustomColor(40, 20, 0), game.input.mouse.position.y / game.app.renderer.screen.height);
             this.renderMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
@@ -141,9 +158,29 @@ export class PixelLayer {
         let y = startY ?? 0;
         bgg.moveTo(0, 1000);
         bgg.lineTo(0, y);
-        const width = 180 + 400 * this.depth;
+        const width = 200 + 1800 * this.depth;
         for (let t = 0; t < width; t++) {
             y += (Math.random() - .5) * 5;
+            bgg.lineTo(t * 5, y);
+        }
+        bgg.lineTo(width * 5, 1000);
+        bgg.fill(CustomColor.gray(255 * (1.2 - this.depth)));
+    }
+    randomTerrainWithSprites(textures: Set<Texture>, startY?: number) {
+        const bgg = new Graphics({ parent: this.container });
+        let y = startY ?? 0;
+        bgg.moveTo(0, 1000);
+        bgg.lineTo(0, y);
+        const width = 200 + 1800 * this.depth;
+        let nextSprite = 0;
+        for (let t = 0; t < width; t++) {
+            y += (Math.random() - .5) * 5;
+            if (t > nextSprite) {
+                const sprite = new Sprite({ texture: Array.from(textures)[Math.floor(Math.random() * textures.size)], anchor: { x: 0, y: 1 } });
+                nextSprite = t + Math.random() * 20 + sprite.texture.width / 5;
+                sprite.position.set(t * 5, Math.floor(y + 10));
+                this.container.addChild(sprite);
+            }
             bgg.lineTo(t * 5, y);
         }
         bgg.lineTo(width * 5, 1000);

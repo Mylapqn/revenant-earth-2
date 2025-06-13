@@ -38,7 +38,7 @@ body {
 
 .debugText {
     position: absolute;
-    top: 0;
+    top: 25vh;
     left: 0;
     font-family: "monogram";
     font-size: 32px;
@@ -413,6 +413,7 @@ button:hover {
     font-size: 20px;
     color: white;
     text-align: left;
+    max-width: 400px;
 }
 
 .quest-list h1 {
@@ -432,4 +433,10 @@ button:hover {
 
 .quest .sub-quest {
     margin-left: 10px;
+}
+
+.quest .details {
+    margin-left: 20px;
+    font-weight: 100;
+    opacity: .5;
 }

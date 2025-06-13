@@ -14,6 +14,15 @@ export class EntityTooltip extends Component {
     highlighted = false;
     tooltipData = new Map<string, string>();
     tooltipName = "";
+    private _enabled = true;
+    public get enabled() {
+        return this._enabled;
+    }
+    public set enabled(value) {
+        if (value == this._enabled) return;
+        if (!value) this.entity.emit("hoverOff");
+        this._enabled = value;
+    }
 
     constructor(parent: Entity) {
         super(parent);
@@ -29,6 +38,7 @@ export class EntityTooltip extends Component {
     }
 
     update(dt: number) {
+        if (!this.enabled) return;
         let x = Math.abs(game.worldMouse.x - this.transform.position.x);
         let y = Math.abs(game.worldMouse.y - this.transform.position.y);
         if (x < 20 && y < 40) {
@@ -73,8 +83,8 @@ export class EntityTooltip extends Component {
     getTooltip() {
         let tooltipText = "";
         this.tooltipData.forEach((value, key) => tooltipText += `${key}: ${value}\n`);
-        if(this.tooltipName == "") this.tooltipName = this.entity.name;
-        return {title: this.tooltipName, text: tooltipText}; //this.tooltipName + "\n" + tooltipText;
+        if (this.tooltipName == "") this.tooltipName = this.entity.name;
+        return { title: this.tooltipName, text: tooltipText }; //this.tooltipName + "\n" + tooltipText;
     }
 
 }

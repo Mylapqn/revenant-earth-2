@@ -59,6 +59,39 @@ export class Prefab {
                     },
                     {
                         componentType: "EntityTooltip"
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20
+                        }
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
+
+    static Rock(params: PrefabParams & { type: number }) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Rock",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./gfx/rocks/rock_" + params.type + ".png",
+                        },
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 2
+                        }
                     }
                 ],
             },

@@ -46,3 +46,5 @@ export function displayNumber(n: number, digits = 2) {
 export const placeholderGeometry = new Geometry({ attributes: { aPosition: [0, 1], aUV: [0, 1], aTerrainStats: [0, 0, 0], aTerrainInspect: [0] } });
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+export const limitAbs = (n: number, max: number) => Math.sign(n) * Math.min(Math.abs(n), max);

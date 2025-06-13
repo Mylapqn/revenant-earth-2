@@ -1,6 +1,8 @@
 import { Text } from "pixi.js";
 import { Vector } from "../utils/vector";
 import { game } from "../game";
+import { Lightmap } from "../shaders/lighting/lightmap";
+import { MouseButton } from "../input";
 
 
 export class ParticleText {
@@ -13,23 +15,30 @@ export class ParticleText {
     text = "Text";
     graphics: Text;
     constructor(text: string, position: Vector) {
-        this.graphics = new Text({ text: text, anchor: { x: 0.51, y: 0.51 }, roundPixels: true });
-        this.graphics.style.fill = 0x333300;
+        this.graphics = new Text({ text: text, anchor: { x: 0, y: 0 }, roundPixels: true });
+        this.graphics.style.fill = 0xffffff;
         this.graphics.style.fontSize = 16;
         this.graphics.resolution = 3;
         this.graphics.style.fontFamily = "monogram";
         this.graphics.style.align = "center";
-        game.pixelLayer.container.addChild(this.graphics);
+        this.graphics.cacheAsTexture({ antialias: false });
+        //this.graphics.renderable = false;
         this.position = position.clone();
-        this.graphics.position.set(this.position.x, this.position.y);
+        this.draw(0);
+        game.worldUiLayer.addChild(this.graphics);
         ParticleText.list.push(this);
     }
     update(dt: number) {
+        //game.app.renderer.render({ container: this.graphics, target: Lightmap.texture, clear: false, transform: this.graphics.worldTransform });
+
         this.age += dt;
         this.graphics.alpha = 1 - (this.age / this.lifespan);
         this.position.add(this.velocity.clone().mult(dt));
-        const rounded = this.position.clone().floor();
-        this.graphics.position.set(rounded.x, rounded.y);
+        this.draw(dt);
         if (this.age > this.lifespan) { this.graphics.destroy(); ParticleText.list.splice(ParticleText.list.indexOf(this), 1); }
+    }
+    draw(dt: number) {
+        const rounded = this.position.clone().sub({ x: this.graphics.width / 2, y: this.graphics.height / 2 }).floor();
+        this.graphics.position.set(rounded.x, rounded.y);
     }
 }

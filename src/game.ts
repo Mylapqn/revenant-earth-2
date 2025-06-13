@@ -68,10 +68,13 @@ export class Game {
     weatherContainer!: Container;
     uiContainer!: Container;
     uiGraphics!: Graphics;
+    worldUiContainer!: Container;
+    worldUiGraphics!: Graphics;
 
     skyLayer!: PixelLayer;
     bgLayers: PixelLayer[] = [];
     fgLayer!: PixelLayer;
+    worldUiLayer!: PixelLayer;
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -127,6 +130,7 @@ export class Game {
     }
 
     resize() {
+        this.camera.resize();
         for (const layer of PixelLayer.resizeLayers) {
             layer.resize(game.camera.pixelScreen.x, game.camera.pixelScreen.y);
         }
@@ -149,11 +153,21 @@ export class Game {
                         { alias: "monogram", src: "./font/monogram.ttf" },
                         { alias: "biochar", src: "./gfx/building/biochar.png" },
                     ]
+                },
+                {
+                    name: "backgrounds", assets: [
+                        { alias: "ruin_factory_1", src: "./gfx/bg/1/ruin_factory_1.png" },
+                        { alias: "ruin_house_1", src: "./gfx/bg/1/ruin_house_1.png" },
+                        { alias: "ruin_house_2", src: "./gfx/bg/1/ruin_house_2.png" },
+                        { alias: "ruin_hway_1", src: "./gfx/bg/1/ruin_hway_1.png" },
+                        { alias: "ruin_pole_1", src: "./gfx/bg/1/ruin_pole_1.png" },
+                        { alias: "ruin_pole_2", src: "./gfx/bg/1/ruin_pole_2.png" },
+                    ]
                 }
             ]
         }
         Assets.init({ manifest });
-        await Assets.loadBundle("bundle");
+        await Assets.loadBundle(["bundle"]);
 
         await this.hitboxLibrary.init();
         await this.soundManager.loadSounds();
@@ -164,7 +178,7 @@ export class Game {
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
         Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg", ambientColor: [1.5, 1, .5] } }, this.activeScene);
-
+        //this.soundManager.soundLibrary.stop("wind");
         initHandlers();
         initComponents();
 
@@ -195,14 +209,7 @@ export class Game {
         bg.scale.set(1);
         //this.app.stage.addChild(bg);
 
-        const scene2 = new Scene();
-        scene2.name = "Scene 2";
-        game.scenes.set(scene2.name, scene2);
-        const s2t = new Array(1000).fill({ x: 0, y: 0 }).map((n, i) => ({ x: i * 10, y: 0 }));
-        const s2td = new Array(1000).fill({ pollution: 0, fertility: 0, erosion: 0, moisture: 0 });
-
-        scene2.data = await Assets.load("./scenes/scene-2.json");
-
+        const scene2 = Scene.deserialise({ name: "Scene 2", kind: "Scene", active: false, data: await Assets.load("./scenes/scene-2.json") });
         const sceneSpace = Scene.deserialise({ name: "Space Station", kind: "Scene", active: false, data: await Assets.load("./scenes/space-station.json") });
 
         this.skyLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.skyContainer, worldSpace: false });
@@ -214,7 +221,11 @@ export class Game {
         for (let i = 0; i < layers; i++) {
             const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.skyContainer });
             this.bgLayers.push(bgl);
-            bgl.randomTerrain();
+            if (i >= layers - 3)
+                bgl.randomTerrainWithSprites(new Set(Object.values((await Assets.loadBundle(["backgrounds"])).backgrounds)));
+            else {
+                bgl.randomTerrain();
+            }
         }
 
 
@@ -229,11 +240,14 @@ export class Game {
         this.pixelLayer.container.addChild((this.terrainContainer = new Container()));
         this.pixelLayer.container.addChild((this.foliageContainer = new Container()));
         this.pixelLayer.container.addChild((this.weatherContainer = new Container()));
-        this.app.stage.addChild((Debug.graphicsWorldspace = new Graphics()));
-        Debug.graphicsWorldspace.scale.set(Game.pixelScale);
+        Debug.containerWorldspace = new Container({ parent: this.app.stage, scale: { x: Game.pixelScale, y: Game.pixelScale } });
+        Debug.graphicsWorldspace = new Graphics({ parent: Debug.containerWorldspace });
 
         this.uiContainer = new Container({ parent: this.app.stage });
         this.uiGraphics = new Graphics({ parent: this.uiContainer });
+        this.worldUiLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1, parent: this.uiContainer, worldSpace: true, lighting: false });
+        this.worldUiContainer = this.worldUiLayer.container;
+        this.worldUiGraphics = new Graphics({ parent: this.worldUiContainer });
 
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
@@ -241,7 +255,7 @@ export class Game {
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
 
-        Entity.fromData(
+        /*Entity.fromData(
             {
                 kind: "Entity",
                 name: "Robo",
@@ -261,7 +275,7 @@ export class Game {
                 ],
             },
             this.activeScene
-        );
+        );*/
 
         Entity.fromData(
             {
@@ -297,6 +311,12 @@ export class Game {
                             dbName: "pollutionSpeed",
                         },
                     },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20,
+                        },
+                    }
                 ],
             },
             this.activeScene
@@ -316,7 +336,7 @@ export class Game {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "./door-space.png",
+                            asset: "./landing.png",
                         },
                     },
                     {
@@ -327,6 +347,19 @@ export class Game {
                         data: {
                             target: "Space Station",
                             doorId: "space-door-1",
+                            enabled: false
+                        },
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20,
+                        },
+                    },
+                    {
+                        componentType: "Trigger",
+                        data: {
+                            name: "planetLanding"
                         },
                     },
                 ],
@@ -343,7 +376,6 @@ export class Game {
         this.atmo = new Atmo();
         this.weather = new Weather();
 
-        this.app.ticker.add(this.update, this);
 
         Light.init();
         Lightmap.init();
@@ -360,36 +392,56 @@ export class Game {
         for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 80 + 10) {
             Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Grass", growth: 5, health: 0 });
         }
+        const rand = new RandomGenerator();
+        for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 30 + 10) {
+            Prefab.Rock({ scene: this.activeScene, x: x, y: 100, type: rand.int(0, 5) });
+        }
+        this.resize();
+        this.loadScene("Space Station");
+        this.camera.zoom = 4;
+        this.camera.targetZoom = 4;
+        this.camera.zoomSpeed = .3;
+        this.camera.position.set(this.camera.targetPlayerPosition());
+        setTimeout(() => {
+            this.camera.targetZoom = 3;
+        }, 500);
+
+        this.app.ticker.add(this.update, this);
     }
 
     update(ticker: Ticker) {
-        const realDt = Math.min(ticker.elapsedMS / 1000, .1);
+        const realDt = Math.min(ticker.elapsedMS / 1000, .04);
         this.frameHistory.push(realDt);
         const avgFrame = this.frameHistory.reduce((a, b) => a + b, 0) / this.frameHistory.length;
         while (this.frameHistory.length > 10)
             this.frameHistory.shift();
-        //Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
+        if (Debug.editorMode)
+            Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
         const dt = realDt * this.timeScale * (!this.input.key("g") ? 1 : .2);
         this.elapsedTime += dt;
-        TimedShader.update(this.elapsedTime);
+
+        Shadowmap.update();
+        this.camera.processZoom(dt);
         Lightmap.update();
-
+        TimedShader.update(this.elapsedTime);
+        
         this.uiGraphics.clear();
-
+        this.worldUiGraphics.clear();
+        
         this.score.update(dt);
-
+        
         this.tooltip.update(realDt);
-
-
+        
+        
         for (const particleText of [...ParticleText.list]) {
-            particleText.update(realDt);
+            particleText.update(dt);
         }
         this.activeScene.update(dt);
         this.activeScene.draw(dt);
 
 
-
         this.camera.update(realDt);
+
 
         //this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
         //this.worldDebugGraphics.stroke(0x999999);
@@ -429,7 +481,7 @@ export class Game {
         let nearest = undefined;
         let nearestDistance = Infinity;
         for (const entity of game.activeScene.objects) {
-            if (entity instanceof Entity) {
+            if (entity instanceof Entity && this.camera.inView(entity.transform.position, 50)) {
                 const distance = entity.transform.position.distanceSquared(position);
                 if (distance < nearestDistance) {
                     nearestDistance = distance;
@@ -449,6 +501,11 @@ export class Game {
 
         if (this.input.keyDown("m")) {
             UI.fullscreenMenu.toggle();
+            //let stats = "";
+            //for (const fc of Object.entries(game.atmo.energyMoveTotal)) {
+            //    stats += `${fc[0]}: ${displayNumber(fc[1], 2)}<br>`;
+            //}
+            //UI.fullscreenMenu.element.innerHTML = stats;
         }
 
         if (this.inputEnabled) {

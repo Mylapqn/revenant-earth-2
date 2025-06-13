@@ -1,24 +1,29 @@
 {
     "kind": "Entity",
-    "id": 5,
-    "name": "Plant",
+    "id": 10,
+    "name": "Trigger",
     "component": [
         {
-            "id": 0,
-            "componentType": "ShaderMesh"
-        },
-        {
-            "id": 1,
-            "componentType": "Plant",
+            "id": 2,
+            "componentType": "Trigger",
             "data": {
-                "growth": 40,
-                "species": "Tree",
-                "health": 0
+                "name": "movementComplete",
+                "radius": 100
             }
         },
         {
-            "id": 2,
-            "componentType": "EntityTooltip"
+            "id": 22,
+            "componentType": "Transform",
+            "data": {
+                "position": {
+                    "x": -497,
+                    "y": -58
+                },
+                "velocity": {
+                    "x": 0,
+                    "y": 0
+                }
+            }
         }
     ]
 }

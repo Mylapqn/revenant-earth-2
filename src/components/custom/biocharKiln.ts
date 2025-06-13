@@ -2,6 +2,7 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
+import { sleep } from "../../utils/utils";
 import { Vector } from "../../utils/vector";
 import { Plant } from "./plant";
 
@@ -25,7 +26,7 @@ export class BiocharKiln extends Component {
     //    super.applyData(data);
     //}
 
-    kiln(): void {
+    async kiln() {
         const plantsInRadius: Plant[] = [];
         game.activeScene.findComponents(Plant).forEach(plant => {
             const dist = plant.transform.position.distance(this.transform.position)
@@ -37,9 +38,10 @@ export class BiocharKiln extends Component {
         console.log(this.transform.position);
         //remove all plants
         new ParticleText(`processed ${plantsInRadius.length} plants`, this.transform.position.clone().add(new Vector(0, -50)));
-        plantsInRadius.forEach(plant => {
+        for (const plant of plantsInRadius) {
             plant.entity.remove();
-            game.score.add(100);
-        });
+            game.score.addWithFx(100, game.camera.worldToRender(plant.transform.position));
+            await sleep(100);    
+        }
     }
 }

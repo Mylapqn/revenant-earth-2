@@ -15,6 +15,7 @@ import { UIElement } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
 import { Debug } from "../../dev/debug";
 import { Shadowmap } from "../../shaders/lighting/shadowmap";
+import { SurfaceMaterial } from "../../world/terrain";
 
 
 
@@ -54,7 +55,7 @@ export class Hitbox extends Component {
         Assets.load("floor.png").then((texture) => {
             this.edgeTexture = texture;
             this.edgeTexture.source.scaleMode = "nearest";
-            this.edgeTexture.source.wrapMode = "repeat";
+            this.edgeTexture.source.addressMode = "repeat";
             this.hitboxMesh.shader!.resources.uSampler = this.edgeTexture.source
         });
         Assets.load("interior_bg.png").then((texture) => {
@@ -120,7 +121,7 @@ export class Hitbox extends Component {
         if (!convexPolygons) throw new Error("No convex polygons");
 
         for (const convexPolygon of convexPolygons) {
-            this.polygons.push(game.collisionSystem.createPolygon({ x: 0, y: 0 }, convexPolygon.map(node => new SATVector(node[0], node[1]))));
+            this.polygons.push(game.collisionSystem.createPolygon({ x: 0, y: 0 }, convexPolygon.map(node => new SATVector(node[0], node[1])), { userData: { material: SurfaceMaterial.metal } }));
         }
     }
 
@@ -137,7 +138,7 @@ export class Hitbox extends Component {
                 this.graphics.lineTo(hitbox.points[i].x + this.transform.position.x, hitbox.points[i].y + this.transform.position.y);
             }
             this.graphics.lineTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
-            this.graphics.fill(0x000000, 1);
+            this.graphics.fill({ color: 0x000000, alpha: 1 });
             //this.graphics.stroke({ color: 0xff0000, width: 1, alpha: .1 });
         }
 
@@ -163,7 +164,7 @@ export class Hitbox extends Component {
         });
         this.hitboxMesh.geometry = hbGeo;
 
-        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform,clear:false });
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform, clear: false });
 
     }
 

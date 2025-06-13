@@ -20,6 +20,7 @@ export class HitboxGeometry extends Geometry {
         const perspective = options.perspectiveDepth ?? 0;
         const uvOffset = options.uvOffset ?? 0;
         let uvX = 0;
+        let lastInnerPoint = new SATVector(0, 0);
 
         for (let i = 1; i < options.points.length - 1; i++) {
             const node = options.points[i];
@@ -29,22 +30,28 @@ export class HitboxGeometry extends Geometry {
             const halfAngle = Math.acos((clamp(Vector.dot(tangentLeft.clone().reverse(), tangentRight), -1, 1))) / 2;
             const normalFactor = 1 / Math.sin(halfAngle);
             normal.perp().reverse();
-            const innerPoint = node.clone().add(normal.clone().scale(depth * normalFactor));
+            let innerPoint = node.clone().add(normal.clone().scale(depth * normalFactor));
+            const lastTangent = innerPoint.clone().sub(lastInnerPoint).normalize();
+            if(lastTangent.dot(tangentLeft) < .1 && i > 2) {
+                innerPoint = lastInnerPoint.clone();
+            }
+            lastInnerPoint = innerPoint.clone();
             if (perspective > 0) {
                 const camDiff = new SATVector((node.x - game.camera.position.x / Game.pixelScale), (node.y - game.camera.position.y / Game.pixelScale));
                 camDiff.scale(perspective);
                 innerPoint.add(camDiff);
             }
-
+            
             positions.push(node.x, node.y, innerPoint.x, innerPoint.y);
             if (uvWidth) {
                 uvs.push((uvOffset + uvX) * 1, 0, (uvOffset + uvX) * 1, 1);
                 uvX += options.points[i + 1].clone().sub(options.points[i]).len() / uvWidth;
             }
             else {
-                uvs.push((uvOffset + i) * 20 / depth, 0, (uvOffset + i) * 20 / depth, 1);
+                uvs.push((uvOffset + i) * 10 / depth, 0, (uvOffset + i) * 10 / depth, 1);
             }
         }
         return { positions, uvs };
     }
 }
+

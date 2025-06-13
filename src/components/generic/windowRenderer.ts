@@ -1,7 +1,8 @@
 import { Entity } from "../../hierarchy/entity";
 import { ShaderMeshRenderer } from "./shaderMeshRenderer";
 import windowFrag from "../../shaders/window.frag?raw";
-import { Assets, Container, RenderTexture, Texture } from "pixi.js";
+import windowEmissiveFrag from "../../shaders/windowEmissive.frag?raw";
+import { Assets, Container, Matrix, RenderTexture, Texture } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { ShaderMesh } from "../../shaders/shaderMesh";
@@ -15,6 +16,7 @@ export class WindowRenderer extends Component {
     topContainer: Container;
     container: Container;
     renderMesh!: ShaderMesh;
+    emissiveMesh!: ShaderMesh;
     directionComponent?: SpriteDirection;
     asset!: string;
 
@@ -29,7 +31,9 @@ export class WindowRenderer extends Component {
 
     override remove() {
         this.renderMesh.destroy();
+        this.emissiveMesh.destroy();
         this.container.destroy();
+        this.topContainer.destroy();
         super.remove();
     }
 
@@ -54,14 +58,19 @@ export class WindowRenderer extends Component {
                 }
             }
         });
+        this.emissiveMesh = new ShaderMesh({
+            texture: Texture.WHITE, frag: windowEmissiveFrag, anchor: new Vector(.5, .5),
+        });
+
         Assets.load(data.asset).then((texture) => {
             this.renderMesh.texture = texture;
+            this.emissiveMesh.texture = texture;
             game.bgContainer.addChild(this.renderMesh);
             this.setBackground(game.ambience.background);
         });
     }
     setBackground(texture: Texture) {
-        
+
         texture.source.repeatMode = "repeat";
         this.renderMesh.setUniform("uBackgroundResolution", [texture.width, texture.height]);
         //console.log(this.renderMesh.shader!.resources.group.uniforms.uBackgroundResolution);
@@ -71,6 +80,8 @@ export class WindowRenderer extends Component {
         if (this.directionComponent != undefined) this.renderMesh.scale.x = this.directionComponent.direction;
         this.renderMesh.position.set(this.transform.position.x, this.transform.position.y);
         //TODO Emissive texture?
-        //game.app.renderer.render({ container: this.renderMesh,target:Lightmap.texture,clear:false,transform:this.renderMesh.worldTransform });
+        //game.app.renderer.render({ container: this.renderMesh, target: Lightmap.texture, transform: new Matrix().translate((this.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
+
+        game.app.renderer.render({ container: this.emissiveMesh, target: Lightmap.texture, clear: false, transform: this.renderMesh.worldTransform });
     }
 }

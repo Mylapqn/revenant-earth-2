@@ -1,4 +1,4 @@
-import { Color, Graphics, StrokeStyle } from "pixi.js";
+import { Color, Container, Graphics, StrokeStyle } from "pixi.js";
 import { Game, game } from "../game";
 import { clamp, displayNumber } from "../utils/utils";
 import { BasicSprite } from "../components/generic/basicSprite";
@@ -30,10 +30,12 @@ export class Debug {
         Debug._editorMode = value;
         if (value) {
             game.camera.customTarget = game.camera.position.clone();
+            game.camera.zoomSpeed = 10;
         }
         else {
             game.camera.customTarget = undefined;
-            game.camera.zoom = 1;
+            game.camera.targetZoom = 1;
+            game.camera.zoomSpeed = 1;
             this.hitboxEditor?.stopEditing();
             game.timeScale = 1;
         }
@@ -42,17 +44,21 @@ export class Debug {
     static debugView = false;
     static hitboxEditor: HitboxEditor;
     private static debugText = "";
+    static containerWorldspace: Container;
     static graphicsWorldspace: Graphics;
     static movingEntity?: Entity;
     static log(text: string | number) { this.debugText += text + "\n"; };
     static update(dt: number) {
+        if (this.containerWorldspace.children.length > 1)
+            this.containerWorldspace.removeChildren(1);
         this.graphicsWorldspace.clear();
+        /*
         if(this.memtext == "") this.snapMemory();
         if (game.input.keyDown(";")) {
             this.memtext = "";
             this.snapMemory();
             navigator.clipboard.writeText(this.memtext);
-        }
+        }*/
 
         if (this.editorMode) {
             this.log("Editor Mode");
@@ -64,7 +70,7 @@ export class Debug {
             if (game.input.key("s")) game.camera.customTarget!.y += camSpeed * dt;
             if (game.input.mouse.getButton(MouseButton.Wheel)) game.camera.customTarget?.sub(game.input.mouse.delta.clone().mult(1 / game.camera.zoom));
             if (game.input.keyUp(" ")) game.timeScale = game.timeScale == 1 ? 0 : 1;
-            if (game.input.mouse.scroll) game.camera.zoom = clamp(game.camera.zoom * (1 - game.input.mouse.scroll * .2), .25, 4);
+            if (game.input.mouse.scroll) game.camera.targetZoom = clamp(game.camera.targetZoom * (1 - game.input.mouse.scroll * .2), .25, 4);
 
             //draw grid
             this.drawGrid(10, { width: .5, color: 0xffffff, alpha: .1 * game.camera.zoom });
@@ -81,12 +87,14 @@ export class Debug {
         }
         if (this.editorMode && !this.hitboxEditor.editing) {
             const nearestEntity = game.nearestEntity(game.worldMouse);
-            for (const entity of game.activeScene.objects) {
-                if (entity instanceof Entity) {
-                    this.graphicsWorldspace.circle(entity.transform.position.x, entity.transform.position.y, 2);
+            const entitiesOnScreen: Entity[] = Array.from(game.activeScene.objects).filter(e => e instanceof Entity && game.camera.inView(e.transform.position, 50)) as Entity[];
+            for (const entity of entitiesOnScreen) {
+                this.graphicsWorldspace.circle(entity.transform.position.x, entity.transform.position.y, 2);
+                this.graphicsWorldspace.stroke({ width: 1, color: 0xaaaaaa });
+                for (const component of entity.components.values()) {
+                    component.debugDraw(this.graphicsWorldspace);
                 }
             }
-            this.graphicsWorldspace.stroke({ width: 1, color: 0xaaaaaa });
             if (game.activeScene.hasTerrain) {
                 for (let x = 0; x < game.terrain.nodes.length; x++) {
                     const node = game.terrain.nodes[x];

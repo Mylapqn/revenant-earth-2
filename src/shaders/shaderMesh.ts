@@ -22,6 +22,12 @@ export type ShaderMeshOptions = {
     size?: Vector
 };
 export class ShaderMesh extends Mesh {
+    public get shader(): TimedTextureShader {
+        return super.shader as TimedTextureShader;
+    }
+    public set shader(value: TimedTextureShader) {
+        super.shader = value;
+    }
     anchor = new Vector(0, 0);
     set texture(value: Texture) {
         if (this.anchor)

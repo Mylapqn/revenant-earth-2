@@ -5,7 +5,11 @@
             "music": "",
             "sound": "space",
             "background": "space",
-            "ambientColor": [0.1, 0.15, 0.3]
+            "ambientColor": [
+                0.1,
+                0.15,
+                0.3
+            ]
         }
     },
     {
@@ -14,31 +18,32 @@
         "name": "Door",
         "component": [
             {
-                "id": 12,
+                "id": 36,
                 "componentType": "BasicSprite",
                 "data": {
                     "asset": "./door-space.png"
                 }
             },
             {
-                "id": 13,
+                "id": 37,
                 "componentType": "Interactable"
             },
             {
-                "id": 14,
+                "id": 38,
                 "componentType": "Door",
                 "data": {
                     "target": "Scene",
-                    "doorId": "space-door-1"
+                    "doorId": "space-door-1",
+                    "enabled": false
                 }
             },
             {
-                "id": 15,
+                "id": 39,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 0,
-                        "y": 11
+                        "x": 317,
+                        "y": 5
                     },
                     "velocity": {
                         "x": 0,
@@ -54,30 +59,30 @@
         "name": "Entity 8",
         "component": [
             {
-                "id": 12,
+                "id": 36,
                 "componentType": "BasicSprite",
                 "data": {
                     "asset": "./robo.png"
                 }
             },
             {
-                "id": 13,
+                "id": 37,
                 "componentType": "Interactable"
             },
             {
-                "id": 14,
+                "id": 38,
                 "componentType": "Button",
                 "data": {
                     "dbName": "pollutionSpeed"
                 }
             },
             {
-                "id": 15,
+                "id": 39,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 290,
-                        "y": 20
+                        "x": 163,
+                        "y": -11
                     },
                     "velocity": {
                         "x": 0,
@@ -93,7 +98,7 @@
         "name": "Dungeon Hitbox",
         "component": [
             {
-                "id": 6,
+                "id": 18,
                 "componentType": "Transform",
                 "data": {
                     "position": {
@@ -107,7 +112,7 @@
                 }
             },
             {
-                "id": 7,
+                "id": 19,
                 "componentType": "Hitbox",
                 "data": {
                     "interior": true,
@@ -119,11 +124,11 @@
     {
         "kind": "Player",
         "position": {
-            "x": 9.169364149877922e-42,
-            "y": 24.087649674107624
+            "x": -569.0356149981113,
+            "y": 16.1
         },
         "velocity": {
-            "x": 2.5694857729384606e-43,
+            "x": -6.169079986906879e-224,
             "y": 0
         }
     },
@@ -133,19 +138,19 @@
         "name": "Window",
         "component": [
             {
-                "id": 6,
+                "id": 26,
                 "componentType": "WindowRenderer",
                 "data": {
-                    "asset": "./window.png"
+                    "asset": "./window_big.png"
                 }
             },
             {
-                "id": 7,
+                "id": 27,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -240,
-                        "y": 10
+                        "x": -437,
+                        "y": -9
                     },
                     "velocity": {
                         "x": 0,
@@ -154,11 +159,12 @@
                 }
             },
             {
+                "id": 28,
                 "componentType": "LightComponent",
                 "data": {
                     "lightData": {
                         "position": {
-                            "x": -0,
+                            "x": 0,
                             "y": -10
                         },
                         "angle": 1.5707963267948966,
@@ -178,46 +184,27 @@
     {
         "kind": "Entity",
         "id": 10,
-        "name": "Window",
+        "name": "Tutorial",
         "component": [
             {
-                "id": 10,
-                "componentType": "WindowRenderer",
+                "id": 23,
+                "componentType": "BasicSprite",
                 "data": {
-                    "asset": "./window.png"
+                    "asset": "./gfx/ui/tutorial/walk.png",
+                    "container": "ui"
                 }
             },
             {
-                "id": 11,
+                "id": 24,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 160,
-                        "y": 10
+                        "x": -541,
+                        "y": -23
                     },
                     "velocity": {
                         "x": 0,
                         "y": 0
-                    }
-                }
-            },
-            {
-                "componentType": "LightComponent",
-                "data": {
-                    "lightData": {
-                        "position": {
-                            "x": -0,
-                            "y": -10
-                        },
-                        "angle": 1.5707963267948966,
-                        "width": 2.5,
-                        "color": [
-                            1,
-                            1,
-                            1
-                        ],
-                        "range": 150,
-                        "intensity": 1.5
                     }
                 }
             }
@@ -229,110 +216,14 @@
         "name": "Window",
         "component": [
             {
-                "id": 12,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 13,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": 240,
-                        "y": 10
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            },
-            {
-                "componentType": "LightComponent",
-                "data": {
-                    "lightData": {
-                        "position": {
-                            "x": -0,
-                            "y": -10
-                        },
-                        "angle": 1.5707963267948966,
-                        "width": 2.5,
-                        "color": [
-                            1,
-                            1,
-                            1
-                        ],
-                        "range": 150,
-                        "intensity": 1.5
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 10,
-                "componentType": "WindowRenderer",
-                "data": {
-                    "asset": "./window.png"
-                }
-            },
-            {
-                "id": 11,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -160,
-                        "y": 10
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            },
-            {
-                "componentType": "LightComponent",
-                "data": {
-                    "lightData": {
-                        "position": {
-                            "x": -0,
-                            "y": -10
-                        },
-                        "angle": 1.5707963267948966,
-                        "width": 2.5,
-                        "color": [
-                            1,
-                            1,
-                            1
-                        ],
-                        "range": 150,
-                        "intensity": 1.5
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 10,
-        "name": "Window",
-        "component": [
-            {
-                "id": 14,
+                "id": 31,
                 "componentType": "WindowRenderer",
                 "data": {
                     "asset": "./window_wall.png"
                 }
             },
             {
-                "id": 15,
+                "id": 32,
                 "componentType": "Transform",
                 "data": {
                     "position": {
@@ -346,22 +237,437 @@
                 }
             },
             {
+                "id": 33,
                 "componentType": "LightComponent",
                 "data": {
                     "lightData": {
                         "position": {
-                            "x": -0,
+                            "x": 0,
                             "y": -20
                         },
                         "angle": 1.5707963267948966,
                         "width": 6,
                         "color": [
                             0.6,
-                            0.7,
+                            0.6980392156862745,
                             1
                         ],
                         "range": 180,
                         "intensity": 20
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Bed",
+        "component": [
+            {
+                "id": 27,
+                "componentType": "BasicSprite",
+                "data": {
+                    "asset": "./gfx/misc/bed.png"
+                }
+            },
+            {
+                "id": 28,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -540,
+                        "y": 15
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 34,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_wall.png"
+                }
+            },
+            {
+                "id": 35,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -240,
+                        "y": -41
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 36,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": -20
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 6,
+                        "color": [
+                            0.6,
+                            0.6980392156862745,
+                            1
+                        ],
+                        "range": 180,
+                        "intensity": 20
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Tutorial",
+        "component": [
+            {
+                "id": 27,
+                "componentType": "BasicSprite",
+                "data": {
+                    "asset": "./gfx/ui/tutorial/jump.png",
+                    "container": "ui"
+                }
+            },
+            {
+                "id": 28,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -354,
+                        "y": -25
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Light",
+        "component": [
+            {
+                "id": 27,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 3,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.4980392156862745
+                        ],
+                        "range": 250,
+                        "intensity": 1.5
+                    }
+                }
+            },
+            {
+                "id": 28,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -500,
+                        "y": -62
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Light",
+        "component": [
+            {
+                "id": 29,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 3,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.4980392156862745
+                        ],
+                        "range": 250,
+                        "intensity": 1.5
+                    }
+                }
+            },
+            {
+                "id": 30,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 325,
+                        "y": -87
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 29,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_big.png"
+                }
+            },
+            {
+                "id": 30,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -120,
+                        "y": 0
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 31,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 32,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_big.png"
+                }
+            },
+            {
+                "id": 33,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 140,
+                        "y": 0
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 34,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 35,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_big.png"
+                }
+            },
+            {
+                "id": 36,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 210,
+                        "y": 0
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 37,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 38,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_big.png"
+                }
+            },
+            {
+                "id": 39,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 316,
+                        "y": -53
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 40,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": -10
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2.5,
+                        "color": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Trigger",
+        "component": [
+            {
+                "id": 25,
+                "componentType": "Trigger",
+                "data": {
+                    "name": "movementComplete"
+                }
+            },
+            {
+                "id": 26,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -168,
+                        "y": 8
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
                     }
                 }
             }

@@ -14,6 +14,8 @@ import { Transform } from "./generic/transfrom";
 import { WindowRenderer } from "./generic/windowRenderer";
 import { LightComponent } from "./generic/lightComponent";
 import { BiocharKiln } from "./custom/biocharKiln";
+import { TerrainAlign } from "./generic/terrainAlign";
+import { Trigger } from "./generic/trigger";
 
 
 export function initComponents(){
@@ -32,4 +34,6 @@ export function initComponents(){
     Component.register(WindowRenderer);
     Component.register(LightComponent);
     Component.register(BiocharKiln);
+    Component.register(TerrainAlign);
+    Component.register(Trigger);
 }

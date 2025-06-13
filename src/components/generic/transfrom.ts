@@ -32,7 +32,9 @@ export class Transform extends Component {
     }
 
     update(dt: number) {
+        if(this.velocity.x != 0)
         this.position.x += this.velocity.x * dt;
+        if(this.velocity.y != 0)
         this.position.y += this.velocity.y * dt;
     }
 

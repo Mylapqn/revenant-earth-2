@@ -1,3 +1,4 @@
+import { Graphics } from "pixi.js";
 import { UIElement } from "../ui/ui";
 import { Callback, Entity, EntityEvents } from "./entity";
 import { primitiveObject } from "./serialise";
@@ -65,6 +66,9 @@ export class Component {
             buttons.unshift(header);
         }
         return buttons;
+    }
+    debugDraw(graphics: Graphics) {
+        
     }
 }
 

@@ -6,6 +6,8 @@ export type GameEvents = {
     entityRemove: [Entity],
     playerBuild: [Entity],
     plantGrow: [Plant],
+    triggerEnter: [string],
+    triggerExit: [string],
 }
 
 export type Callback<T extends keyof GameEvents> = (...args: GameEvents[T]) => void;

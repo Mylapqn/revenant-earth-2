@@ -29,6 +29,7 @@ export class Plant extends Component {
     dead = false;
     species!: PlantSpecies;
     generator!: PlantGenerator;
+    bounds = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     fullyGrown = false;
     inView = false;
 
@@ -47,7 +48,7 @@ export class Plant extends Component {
         this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
         this.shaderMeshComponent?.container.addChild(this.graphics);
 
-        if(this.health > 0){
+        if (this.health > 0) {
             game.score.add(100);
         }
         Plant.list.push(this);
@@ -62,7 +63,7 @@ export class Plant extends Component {
     override applyData(data: { growth: number; species: string; health: number }): void {
         this.growth = data.growth;
         this.health = data.health ?? 1;
-        console.log(data.species);
+        //console.log(data.species);
         if (data.species) this.species = PlantSpecies.species.get(data.species)!;
     }
 
@@ -71,15 +72,16 @@ export class Plant extends Component {
 
         const dt = realDt * plantSimulationSpeed;
 
-        const bounds = this.shaderMeshComponent.container.getLocalBounds();
+        const bounds = this.bounds;
         const minBox = { x: bounds.minX, y: bounds.minY };
         const maxBox = { x: bounds.maxX, y: bounds.maxY };
 
-        if (game.camera.inViewBox(this.transform.position, minBox, maxBox, 50)) {
+        if (game.camera.inViewX(this.transform.position.x) || game.camera.inViewBox(this.transform.position, minBox, maxBox, 50)) {
             if (!this.inView) {
                 this.inView = true;
                 this.drawPlant();
                 this.timeSinceDraw = 0;
+                this.setCullVisible(true);
                 return;
             }
             this.timeSinceDraw += realDt;
@@ -90,6 +92,7 @@ export class Plant extends Component {
             }
         }
         else {
+            this.setCullVisible(false);
             this.inView = false;
         }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
@@ -113,25 +116,25 @@ export class Plant extends Component {
             //this.tooltipComponent.tooltipData.set("species", this.species.name);
         }
         if (tdata == undefined) return;
-        if (adata.pollution > 0) {
-            this.damage(dt * adata.pollution * .02 * this.species.statsPerTime.pollutionDamage, "air pollution");
-            if (this.health > .1) {
-                adata.pollution = Math.max(0, adata.pollution - dt * this.species.statsPerTime.pollution * .02);
-            }
-            this.shaderMeshComponent.renderMesh.tint = new Color({ r: 255, g: this.health * 255, b: this.health * 255, a: 1 });
-        }
         if (this.health < 1) {
             this.health = Math.min(1, this.health + dt * .001);
+        }
+        if (adata.pollution > 0) {
+            this.damage(dt * adata.pollution * .002 * this.species.statsPerTime.pollutionDamage, "air pollution");
+            if (this.dead) return;
+            if (this.health > .1) {
+                adata.pollution = Math.max(0, adata.pollution - dt * this.species.statsPerTime.pollution * .0001 * this.growth);
+            }
+            this.shaderMeshComponent.renderMesh.tint = new Color({ r: 255, g: this.health * 255, b: this.health * 255, a: 1 });
         }
         if (tdata.fertility > 0 && tdata.moisture > .1 && this.health > .1 && this.growth < this.species.statsPerGrowth.maxGrowth) {
             let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * .2;
             this.growth += addedGrowth;
             game.score.add(addedGrowth);
-            tdata.fertility -= addedGrowth * this.species.statsPerGrowth.nutrients * .1;
+            game.terrain.consumeFertility(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.nutrients * 20);
             game.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
-            tdata.erosion -= addedGrowth * this.species.statsPerGrowth.erosion * .1;
-            tdata.erosion = Math.max(0, tdata.erosion);
-            tdata.moisture -= addedGrowth * this.species.statsPerGrowth.water * .1;
+            game.terrain.fixErosion(this.transform.position.x + Math.random()*60, addedGrowth * this.species.statsPerGrowth.erosion * .05);
+            game.terrain.removeMoisture(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.water * .02);
         }
         if (this.health > 0) {
             let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .05;
@@ -172,6 +175,7 @@ export class Plant extends Component {
         const oldHealth = this.health;
         this.health = Math.max(0, this.health - amount);
         if (this.health <= 0 && !this.dead) {
+            this.health = 0;
             this.dead = true;
             this.drawPlant();
             if (oldHealth > 0)
@@ -259,11 +263,19 @@ export class Plant extends Component {
         //this.graphics.stroke({ color: 0x449900, width: 2 });
         //this.graphics.fill(0x338800);
         this.shaderMeshComponent.draw();
+        this.bounds = this.shaderMeshComponent.renderMesh.getLocalBounds();
     }
 
     remove() {
         Plant.list.splice(Plant.list.indexOf(this), 1);
         super.remove();
+    }
+
+    setCullVisible(visible: boolean) {
+        if (this.tooltipComponent != undefined)
+            this.tooltipComponent.enabled = visible;
+        this.shaderMeshComponent.renderMesh.visible = visible;
+        this.shaderMeshComponent.renderMesh.shader.enabled = visible;
     }
 
     static list: Plant[] = [];

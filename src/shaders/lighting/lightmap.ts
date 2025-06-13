@@ -27,7 +27,7 @@ export class Lightmap {
     static fragment: string = fragment;
     static vertex: string = vertex;
     //TODO float texture not doing anything
-    static texture: RenderTexture = RenderTexture.create({format:"rgba32float"});
+    static texture: RenderTexture = RenderTexture.create({ format: "rgba32float" });
     static shaderMesh: ShaderMesh;
     static init() {
         Shadowmap.init();
@@ -45,16 +45,16 @@ export class Lightmap {
 
     static update() {
         Light.updateDataTexture();
-        Shadowmap.update();
+        //Shadowmap.update();
         this.shaderMesh.setUniform("uPixelSize", [1 / game.camera.pixelScreen.x, 1 / game.camera.pixelScreen.y]);
         this.shaderMesh.setUniform("lightAmount", Light.list.length);
         this.shaderMesh.setUniform("viewport", [...game.camera.position.xy(), game.camera.pixelScreen.x, game.camera.pixelScreen.y]);
         game.app.renderer.render({ target: this.texture, container: this.shaderMesh });
     }
 
-    static resize(){
-        if(game.camera)
-        this.texture.resize(game.camera.pixelScreen.x+2, game.camera.pixelScreen.y+2);
-        this.shaderMesh.resize(game.camera.pixelScreen.x+2, game.camera.pixelScreen.y+2);
+    static resize() {
+        if (game.camera)
+            this.texture.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
+        this.shaderMesh.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
     }
 }

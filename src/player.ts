@@ -1,4 +1,4 @@
-import { Ellipse } from "detect-collisions";
+import { Body, Ellipse } from "detect-collisions";
 import { Game, game } from "./game";
 import { Assets, Graphics, Matrix, Sprite, Spritesheet } from "pixi.js";
 import { Vector, Vectorlike } from "./utils/vector";
@@ -10,13 +10,16 @@ import { Atmo } from "./world/atmo";
 import { UIProgressBar } from "./ui/progressBar";
 import { LegSystem } from "./limbs/legSystem";
 import { Debug } from "./dev/debug";
-import { displayNumber } from "./utils/utils";
+import { displayNumber, limitAbs } from "./utils/utils";
 import { DynamicAnimatedSprite } from "./pixelRendering/dynamicAnimatedSprite";
 import { Shadowmap } from "./shaders/lighting/shadowmap";
 import { CustomColor } from "./utils/color";
+import { Lightmap } from "./shaders/lighting/lightmap";
+import { SurfaceMaterial } from "./world/terrain";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
+    initialPosition = new Vector(1100, -50);
     sprite: Sprite;
     playerHitbox: Ellipse;
     graphics: Graphics;
@@ -27,6 +30,7 @@ export class Player implements ISerializable {
         return this.groundedTimer > 0;
     }
     groundedTimer = 0;
+    materialUnder: SurfaceMaterial = SurfaceMaterial.metal;
 
     health = 100;
     oxygen = 100;
@@ -88,12 +92,19 @@ export class Player implements ISerializable {
         this.pixelLayer.addChild(this.animatedSprite);
     }
 
+    respawn() {
+        this.position = this.initialPosition.clone();
+        this.velocity.set(0, 0);
+        this.health = 100;
+        this.oxygen = 100;
+    }
+
     update(dt: number) {
         //Debug.log(this.position.y);
         const tdata = game.terrain.getProperties(this.position.x);
         const adata = game.atmo.getProperties(this.position.x);
 
-        this.oxygen -= (adata.pollution - .5) * dt * 100;
+        this.oxygen -= (adata.pollution - .5) * dt * 10;
         this.oxygen = Math.max(0, Math.min(100, this.oxygen));
 
         if (this.oxygen <= 0) this.health -= dt * 10 * adata.pollution;
@@ -109,30 +120,47 @@ export class Player implements ISerializable {
         let accel = 1000;
         let jumpSpeed = 300;
         let input = new Vector(0, 0);
+        let sprint = false;
         if (game.inputEnabled) {
             if (game.input.key("d")) input.x += 1;
             if (game.input.key("a")) input.x -= 1;
             if (game.input.key(" ") || game.input.key("w")) input.y += 1;
             if (game.input.key("s")) input.y -= 1;
-            if (game.input.key("shift")) {
+
+            sprint = !game.input.key("shift");
+            if (sprint) {
                 maxSpeed *= 2;
                 accel *= 2;
             }
         }
         input.clamp(-1, 1);
-        this.footstepProgress += Math.abs(input.x) * dt * 1.11 * (game.input.key("shift") ? 2 : 1);
+        if (this.grounded)
+            this.footstepProgress += Math.abs(input.x) * dt * 1.5 * (sprint ? 1.5 : 1);
         if (this.footstepProgress > 1) {
             this.footstepProgress = 0;
-            game.soundManager.playOneshot("footstep");
+            let footstepType = "dirt";
+            switch (this.materialUnder) {
+                case SurfaceMaterial.dirt:
+                    footstepType = "dirt"
+                    break;
+                case SurfaceMaterial.metal:
+                    footstepType = "metal"
+                    break;
+                default:
+                    break;
+            }
+            game.soundManager.playOneshot("footstep_" + footstepType);
         }
         if (input.x == 0) {
+            this.footstepProgress = .4;
             if (this.grounded) this.velocity.x *= 1 - dt * 100;
             this.animatedSprite.swapAnimation("idle");
+            this.animatedSprite.animationSpeed = .1;
             this.animatedSprite.scale.x = game.input.mouse.position.x > game.camera.worldToScreen(this.position).x ? 1 : -1;
         }
         else {
             this.animatedSprite.swapAnimation("run");
-            this.animatedSprite.animationSpeed = game.input.key("shift") ? .15 : .1;
+            this.animatedSprite.animationSpeed = sprint ? .15 : .1;
             this.animatedSprite.scale.x = input.x;
             if (input.x > 0 && this.velocity.x < maxSpeed || input.x < 0 && this.velocity.x > -maxSpeed) {
                 this.velocity.x += accel * dt * input.x;
@@ -147,8 +175,14 @@ export class Player implements ISerializable {
         if (!this.grounded) {
             this.velocity.y += 1000 * dt;
             if (this.groundedTimer < -.1) {
+
                 //this.animatedSprite.swapAnimation("jump_sprint");
             }
+        }
+        if (game.activeScene.hasTerrain) {
+            if (this.position.x < 400) this.velocity.x += (400 - this.position.x);
+            if (this.position.x > game.terrain.totalWidth - 400) this.velocity.x -= (this.position.x - (game.terrain.totalWidth - 400)) * 1;
+            if (this.position.y > 500) this.respawn();
         }
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
@@ -159,9 +193,11 @@ export class Player implements ISerializable {
         this.groundedTimer -= dt;
         this.graphics.clear();
         game.collisionSystem.checkOne(this.playerHitbox, (response) => {
+            this.materialUnder = (response.b as Body).userData.material;
             if (response.overlapV.y > 0) {
                 //colliding with ground
                 this.groundedTimer = 0.1;
+                if (this.velocity.y > 200) this.footstepProgress = 2
                 this.velocity.y = 0;
             }
             else {
@@ -171,7 +207,8 @@ export class Player implements ISerializable {
                 if (Math.sign(this.velocity.x) == Math.sign(response.overlapV.x)) this.velocity.x *= -.1;
                 if (Math.sign(this.velocity.y) == Math.sign(response.overlapV.y)) this.velocity.y *= -.1;
             }
-            this.velocity.x -= response.overlapV.x;
+            if (Math.abs(this.velocity.x) < 20)
+                this.velocity.x -= limitAbs(response.overlapV.x, 2);
             this.position.x -= response.overlapV.x;
             this.position.y -= response.overlapV.y;
             this.playerHitbox.setPosition(this.position.x, this.position.y);

@@ -10,6 +10,7 @@ export class Score {
     particles: Vector[] = [];
     particlesQueue: Vectorlike[] = [];
     particleAccumulation = 0;
+    lastSound = 0;
     set score(score: number) {
         game.progressDatabase.db.set("score", score);
     }
@@ -62,10 +63,15 @@ export class Score {
     updateParticles(dt: number) {
         if (this.particlesQueue.length > 0) {
             this.particleAccumulation += dt * this.particlesQueue.length * 2;
+            this.lastSound += dt;
             while (this.particleAccumulation > 1 && this.particlesQueue.length > 0) {
                 this.particles.push(game.camera.renderToScreen(this.particlesQueue.shift()!));
                 this.particleAccumulation -= 1;
-                game.soundManager.soundLibrary.play("score", { volume: 0.1 });
+                if (this.lastSound > 0.03) {
+                    //game.soundManager.soundLibrary.play("score", { volume: 0.1, speed: Math.min(.2, this.particlesQueue.length * .005) + .1 + Math.random()*.1});
+                    game.soundManager.soundLibrary.play("score", { volume: 0.05 + Math.random() * .05 });
+                    this.lastSound = 0;
+                }
             }
         }
         for (let i = 0; i < this.particles.length; i++) {

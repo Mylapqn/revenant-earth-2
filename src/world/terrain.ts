@@ -8,12 +8,18 @@ import { ISceneObject, Scene } from "../hierarchy/scene";
 import { TerrainMesh, TerrainNode } from "./terrainNode";
 import { Input, MouseButton } from "../input";
 
-import vertex from "../shaders/terrainSurface.vert?raw";
-import fragment from "../shaders/terrainSurface.frag?raw";
+import surfaceVertex from "../shaders/terrain/terrainSurface.vert?raw";
+import surfaceFragment from "../shaders/terrain/terrainSurface.frag?raw";
+
+import groundFogVertex from "../shaders/terrain/groundFog.vert?raw";
+import groundFogFragment from "../shaders/terrain/groundFog.frag?raw";
+
 import { placeholderGeometry, lerp } from "../utils/utils";
 import { HitboxGeometry } from "../shaders/hitboxGeometry";
 import { Debug } from "../dev/debug";
 import { Shadowmap } from "../shaders/lighting/shadowmap";
+import { TimedShader } from "../shaders/timedShader";
+import { Lightmap } from "../shaders/lighting/lightmap";
 
 export enum TerrainInspectMode {
     none = 0,
@@ -23,10 +29,17 @@ export enum TerrainInspectMode {
     erosion = 4
 }
 
+export enum SurfaceMaterial {
+    dirt,
+    metal,
+    rock
+}
+
 export class Terrain implements ISerializable, ISceneObject {
     graphics: Graphics;
     terrainMesh: TerrainMesh;
     surfaceMesh;
+    groundFogMesh;
     /** contains only loaded nodes */
     nodes: TerrainNode[];
     initialIndex = 0;
@@ -36,7 +49,9 @@ export class Terrain implements ISerializable, ISceneObject {
     terrainData = new Array<TerrainData>();
     readonly dataWidth = 30;
 
-    totalWidth = 2000;
+    totalNodes = 1000;
+    widthPerNode = 10;
+    get totalWidth(): number { return this.totalNodes * this.widthPerNode; }
 
     inspectMode: TerrainInspectMode = 0;
 
@@ -48,7 +63,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.terrainMesh = new TerrainMesh();
         this.surfaceMesh = new Mesh({
             geometry: placeholderGeometry, shader: new Shader({
-                glProgram: GlProgram.from({ vertex, fragment }),
+                glProgram: GlProgram.from({ vertex: surfaceVertex, fragment: surfaceFragment }),
                 resources: {
                     group: {
                         uInspectMode: {
@@ -59,20 +74,53 @@ export class Terrain implements ISerializable, ISceneObject {
                 }
             })
         });
+        this.groundFogMesh = new Mesh({
+            geometry: placeholderGeometry, shader: new TimedShader({
+                glProgram: GlProgram.from({ vertex: groundFogVertex, fragment: groundFogFragment }),
+                resources: {
+                    group: {
+                        uGroundFogColor: {
+                            type: "vec3<f32>",
+                            value: [0, 0, 0]
+                        },
+                        uPosition: {
+                            type: "vec2<f32>",
+                            value: [0, 0]
+                        },
+                        uPixelRatio: {
+                            type: "f32",
+                            value: 1
+                        },
+                        uRainDirection: {
+                            type: "vec2<f32>",
+                            value: [0, 0]
+                        },
+                        uRainAmount: {
+                            type: "f32",
+                            value: 0
+                        }
+                    }
+                }
+            })
+        })
         this.nodes = [];
 
         game.terrainContainer.addChild(this.graphics);
         game.terrainContainer.addChild(this.surfaceMesh);
+        game.weatherContainer.addChild(this.groundFogMesh);
         this.hitbox = game.collisionSystem.createPolygon({ x: 0, y: 0 }, [
             { x: 0, y: 0 },
             { x: 0, y: 1 },
-        ], { userData: { terrain: true } });
+        ], { userData: { terrain: true, material: SurfaceMaterial.dirt } });
 
         this.defaultTerrain();
     }
 
     unload() {
         game.activeScene.unregister(this);
+        this.surfaceMesh.visible = false;
+        this.groundFogMesh.visible = false;
+        //game.collisionSystem.remove(this.hitbox);
     }
 
     static deserialise(raw: any, scene?: Scene) {
@@ -88,26 +136,29 @@ export class Terrain implements ISerializable, ISceneObject {
         if (scene) {
             scene.register(game.terrain);
             scene.hasTerrain = true;
+            game.terrain.surfaceMesh.visible = true;
+            game.terrain.groundFogMesh.visible = true;
         }
     }
 
     defaultTerrain() {
         let lastHeight = 0;
-        for (let index = 0; index < 1000; index++) {
+        for (let index = 0; index < this.totalNodes; index++) {
             lastHeight += Math.random() * 5 - 2.5;
-            this.terrainMesh.push(new TerrainNode(20 * index, lastHeight));
+            this.terrainMesh.push(new TerrainNode(this.widthPerNode * index, lastHeight));
         }
 
         let index = 0;
         for (const element of this.terrainMesh) {
             index++;
-            if (index > 25 && index < 50) element.add({ x: 0, y: -100 });
+            if (index > 25 && index < 50) element.add({ x: 0, y: -100 * (1 - Math.abs(index - 37) / 12) });
         }
 
         for (let index = 0; index < this.totalWidth; index += this.dataWidth) {
             this.terrainData.push({ pollution: 0, fertility: 0, erosion: 0.9, moisture: 0.3 });
         }
 
+        //this.changeFixer(new Set(this.terrainMesh));
         this.considerNodes();
     }
 
@@ -138,7 +189,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.hitbox.updateBody(true);
     }
 
-    update() {
+    update(dt: number) {
         this.graphics.clear();
         if (!game.activeScene.hasTerrain) return;
 
@@ -164,7 +215,7 @@ export class Terrain implements ISerializable, ISceneObject {
             //data.moisture = Math.min(1, data.moisture + 0.1);
         }
 
-        this.updateProperties();
+        this.updateProperties(dt);
 
         this.changeFixer(editedNodes);
         this.considerNodes();
@@ -256,7 +307,7 @@ export class Terrain implements ISerializable, ISceneObject {
         return grams;
     }
 
-    updateProperties() {
+    updateProperties(dt: number) {
         for (let index = 0; index < this.terrainData.length - 1; index++) {
             const a = this.terrainData[index];
             const b = this.terrainData[index + 1];
@@ -270,11 +321,11 @@ export class Terrain implements ISerializable, ISceneObject {
         }
 
         for (const data of this.terrainData) {
-            this.processChunk(data);
+            this.processChunk(data, dt);
         }
     }
 
-    processChunk(a: TerrainData) {
+    processChunk(a: TerrainData, dt: number) {
         const minWK = 0.1;
         const maxWK = 0.9;
         const waterkeep = lerp(minWK, maxWK, 1. - a.erosion);
@@ -283,45 +334,42 @@ export class Terrain implements ISerializable, ISceneObject {
         if (game.weather.weatherData.rainIntensity <= 0) {
             if (a.moisture > waterkeep) {
                 // in water
-                evaporated = 0.00001 * game.atmo.celsius;
+                evaporated = 0.0001 * game.atmo.celsius * dt;
             }
             // has water
-            evaporated += a.moisture * 0.00000001 * game.atmo.celsius;
+            evaporated += a.moisture * 0.0001 * game.atmo.celsius * dt;
 
             if (a.moisture - evaporated < 0) {
                 evaporated = a.moisture;
             }
         }
-
         a.moisture -= evaporated;
         game.atmo.waterLevel += evaporated;
         // energy to evaporate
-        const energy = evaporated * 10000;
+        const energy = evaporated * 1000;
         game.atmo.energy(-energy, "evaporation");
     }
 
     draw() {
         if (this.nodes.length < 2) return;
-        this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
-
-        for (const node of this.hitbox.points) {
-            this.graphics.lineTo(node.x, node.y);
-        }
-
-        this.graphics.fill(0x151008);
 
         const terrainStats: number[] = [];
+        const atmoStats: number[] = [];
         const terrainInspect: number[] = [];
-        const depth = 30;
+        const depth = 50;
         const uvWidth = 20 / depth;
 
         for (let i = 1; i < this.hitbox.points.length - 1; i++) {
             const node = this.hitbox.points[i];
             //const x = Math.round(node.x / this.dataWidth) * this.dataWidth;
-            const data = this.getProperties(node.x);
+            const tdata = this.getProperties(node.x);
+            const adata = game.atmo.getProperties(node.x);
 
-            terrainStats.push(data.moisture, data.fertility, data.erosion);
-            terrainStats.push(data.moisture, data.fertility, data.erosion);
+            terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion);
+            terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion);
+
+            atmoStats.push(adata.pollution);
+            atmoStats.push(adata.pollution);
 
             let inspect = 0;
             if (this.inspectMode != 0) inspect = this.getProperties(node.x)[Terrain.inspectModes[this.inspectMode] as keyof TerrainData];
@@ -335,15 +383,50 @@ export class Terrain implements ISerializable, ISceneObject {
             points: this.hitbox.points,
             uvOffset: this.initialIndex,
             depth: depth,
-            perspectiveDepth: 0.1,
+            perspectiveDepth: 0.2,
             customAttributes: {
                 aTerrainStats: terrainStats, aTerrainInspect: terrainInspect
             },
         });
 
+        const aboveSurfaceGeometry = new HitboxGeometry({
+            points: this.hitbox.points,
+            uvOffset: this.initialIndex,
+            depth: -100,
+            perspectiveDepth: 0,
+            customAttributes: {
+                aTerrainStats: terrainStats, aAtmoStats: atmoStats
+            },
+        })
+
         this.surfaceMesh.geometry = hitboxGeometry;
         this.surfaceMesh.shader!.resources.group.uniforms.uInspectMode = this.inspectMode != 0 ? 1 : 0;
-        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform,clear:false });
+
+        this.groundFogMesh.geometry = aboveSurfaceGeometry;
+        this.groundFogMesh.shader!.resources.group.uniforms.uInspectMode = this.inspectMode != 0 ? 1 : 0;
+        this.groundFogMesh.shader!.resources.group.uniforms.uGroundFogColor = game.ambience.fogColor().ground;
+        this.groundFogMesh.shader!.resources.group.uniforms.uPosition = game.camera.pixelOffset.clone().vecdiv(game.camera.pixelScreen).vecmult({ x: -1, y: -1 }).xy();
+        this.groundFogMesh.shader!.resources.group.uniforms.uPixelRatio = game.camera.ratio;
+        this.groundFogMesh.shader!.resources.group.uniforms.uRainDirection = Vector.fromAngle(game.weather.rainAngle - Math.PI / 2).xy();
+        this.groundFogMesh.shader!.resources.group.uniforms.uRainAmount = game.weather.weatherData.rainIntensity * game.weather.rainFadeIn * game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold;
+
+
+        if (this.inspectMode != TerrainInspectMode.none) {
+            this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
+            for (const node of this.hitbox.points) {
+                this.graphics.lineTo(node.x, node.y);
+            }
+            this.graphics.fill(0x666666);
+            game.app.renderer.render({ container: this.graphics, target: Lightmap.texture, clear: false, transform: this.graphics.worldTransform });
+        }
+        this.graphics.clear();
+        this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
+        for (const node of this.hitbox.points) {
+            this.graphics.lineTo(node.x, node.y);
+        }
+        this.graphics.fill(0x151008);
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform, clear: false });
+
     }
 
     changeFixer(affectedNodes: Set<TerrainNode>) {
@@ -402,8 +485,8 @@ export class Terrain implements ISerializable, ISceneObject {
             }
         }
 
-        const splitDistanceSq = 30 ** 2;
-        const mergeDistanceSq = 10 ** 2;
+        const splitDistanceSq = 18 ** 2;
+        const mergeDistanceSq = 7 ** 2;
 
         for (const cedge of relevantEdges) {
             const node = cedge.start;

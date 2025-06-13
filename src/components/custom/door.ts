@@ -1,13 +1,16 @@
 import { Game, game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { ParticleText } from "../../hierarchy/particleText";
 import { UIElement, UIPanel } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
+import { Vector } from "../../utils/vector";
 
 export class Door extends Component {
     static componentType = "Door";
     targetScene: string = "None";
     doorId: string = "default-door";
+    enabled: boolean = true;
 
     constructor(parent: Entity) {
         super(parent);
@@ -20,16 +23,21 @@ export class Door extends Component {
     }
 
     override toData(): ComponentData {
-        const data = { target: this.targetScene, doorId: this.doorId };
+        const data = { target: this.targetScene, doorId: this.doorId, enabled: this.enabled };
         return super.toData(data);
     }
 
-    override applyData(data: { target: string, doorId: string }): void {
+    override applyData(data: { target: string, doorId: string, enabled: boolean }): void {
+        this.enabled = data.enabled ?? true;
         this.targetScene = data.target;
         this.doorId = data.doorId;
     }
 
     activate() {
+        if (!this.enabled) {
+            new ParticleText("Door locked", this.transform.position.clone().add(new Vector(0, -20)));
+            return;
+        }
         game.loadScene(this.targetScene);
         const targetDoor = game.activeScene.findComponents(Door).find(comp => comp.doorId === this.doorId);
         if (targetDoor) {

@@ -1,11 +1,18 @@
 #version 300 es
 precision mediump float;
 uniform sampler2D uSampler;
-uniform int uInspectMode;
 in vec2 vUV;
 //moisture, fertility, erosion
 in vec3 vTerrainStats;
-in float vTerrainInspect;
+in vec2 vWorldUV;
+uniform float uTime;
+
+uniform vec3 uGroundFogColor;
+in float vPollution;
+
+uniform vec2 uRainDirection;
+uniform float uRainAmount;
+
 out vec4 color;
 
 vec3 permute(vec3 x) {
@@ -57,31 +64,24 @@ float posterise(float f, int steps) {
 
 void main() {
     vec2 uv = vUV;
-    color = texture(uSampler, uv);
-    float noise = fractalNoise(uv * 1.f, 4, 2.f, .8f);
-    float HFnoise = fractalNoise(uv * 1.f, 5, 2.f, .9f);
-    float baseMask = (2.f - uv.y * 3.f) * (noise + .2f);
-    baseMask = posterise(baseMask * 1.5f + .5f, 6);
-    float surfaceLight = step(uv.y * 8.f - .2f, HFnoise);
-    float wetness = posterise((1.f - uv.y) * noise * 1.f * vTerrainStats.x + vTerrainStats.x * .9f, 2);
-    float fertility = step(uv.y, noise * vTerrainStats.y * 2.f);
-    vec3 baseColor = vec3(0.24f, 0.15f, 0.11f);
-    vec3 wetColor = vec3(0.61f, 0.44f, 0.41f);
-    vec3 fertColor = vec3(0.22f, 0.1f, 0.05f);
-    vec3 inspectLowColor = vec3(0.56f, 0.09f, 0.01f);
-    vec3 inspectHighColor = vec3(0.07f, 0.93f, 0.17f);
-    float inspect = posterise(vTerrainInspect, 5);
-    vec3 inspectColor = normalize(vec3(1.f - inspect, inspect, 0.1f)) * .8f;
-    //inspectColor = mix(inspectLowColor, inspectHighColor, inspect);
-    vec3 mixedColor = baseColor;
-    mixedColor = mix(mixedColor, fertColor, fertility);
-    mixedColor *= mix(vec3(1.f), wetColor, wetness);
-    mixedColor = mix(mixedColor, baseColor * 1.4f, surfaceLight);
-    color = vec4(mixedColor, 1.f);
-    color.rgb = mix(color.rgb, inspectColor, float(uInspectMode));
-    baseMask = mix(baseMask, step(.5f, (1.f - uv.y) * .7f + HFnoise * .5f * clamp(.2f + inspect * .2f, 0.f, 1.f)), float(uInspectMode));
-    //color = vec4(1.);
-    color *= baseMask;
-    //color = vec4(noise);
+    //color = texture(uSampler, uv);
+    vec2 windUV = vWorldUV + vec2(1.f, 0.2f) * uTime * .1f;
+    vec2 windUV2 = vWorldUV + vec2(.5f, 0.5f) * uTime * .1f;
+    vec2 rainUV = vWorldUV + uRainDirection * uTime * .6f;
+    float rainNoise = fractalNoise(rainUV * 1.f, 4, 2.f, .7f);
+    float noise1 = fractalNoise(windUV * 1.f, 4, 2.f, .8f);
+    float noise2 = fractalNoise(windUV2 * 1.5f, 5, 2.f, .8f);
+    float noise = (noise1 * 1.5f + noise2 * .5f) / 2.f;
+    noise *= vTerrainStats.b;
+    float rainRatio = clamp(uRainAmount * 2.f, 0.f, 1.f);
+    noise = mix(noise, rainNoise * 1.f, rainRatio);
+    float groundDist = 1.f - uv.y;
+    noise *= groundDist * groundDist;
+
+    vec3 noiseColor = noise * uGroundFogColor;
+    vec3 nColor = vec3(1.f);
+    nColor = mix(uGroundFogColor, vec3(1.f), rainRatio);
+
+    color = vec4(nColor * noise, noise);
     //color = vec4(1.);
 }
