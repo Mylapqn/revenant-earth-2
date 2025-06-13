@@ -61,7 +61,7 @@ export class Milestone {
         if (this._completed) return;
         if (this.tier != game.milestones.currentTier || !this.enabled) return;
         this._completed = true;
-        game.soundManager.soundLibrary.play("milestone");
+        game.soundManager.soundLibrary.play("milestone",{singleInstance: true});
         const panel = UIElement.create({ type: "div", classes: ["milestone", "appear"], parent: UI.container, content: `` });
         const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Milestone achieved" });
         const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: this.name });
@@ -74,12 +74,12 @@ export class Milestone {
         details.htmlElement.classList.add("appear");
         game.score.addWithFx(this.reward, { x: .5, y: .15 });
         if (this.onComplete) this.onComplete();
-        await sleep(5000 * waitMult);
-        panel.htmlElement.classList.remove("appear");
-
+        
         game.milestones.displayQuests();
         this.parent?.checkChildren();
-
+        
+        await sleep(5000 * waitMult);
+        panel.htmlElement.classList.remove("appear");
         await sleep(3000);
         panel.remove();
     }

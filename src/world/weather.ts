@@ -110,6 +110,7 @@ export class Weather implements ISerializable, ISceneObject {
         }
         else if (this.weatherData.rainBuildup > this.weatherData.rainThreshold) {
             //start rain
+            this.rainFadeIn = 0;
             this.thunderBuildup = this.random.range(10, 40);
             this.thunderThreshold = this.random.range(10, 20);
             this.weatherData.rainIntensity = this.random.range(.2, 2) * (1 + game.atmo.overheat * .05);

@@ -221,21 +221,21 @@ export class Terrain implements ISerializable, ISceneObject {
         this.considerNodes();
     }
 
-    private spread(a: TerrainData, b: TerrainData) {
+    private spread(a: TerrainData, b: TerrainData, dt: number) {
         if (a.fertility > 0.8) {
-            const half = (a.fertility - 0.01) * 0.001;
+            const half = (a.fertility - 0.01) * 0.001 * dt;
             b.fertility += half;
             a.fertility -= half;
         }
 
         if (a.moisture > 0.5) {
-            const half = (a.moisture - 0.01) * 0.01;
+            const half = (a.moisture - 0.01) * 0.01 * dt;
             b.moisture += half;
             a.moisture -= half;
         }
 
         if (a.pollution > 0.5 && b.pollution < a.pollution) {
-            const half = a.pollution * 0.005;
+            const half = a.pollution * 0.005 * dt;
             b.pollution += half;
             a.pollution -= half;
         }
@@ -311,13 +311,13 @@ export class Terrain implements ISerializable, ISceneObject {
         for (let index = 0; index < this.terrainData.length - 1; index++) {
             const a = this.terrainData[index];
             const b = this.terrainData[index + 1];
-            this.spread(a, b);
+            this.spread(a, b, dt);
         }
 
         for (let index = this.terrainData.length - 1; index > 0; index--) {
             const a = this.terrainData[index];
             const b = this.terrainData[index - 1];
-            this.spread(a, b);
+            this.spread(a, b, dt);
         }
 
         for (const data of this.terrainData) {
@@ -334,7 +334,7 @@ export class Terrain implements ISerializable, ISceneObject {
         if (game.weather.weatherData.rainIntensity <= 0) {
             if (a.moisture > waterkeep) {
                 // in water
-                evaporated = 0.0001 * game.atmo.celsius * dt;
+                evaporated = 0.001 * game.atmo.celsius * dt;
             }
             // has water
             evaporated += a.moisture * 0.0001 * game.atmo.celsius * dt;

@@ -398,12 +398,12 @@ export class Game {
         }
         this.resize();
         this.loadScene("Space Station");
-        this.camera.zoom = 4;
-        this.camera.targetZoom = 4;
+        this.camera.zoom = 3;
+        this.camera.targetZoom = 3;
         this.camera.zoomSpeed = .3;
         this.camera.position.set(this.camera.targetPlayerPosition());
         setTimeout(() => {
-            this.camera.targetZoom = 3;
+            this.camera.targetZoom = 2;
         }, 500);
 
         this.app.ticker.add(this.update, this);
