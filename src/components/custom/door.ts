@@ -38,6 +38,10 @@ export class Door extends Component {
             new ParticleText("Door locked", this.transform.position.clone().add(new Vector(0, -20)));
             return;
         }
+        this.enter();
+    }
+
+    enter() {
         game.loadScene(this.targetScene);
         const targetDoor = game.activeScene.findComponents(Door).find(comp => comp.doorId === this.doorId);
         if (targetDoor) {
@@ -50,7 +54,7 @@ export class Door extends Component {
     update(dt: number) {
     }
     debugOptions(buttons: UIElement[]): UIElement[] {
-        buttons.push(new UIButton(`Go through`, () => { this.activate() }));
+        buttons.push(new UIButton(`Go through`, () => { this.enter() }));
         return super.debugOptions(buttons);
     }
 

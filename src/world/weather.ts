@@ -7,6 +7,7 @@ import { clamp, displayNumber, RandomGenerator } from "../utils/utils";
 import { CloudMesh } from "./cloudMesh";
 import { VolumeCurve } from "../sound/sound";
 import { Debug } from "../dev/debug";
+import { ParticleText } from "../hierarchy/particleText";
 
 export class Weather implements ISerializable, ISceneObject {
     weatherData: WeatherData = {
@@ -41,7 +42,7 @@ export class Weather implements ISerializable, ISceneObject {
     }
     static deserialise(raw: { kind: string; weatherData: WeatherData }, scene?: Scene) {
         const data = raw;
-        game.weather.weatherData = data.weatherData;
+        Object.assign(game.weather.weatherData, data.weatherData);
         if (data.weatherData.rainIntensity > 0) {
             game.soundManager.soundLibrary.play("rain_heavy");
             game.soundManager.soundLibrary.play("rain_light");
@@ -56,7 +57,7 @@ export class Weather implements ISerializable, ISceneObject {
     update(dt: number): void {
         this.weatherData.dayTime += dt;
         while (this.weatherData.dayTime > this.dayLength) this.weatherData.dayTime -= this.dayLength;
-        if (this.weatherData.rainThreshold === 0) this.weatherData.rainThreshold = this.random.range(10, 40);
+        if (this.weatherData.rainThreshold == 0) this.weatherData.rainThreshold = this.random.range(10, 40);
         if (this.weatherData.rainIntensity > 0) {
             this.rainFadeIn = clamp(this.rainFadeIn + dt * .2);
             const rainRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
@@ -124,6 +125,7 @@ export class Weather implements ISerializable, ISceneObject {
         }
     }
     draw(dt: number): void {
+        if (this.weatherData.rainThreshold == 0) return;
         this.rainRenderer.draw(dt);
         this.cloudMesh.setUniform("uClouds", 1 - clamp(this.weatherData.rainBuildup / 30));
         let sunAngle = (this.weatherData.dayTime / this.dayLength + .5) * Math.PI * 2;
@@ -156,6 +158,7 @@ class RainRenderer {
     draw(dt: number) {
         const rainSpeed = 600;
         this.raindropBuildup += 800 * dt * game.weather.weatherData.rainIntensity * game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold;
+        this.raindropBuildup = clamp(this.raindropBuildup, 0, 100);
         while (this.raindropBuildup > 1) {
             this.raindropBuildup -= 1;
             const raindrop = new RainParticle(new Vector(game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5, game.camera.worldPosition.y - game.camera.pixelScreen.y / 2), game.weather.rainAngle);

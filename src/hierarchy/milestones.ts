@@ -73,10 +73,10 @@ export class Milestone {
         title.htmlElement.classList.add("appear");
         details.htmlElement.classList.add("appear");
         game.score.addWithFx(this.reward, { x: .5, y: .15 });
+        if (this.onComplete) this.onComplete();
         await sleep(5000 * waitMult);
         panel.htmlElement.classList.remove("appear");
 
-        if (this.onComplete) this.onComplete();
         game.milestones.displayQuests();
         this.parent?.checkChildren();
 
