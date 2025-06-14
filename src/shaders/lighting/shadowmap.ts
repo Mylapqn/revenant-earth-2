@@ -36,27 +36,10 @@ export class Shadowmap {
         this.occluderTexture = RenderTexture.create({ width: game.camera.pixelScreen.x, height: game.camera.pixelScreen.y });
         this.shadowDataTexture = RenderTexture.create({ width: this.angles, height: Light.maxAmount, format: "r32float" });
         this.shaderMesh = new ShaderMesh({ frag: Shadowmap.fragment, customTextures: [{ name: "occluder", texture: this.occluderTexture }, { name: "uLightData", texture: Light.dataTexture }], customUniforms: defaultUniforms, size: new Vector(this.angles, Light.maxAmount), anchor: new Vector(0, 0) });
-        new Light({ position: new Vector(0, 0), angle: 0, width: .5, color: new CustomColor(255, 255, 255), range: 300, intensity: 5 });
         this.resize();
     }
 
     static update() {
-        if (!Debug.editorMode) {
-            Light.list[0].position.set(game.player.position.clone().add({ x: 0, y: -20 }));
-            let dist = game.player.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).length() / 200;
-            dist = clamp(dist);
-            Light.list[0].width = (1 - dist) * (1 - dist) * 1.8 + .2;
-            Light.list[0].intensity = (dist) * 2 + 1;
-            Light.list[0].range = dist * 200 + 200;
-            Light.list[0].angle = game.player.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).toAngle() - Math.PI;
-        }
-        else {
-            Light.list[0].position.set(game.worldMouse);
-            Light.list[0].width = 10;
-            Light.list[0].intensity = 1;
-            Light.list[0].range = 500;
-            Light.list[0].angle = 0;
-        }
 
         this.shaderMesh.setUniform("uPixelSize", [1 / game.camera.pixelScreen.x, 1 / game.camera.pixelScreen.y]);
         this.shaderMesh.setUniform("lightAmount", Light.list.length);

@@ -149,7 +149,8 @@ export class Game {
                     name: "bundle", assets: [
                         { alias: "player_anim", src: "./anim/player2.json" },
                         { alias: "bg", src: "./bg2.png" },
-                        { alias: "space", src: "./space.png" },
+                        { alias: "metal_bg", src: "./interior_bg.png" },
+                        { alias: "space", src: "./space_tile.png" },
                         { alias: "monogram", src: "./font/monogram.ttf" },
                         { alias: "biochar", src: "./gfx/building/biochar.png" },
                     ]
@@ -249,123 +250,16 @@ export class Game {
         this.worldUiContainer = this.worldUiLayer.container;
         this.worldUiGraphics = new Graphics({ parent: this.worldUiContainer });
 
+        Light.init();
+        Lightmap.init();
+
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
 
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
 
-        /*Entity.fromData(
-            {
-                kind: "Entity",
-                name: "Robo",
-                component: [
-                    {
-                        componentType: "SpriteDirection",
-                    },
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./robo.png",
-                        },
-                    },
-                    {
-                        componentType: "RoboLogic",
-                    },
-                ],
-            },
-            this.activeScene
-        );*/
-
-        Entity.fromData(
-            {
-                kind: "Entity",
-                name: "Door",
-                component: [
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 1000, y: -5 },
-                        },
-                    },
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./door.png",
-                        },
-                    },
-                    {
-                        componentType: "Interactable",
-                    },
-                    {
-                        componentType: "Door",
-                        data: {
-                            target: "Scene 2",
-                            doorId: "dungeon-door-1",
-                        },
-                    },
-                    {
-                        componentType: "Pollution",
-                        data: {
-                            speed: 1,
-                            dbName: "pollutionSpeed",
-                        },
-                    },
-                    {
-                        componentType: "TerrainAlign",
-                        data: {
-                            yOffset: 20,
-                        },
-                    }
-                ],
-            },
-            this.activeScene
-        );
-
-        Entity.fromData(
-            {
-                kind: "Entity",
-                name: "Door Space",
-                component: [
-                    {
-                        componentType: "Transform",
-                        data: {
-                            position: { x: 1150, y: -20 },
-                        },
-                    },
-                    {
-                        componentType: "BasicSprite",
-                        data: {
-                            asset: "./landing.png",
-                        },
-                    },
-                    {
-                        componentType: "Interactable",
-                    },
-                    {
-                        componentType: "Door",
-                        data: {
-                            target: "Space Station",
-                            doorId: "space-door-1",
-                            enabled: false
-                        },
-                    },
-                    {
-                        componentType: "TerrainAlign",
-                        data: {
-                            yOffset: 20,
-                        },
-                    },
-                    {
-                        componentType: "Trigger",
-                        data: {
-                            name: "planetLanding"
-                        },
-                    },
-                ],
-            },
-            this.activeScene
-        );
+        this.defaultScene();
 
 
 
@@ -376,9 +270,6 @@ export class Game {
         this.atmo = new Atmo();
         this.weather = new Weather();
 
-
-        Light.init();
-        Lightmap.init();
 
         UI.init();
         this.score.init();
@@ -424,15 +315,15 @@ export class Game {
         this.camera.processZoom(dt);
         Lightmap.update();
         TimedShader.update(this.elapsedTime);
-        
+
         this.uiGraphics.clear();
         this.worldUiGraphics.clear();
-        
+
         this.score.update(dt);
-        
+
         this.tooltip.update(realDt);
-        
-        
+
+
         for (const particleText of [...ParticleText.list]) {
             particleText.update(dt);
         }
@@ -571,5 +462,118 @@ export class Game {
                 }
             }
         }
+    }
+    defaultScene() {
+        /*Entity.fromData(
+    {
+        kind: "Entity",
+        name: "Robo",
+        component: [
+            {
+                componentType: "SpriteDirection",
+            },
+            {
+                componentType: "BasicSprite",
+                data: {
+                    asset: "./robo.png",
+                },
+            },
+            {
+                componentType: "RoboLogic",
+            },
+        ],
+    },
+    this.activeScene
+);*/
+
+        Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Door",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 1000, y: -5 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./door.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Door",
+                        data: {
+                            target: "Scene 2",
+                            doorId: "dungeon-door-1",
+                        },
+                    },
+                    {
+                        componentType: "Pollution",
+                        data: {
+                            speed: 1,
+                            dbName: "pollutionSpeed",
+                        },
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20,
+                        },
+                    }
+                ],
+            },
+            this.activeScene
+        );
+
+        Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Door Space",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 1150, y: -20 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./landing.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Door",
+                        data: {
+                            target: "Space Station",
+                            doorId: "space-door-1",
+                            enabled: false
+                        },
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20,
+                        },
+                    },
+                    {
+                        componentType: "Trigger",
+                        data: {
+                            name: "planetLanding"
+                        },
+                    },
+                ],
+            },
+            this.activeScene
+        );
     }
 }

@@ -10,12 +10,13 @@ import { Atmo } from "./world/atmo";
 import { UIProgressBar } from "./ui/progressBar";
 import { LegSystem } from "./limbs/legSystem";
 import { Debug } from "./dev/debug";
-import { displayNumber, limitAbs } from "./utils/utils";
+import { clamp, displayNumber, limitAbs } from "./utils/utils";
 import { DynamicAnimatedSprite } from "./pixelRendering/dynamicAnimatedSprite";
 import { Shadowmap } from "./shaders/lighting/shadowmap";
 import { CustomColor } from "./utils/color";
 import { Lightmap } from "./shaders/lighting/lightmap";
 import { SurfaceMaterial } from "./world/terrain";
+import { Light } from "./shaders/lighting/light";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -26,6 +27,7 @@ export class Player implements ISerializable {
     legGraphics: Graphics;
     velocity = new Vector();
     pixelLayer: PixelLayer;
+    light: Light;
     get grounded() {
         return this.groundedTimer > 0;
     }
@@ -78,6 +80,10 @@ export class Player implements ISerializable {
         limbGroup3.addLimb(new Vector(-5, 0), kok);
         */
         this.playerHitbox = game.collisionSystem.createEllipse({ x: 0, y: 0 }, 8, 24);
+
+        this.light = new Light({ position: new Vector(0, 0), angle: 0, width: .5, color: new CustomColor(255, 255, 255), range: 10, intensity: 0 });
+
+
 
         this.sprite = new Sprite();
         this.sprite.anchor.set(0.5);
@@ -153,7 +159,7 @@ export class Player implements ISerializable {
         }
         if (input.x == 0) {
             this.footstepProgress = .4;
-            if (this.grounded) this.velocity.x *= 1 - dt * 100;
+            if (this.grounded) this.velocity.x *= clamp(1 - dt * 100, 0, 1);
             this.animatedSprite.swapAnimation("idle");
             this.animatedSprite.animationSpeed = .1;
             this.animatedSprite.scale.x = game.input.mouse.position.x > game.camera.worldToScreen(this.position).x ? 1 : -1;
@@ -180,18 +186,38 @@ export class Player implements ISerializable {
             }
         }
         if (game.activeScene.hasTerrain) {
-            if (this.position.x < 400) this.velocity.x += (400 - this.position.x);
-            if (this.position.x > game.terrain.totalWidth - 400) this.velocity.x -= (this.position.x - (game.terrain.totalWidth - 400)) * 1;
-            if (this.position.y > 500) this.respawn();
+            if (this.position.x < 400) this.velocity.x = clamp(this.velocity.x + 400 - this.position.x, -5, 10);
+            if (this.position.x > game.terrain.totalWidth - 400) this.velocity.x = clamp(this.velocity.x - (this.position.x - (game.terrain.totalWidth - 400)), -10, 5);
+            if (this.position.y > 500 || this.position.y < -500 || this.position.x < 0 || this.position.x > game.terrain.totalWidth) this.respawn();
         }
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
+
+        this.updateLight();
 
         this.playerHitbox.setPosition(this.position.x, this.position.y);
         this.playerHitbox.updateBody(true);
 
         this.groundedTimer -= dt;
         this.graphics.clear();
+
+        this.processCollision(dt);
+
+        //console.log(this.limbSystem.limbGroups[0].passingPhase);
+        this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
+        this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
+        this.pixelLayer.render();
+        this.animatedSprite.tint = game.ambience.ambientColor().add(CustomColor.gray(game.activeScene.hasTerrain ? 0 : 200)).toPixi();
+
+        this.graphics.position.set(32, 32);
+
+        const shadowEnabled = false;
+        if (shadowEnabled)
+            game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.pixelLayer.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
+
+    }
+
+    processCollision(dt: number) {
         game.collisionSystem.checkOne(this.playerHitbox, (response) => {
             this.materialUnder = (response.b as Body).userData.material;
             if (response.overlapV.y > 0) {
@@ -209,27 +235,33 @@ export class Player implements ISerializable {
             }
             if (Math.abs(this.velocity.x) < 20)
                 this.velocity.x -= limitAbs(response.overlapV.x, 2);
-            this.position.x -= response.overlapV.x;
-            this.position.y -= response.overlapV.y;
+            this.position.x -= limitAbs(response.overlapV.x, 5);
+            this.position.y -= limitAbs(response.overlapV.y, 5);
             this.playerHitbox.setPosition(this.position.x, this.position.y);
             this.playerHitbox.updateBody(true);
             /* this.graphics.moveTo(0, 0);
             this.graphics.lineTo(response.overlapN.x * 10, response.overlapN.y * 10);
             this.graphics.stroke({ color: 0xffffff, width: 1 }); */
         });
+    }
 
-        //console.log(this.limbSystem.limbGroups[0].passingPhase);
-        this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
-        this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
-        this.pixelLayer.render();
-        this.animatedSprite.tint = game.ambience.ambientColor().add(CustomColor.gray(game.activeScene.hasTerrain ? 0 : 200)).toPixi();
-
-        this.graphics.position.set(32, 32);
-
-        const shadowEnabled = false;
-        if (shadowEnabled)
-            game.app.renderer.render({ container: this.pixelLayer.renderMesh, target: Shadowmap.occluderTexture, transform: new Matrix().translate((this.pixelLayer.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.pixelLayer.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
-
+    updateLight() {
+        if (!Debug.editorMode) {
+            this.light.position.set(this.position.clone().add({ x: 0, y: -20 }));
+            let dist = game.player.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).length() / 200;
+            dist = clamp(dist);
+            this.light.width = (1 - dist) * (1 - dist) * 1.8 + .2;
+            this.light.intensity = (dist) * 2 + 1;
+            this.light.range = dist * 200 + 200;
+            this.light.angle = this.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).toAngle() - Math.PI;
+        }
+        else {
+            this.light.position.set(game.worldMouse);
+            this.light.width = 10;
+            this.light.intensity = 1;
+            this.light.range = 500;
+            this.light.angle = 0;
+        }
     }
 
     serialise(mode: StateMode): false | PlayerData {
@@ -237,8 +269,10 @@ export class Player implements ISerializable {
     }
 
     static deserialise(data: PlayerData, scene?: Scene) {
-        game.player.position.set(data.position.x, data.position.y);
-        game.player.velocity.set(data.velocity.x, data.velocity.y);
+        game.player.initialPosition.set(data.position.x, data.position.y);
+        //game.player.position.set(data.position.x, data.position.y);
+        //game.player.velocity.set(data.velocity.x, data.velocity.y);
+        game.player.respawn();
         if (scene) scene.register(game.player);
     }
 }

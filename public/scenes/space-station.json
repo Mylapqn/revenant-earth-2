@@ -651,19 +651,20 @@
         "name": "Trigger",
         "component": [
             {
-                "id": 25,
+                "id": 29,
                 "componentType": "Trigger",
                 "data": {
-                    "name": "movementComplete"
+                    "name": "movementComplete",
+                    "radius": 40
                 }
             },
             {
-                "id": 26,
+                "id": 30,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -168,
-                        "y": 8
+                        "x": -289,
+                        "y": -12
                     },
                     "velocity": {
                         "x": 0,
