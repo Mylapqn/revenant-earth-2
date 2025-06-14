@@ -119,6 +119,7 @@ export class Weather implements ISerializable, ISceneObject {
             game.soundManager.soundLibrary.play("rain_light");
         }
         else {
+            this.currentThunder = 0;
             this.weatherData.rainBuildup += dt * game.atmo.temp * .002 * this.weatherSpeed;
             const rainBuildupRatio = this.weatherData.rainBuildup / this.weatherData.rainThreshold;
             if (game.ambience.sound != "")
