@@ -309,6 +309,11 @@ export class Game {
         }, 500);
 
         this.app.ticker.add(this.update, this);
+
+
+        ///////////////////////////////////////////////
+
+        Prefab.Planter({ scene: this.activeScene, x: 100, y: 100 });
     }
 
     update(ticker: Ticker) {

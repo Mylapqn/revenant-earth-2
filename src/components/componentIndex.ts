@@ -16,6 +16,7 @@ import { LightComponent } from "./generic/lightComponent";
 import { BiocharKiln } from "./custom/biocharKiln";
 import { TerrainAlign } from "./generic/terrainAlign";
 import { Trigger } from "./generic/trigger";
+import { Planter } from "./custom/planter";
 
 
 export function initComponents(){
@@ -36,4 +37,5 @@ export function initComponents(){
     Component.register(BiocharKiln);
     Component.register(TerrainAlign);
     Component.register(Trigger);
+    Component.register(Planter);
 }

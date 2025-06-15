@@ -673,5 +673,87 @@
                 }
             }
         ]
+    },
+    {
+        "kind": "Entity",
+        "id": 651,
+        "name": "Planter",
+        "component": [
+            {
+                "id": 0,
+                "componentType": "BasicSprite",
+                "data": {
+                    "asset": "vite.svg"
+                }
+            },
+            {
+                "id": 1,
+                "componentType": "Planter",
+                "data": {
+                    "terrainData": {
+                        "pollution": 0,
+                        "fertility": 1,
+                        "erosion": 0.9,
+                        "moisture": 0.3
+                    },
+                    "atmoData": {
+                        "pollution": 0
+                    }
+                }
+            },
+            {
+                "id": 2,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -238,
+                        "y": 8
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 655,
+        "name": "Plant",
+        "component": [
+            {
+                "id": 0,
+                "componentType": "ShaderMesh"
+            },
+            {
+                "id": 1,
+                "componentType": "Plant",
+                "data": {
+                    "growth": 2,
+                    "species": "Tree",
+                    "health": 0.6849552198023727,
+                    "plantedIn": 651
+                }
+            },
+            {
+                "id": 2,
+                "componentType": "EntityTooltip"
+            },
+            {
+                "id": 3,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -238,
+                        "y": -5
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
     }
 ]
