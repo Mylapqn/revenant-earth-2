@@ -55,45 +55,6 @@
     },
     {
         "kind": "Entity",
-        "id": 8,
-        "name": "Entity 8",
-        "component": [
-            {
-                "id": 44,
-                "componentType": "BasicSprite",
-                "data": {
-                    "asset": "./robo.png"
-                }
-            },
-            {
-                "id": 45,
-                "componentType": "Interactable"
-            },
-            {
-                "id": 46,
-                "componentType": "Button",
-                "data": {
-                    "dbName": "pollutionSpeed"
-                }
-            },
-            {
-                "id": 47,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": 163,
-                        "y": -11
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
         "id": 9,
         "name": "Dungeon Hitbox",
         "component": [

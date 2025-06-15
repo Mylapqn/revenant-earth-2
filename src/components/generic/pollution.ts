@@ -9,7 +9,7 @@ import { Debug } from "../../dev/debug";
 export class Pollution extends Component {
     static componentType = "Pollution";
     speed = 2;
-    dbName = "degault";
+    dbName = "default";
     totalPolluted = 0;
     nextText = 1;
 
