@@ -1,16 +1,18 @@
+import { Inventory } from "../components/generic/inventory";
 import { Debug } from "../dev/debug";
-import { game } from "../game";
+import { Game, game } from "../game";
+import { ItemDefinition, itemDefinitions, ItemGroup } from "../itemDefinitions";
 import { Vector } from "../utils/vector";
 
 export class UI {
     static container: HTMLDivElement;
     static mouseOverUI = 0;
     static lastHoveredElement?: UIElement;
-    static customElement(type: string, parent: HTMLElement, ...classes: string[]) {
+    static customElement<T = HTMLElement>(type: string, parent: HTMLElement, ...classes: string[]): T {
         const element = document.createElement(type);
         element.classList.add(...classes);
         parent.appendChild(element);
-        return element;
+        return element as T;
     }
     static customDiv(parent: HTMLElement, ...classes: string[]) {
         return UI.customElement("div", parent, ...classes) as HTMLDivElement;
@@ -27,6 +29,7 @@ export class UI {
     static init() {
         UI.container = UI.customDiv(document.body, "uiContainer");
         UI.fullscreenMenu = new UIFullscreenMenu();
+        //setTimeout(() => UI.fullscreenMenu.toggle(true), 100);
     }
     static fullscreenMenu: UIFullscreenMenu;
 }
@@ -87,6 +90,7 @@ export class UIPanel extends UIElement {
 export class UIFullscreenMenu {
     element: HTMLDivElement;
     shown = false;
+    itemHolder: HTMLDivElement;
     constructor() {
         this.element = UI.customDiv(document.body, "fullscreenMenu");
         const bg = UI.customDiv(this.element, "menuBG");
@@ -94,19 +98,73 @@ export class UIFullscreenMenu {
         const pattern = UI.customDiv(border, "menuPattern");
         const title = UI.customDiv(this.element, "menuTitle");
         title.innerText = "Revenant Earth 2";
+
+        const inventoryPanel = UI.customDiv(this.element, "inventoryPanel");
+        const categoryFilter = UI.customDiv(inventoryPanel, "categoryFilterWrapper");
+        const seedFilter = UI.customDiv(categoryFilter);
+        seedFilter.classList.add("active");
+        seedFilter.innerText = "Seeds";
+        seedFilter.addEventListener("click", () => {
+            this.selectedGroup = ItemGroup.Seed;
+            equipmentFilter.classList.remove("active");
+            seedFilter.classList.add("active");
+            this.renderItems(game.player.inventory);
+        });
+
+        const equipmentFilter = UI.customDiv(categoryFilter);
+        equipmentFilter.innerText = "Equipment";
+                equipmentFilter.addEventListener("click", () => {
+            this.selectedGroup = ItemGroup.Tool;
+            seedFilter.classList.remove("active");
+            equipmentFilter.classList.add("active");
+            this.renderItems(game.player.inventory);
+        });
+        const itemHeader = UI.customDiv(inventoryPanel, "itemHeader");
+        UI.customDiv(itemHeader).innerText = "Icon";
+        UI.customDiv(itemHeader).innerText = "Name";
+        UI.customDiv(itemHeader).innerText = "Amount";
+        this.itemHolder = UI.customDiv(inventoryPanel, "itemHolder");
+
+        
     }
+
+    selectedGroup = ItemGroup.Seed;
+
     toggle(show?: boolean) {
         if (show === undefined) show = !this.shown;
         if (show) {
             this.element.classList.add("menuAppear");
             this.element.classList.remove("menuHide");
             this.shown = true;
+            this.renderItems(game.player.inventory);
         }
         else {
             this.element.classList.add("menuHide");
             this.element.classList.remove("menuAppear");
             this.shown = false;
         }
+    }
+
+    renderItems(inventory?: Inventory) {
+        this.itemHolder.innerHTML = "";
+        if (!inventory) return;
+        for (const [type, amount] of inventory.items) {
+            const info = itemDefinitions[type]
+            if (info.group != this.selectedGroup) continue;
+            this.renderItem(info, amount);
+        }
+    }
+
+    renderItem(item: ItemDefinition, amount: number) {
+        const inventoryItem = UI.customDiv(this.itemHolder, "inventoryItem");
+        UI.customElement<HTMLImageElement>("img", inventoryItem, "itemImage").src = item.icon;
+        const itemTextWrapper = UI.customDiv(inventoryItem, "itemTextWrapper");
+        const itemName = UI.customDiv(itemTextWrapper, "itemName");
+        itemName.innerText = item.name;
+        const itemDescription = UI.customDiv(itemTextWrapper, "itemDescription");
+        itemDescription.innerText = item.description;
+        const itemAmount = UI.customDiv(inventoryItem, "itemAmount");
+        itemAmount.innerText = amount.toString();
     }
 }
 
