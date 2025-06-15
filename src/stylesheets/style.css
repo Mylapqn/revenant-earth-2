@@ -11,6 +11,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 
 @font-face {
@@ -304,6 +305,7 @@ body {
     width: 100%;
     height: 100%;
     padding: 10px;
+    z-index: -10;
 }
 
 .menuBorder {
@@ -489,4 +491,133 @@ button:hover {
 
 .prompt-text.highlight {
     width: 100px;
+}
+
+
+.inventoryPanel {
+    max-width: 645px;
+    width: 100%;
+    background: #233243;
+    height: 757px;
+}
+
+.categoryFilterWrapper {
+    width: 100%;
+    display: flex;
+    font-family: Chakra Petch;
+    font-weight: 300;
+    font-size: 20px;
+    line-height: 111.00000000000001%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    text-transform: uppercase;
+
+}
+
+.categoryFilterWrapper>div {
+    width: 100%;
+    align-items: center;
+    display: flex;
+    padding: 17px 33px;
+    cursor: pointer;
+}
+
+.itemHeader {
+    width: 100%;
+    align-items: center;
+    display: flex;
+    padding-top: 29px;
+    padding-bottom: 17px;
+    font-family: Chakra Petch;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 111.00000000000001%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    text-transform: uppercase;
+}
+
+.itemHeader>div:nth-child(1) {
+    padding-left: 33px;
+}
+
+.itemHeader>div:nth-child(2) {
+    padding-left: 93px;
+}
+
+.itemHeader>div:nth-child(3) {
+    margin-left: auto;
+    padding-right: 33px;
+}
+
+.categoryFilterWrapper>div.active {
+    background: #136DD9;
+}
+
+.itemHolder {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.inventoryItem {
+    display: flex;
+    padding: 17px 33px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.itemImage {
+    flex-shrink: 0;
+    width: 83px;
+    margin-right: 58px;
+    aspect-ratio: 1 / 1;
+}
+
+.inventoryItem:nth-child(odd) {
+    background: #1C2938;
+}
+
+.inventoryItem:nth-child(even) {
+    background: #202F41;
+}
+
+.inventoryItem.active,
+.inventoryItem:hover {
+    background: #136DD9;
+}
+
+.itemTextWrapper {
+    width: 100%;
+}
+
+.itemName {
+    font-family: Chakra Petch;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 111.00000000000001%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    text-transform: uppercase;
+}
+
+.itemDescription {
+    font-family: Chakra Petch;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 111.00000000000001%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+}
+
+
+.itemAmount {
+    font-family: Chakra Petch;
+    font-weight: 300;
+    font-size: 50px;
+    line-height: 111.00000000000001%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    text-transform: uppercase;
 }

@@ -50,6 +50,7 @@ export class Game {
     progressDatabase!: ProgressDatabase;
     scenes: Map<string, Scene> = new Map<string, Scene>();
     activeScene!: Scene;
+    globalScene!: Scene;
 
     hacking?: HackingMinigame;
 
@@ -183,6 +184,8 @@ export class Game {
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
         this.stateManager.register(this.progressDatabase);
+        this.globalScene = new Scene();
+        this.globalScene.name = "Global";
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
         Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg", ambientColor: [1.5, 1, .5] } }, this.activeScene);
@@ -275,6 +278,14 @@ export class Game {
         this.defaultScene();
 
 
+        Entity.fromData({ kind: "Entity", name: "Global",
+            component: [
+                {
+                    componentType: "Inventory",
+                    data: {}
+                }
+            ]
+         }, this.globalScene);
 
         this.tooltip = new UITooltip();
 
@@ -311,9 +322,6 @@ export class Game {
         }, 500);
 
         this.app.ticker.add(this.update, this);
-
-
-        ///////////////////////////////////////////////
     }
 
     update(ticker: Ticker) {

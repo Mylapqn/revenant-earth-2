@@ -17,6 +17,7 @@ import { CustomColor } from "./utils/color";
 import { Lightmap } from "./shaders/lighting/lightmap";
 import { SurfaceMaterial } from "./world/terrain";
 import { Light } from "./shaders/lighting/light";
+import { Inventory } from "./components/generic/inventory";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -43,6 +44,8 @@ export class Player implements ISerializable {
     animatedSprite: DynamicAnimatedSprite;
 
     footstepProgress = 0;
+
+    get inventory() { return game.globalScene.findComponent(Inventory); }
 
     constructor() {
         this.statsDisplay = document.createElement("div");
