@@ -2,12 +2,14 @@ import { Graphics } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { Vectorlike } from "../../utils/vector";
+import { Vector, Vectorlike } from "../../utils/vector";
 import { AtmoData } from "../../world/atmo";
-import { Terrain, TerrainData } from "../../world/terrain";
+import { SurfaceMaterial, Terrain, TerrainData } from "../../world/terrain";
+import { Box, SATVector } from "detect-collisions";
 
 export class Planter extends Component {
     static componentType = "Planter";
+    collider!: Box;
     constructor(entity: Entity) {
         super(entity);
         this.mockEnvironment();
@@ -30,11 +32,17 @@ export class Planter extends Component {
             this.atmoData = data.atmoData;
         }
         this.mockEnvironment();
+
+    }
+
+    override init(): void {
+        this.collider = game.collisionSystem.createBox(new Vector(-this.radius/2, -this.radius/2), this.radius, this.radius, { userData: { material: SurfaceMaterial.dirt } });
     }
 
     readonly radius = 25;
 
     update(dt: number) {
+        this.collider.setOffset(new SATVector(this.transform.position.x, this.transform.position.y));
         if (this.transform.position.distanceSquared(game.worldMouse) < this.radius ** 2) {
             if (game.input.key("x")) {
                 const data = this.environment.terrain.getProperties(game.worldMouse.x);

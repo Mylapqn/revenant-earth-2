@@ -12,6 +12,7 @@ import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
 import { IEvnironmentProvider, Planter } from "./planter";
+import { SurfaceMaterial } from "../../world/terrain";
 
 export class Plant extends Component {
     static componentType = "Plant";
@@ -246,10 +247,11 @@ export class Plant extends Component {
     }
 
     drawPlant() {
-        let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -1000 }), this.entity.transform.position.clone().add({ x: 0, y: 1000 }), (body) => { return body.userData?.terrain });
+        let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -1000 }), this.entity.transform.position.clone().add({ x: 0, y: 1000 }), (body) => { return body.userData?.material == SurfaceMaterial.dirt });
         if (hit) {
             this.entity.transform.position.y = hit.point.y;
         }
+        if (this.plantedIn) this.entity.transform.position.x = this.plantedIn.transform.position.x;
         Plant.plantGraphics({ graphics: this.graphics, species: this.species, growth: this.growth, randomSeed: this.randomSeed, health: this.health });
         this.shaderMeshComponent.draw();
         this.bounds = this.shaderMeshComponent.renderMesh.getLocalBounds();

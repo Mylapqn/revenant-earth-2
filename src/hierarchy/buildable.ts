@@ -6,6 +6,8 @@ import { SurfaceMaterial } from "../world/terrain";
 import { Entity } from "./entity";
 import { Prefab } from "./prefabs";
 import { Plant } from "../components/custom/plant";
+import { Planter } from "../components/custom/planter";
+import { Debug } from "../dev/debug";
 
 export type ValidateResults = { valid: boolean, reason: string, warning?: string };
 export type CheckResults = ValidateResults & { snap: Vectorlike };
@@ -69,15 +71,22 @@ export class Buildable {
         return new Buildable({
             allowedMaterials: [SurfaceMaterial.dirt],
             validatePosition: (position) => {
-                const tdata = game.terrain.getProperties(position.x);
+                const planter = game.activeScene.findComponent(Planter, (planter) => planter.transform.position.distanceSquared(position) < planter.radius ** 2);
+                const tdata = planter ? planter.environment.terrain.getProperties(position.x) : game.terrain.getProperties(position.x);
+                const snap = planter ? planter.transform.position.clone() : position;
                 let reason = "Can place here";
                 let warning = "";
                 if (tdata.fertility < .5) warning += "Fertility too low\n";
                 if (tdata.moisture < .5) warning += "Moisture too low\n";
-                if(warning.length > 0) reason = "";
-                return { valid: true, reason, warning, snap: position };
+                if (warning.length > 0) reason = "";
+                return { valid: true, reason, warning };
             },
-            onBuild: (position) => { return Prefab.Plant({ position: position, species: species.name, growth: 2 }); },
+            onBuild: (position) => {
+                const planter = game.activeScene.findComponent(Planter, (planter) => planter.transform.position.distanceSquared(position) < planter.radius ** 2);
+                const plant = Prefab.Plant({ position: position, species: species.name, growth: 2 });
+                plant.getComponent(Plant)!.plantedIn = planter ? planter : undefined;
+                return plant;
+            },
             drawGhost: () => {
                 Plant.plantGraphics({ graphics: game.buildingGhost.graphics, species: species, growth: Math.min(15, species.statsPerGrowth.maxGrowth), randomSeed: Math.random() * 1000, health: 1 });
                 game.buildingGhost.renderGraphics();

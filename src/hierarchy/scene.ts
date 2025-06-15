@@ -47,6 +47,15 @@ export class Scene implements ISerializable {
         return result;
     }
 
+    findComponent<T extends Component>(type: Constructor<T>, filter?: (component: T) => boolean) {
+        for (const obj of this.objects) {
+            if (obj instanceof Entity) {
+                const component = obj.getComponent(type);
+                if (component && (!filter || filter(component))) return component;
+            }
+        }
+    }
+
     register(obj: ISerializable) {
         this.stateManager.register(obj);
     }
