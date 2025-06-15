@@ -4,6 +4,7 @@ import { CustomColor } from '../../utils/color';
 import { Vector } from '../../utils/vector';
 import { game } from '../../game';
 import { ISerializable, KindedObject, StateMode } from '../../hierarchy/serialise';
+import { Debug } from '../../dev/debug';
 
 export type LightOptions = { position: Vector; angle?: number; width?: number; color?: CustomColor; range?: number; intensity?: number; parent?: Entity; };
 
@@ -36,7 +37,7 @@ export class Light {
     }
     public get position(): Vector {
         if (!this.parent) return this._position;
-        return this.parent.transform.worldCoords(new Vector(this._position.x, -this._position.y));
+        return this.parent.transform.worldCoords(new Vector(this._position.x, -this._position.y)).floor();
     }
     public set angle(angle) {
         this._angle = angle;
@@ -71,7 +72,9 @@ export class Light {
         for (let i = 0; i < Light.list.length && i < Light.maxAmount; i++) {
             const index = i * dataWidth;
             const light = Light.list[i];
-            const renderPos = game.camera.worldToRender(light.position);
+            const pos = light.position.clone();
+            pos.floor();
+            const renderPos = game.camera.worldToRender(pos);
             // rg: position, b: rotation
             // r: width, g: range, b: intensity
             // rgb: color

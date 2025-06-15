@@ -39,6 +39,7 @@ export class Hitbox extends Component {
         this.graphics = new Graphics();
         this.onEntity("draw", (dt) => this.draw(dt));
         this.onEntity("update", (dt) => this.update(dt));
+        this.onEntity("drawShadow", (dt) => this.drawShadow(dt));
         this.polygons = [];
         this.edgeTexture = Texture.WHITE;
         this.bgTexture = Texture.WHITE;
@@ -50,7 +51,7 @@ export class Hitbox extends Component {
                 resources: {
                     uSampler: Texture.WHITE.source,
                 }
-            })
+            }),
         });
         Assets.load("floor.png").then((texture) => {
             this.edgeTexture = texture;
@@ -132,12 +133,12 @@ export class Hitbox extends Component {
         //this.sprite.position.set(this.transform.position.x, this.transform.position.y);
         this.graphics.clear();
 
-        for (const hitbox of this.polygons) {
-            this.graphics.moveTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
-            for (let i = 0; i < hitbox.points.length; i++) {
-                this.graphics.lineTo(hitbox.points[i].x + this.transform.position.x, hitbox.points[i].y + this.transform.position.y);
+        for (const polygon of this.polygons) {
+            this.graphics.moveTo(polygon.points[0].x + this.transform.position.x, polygon.points[0].y + this.transform.position.y);
+            for (let i = 0; i < polygon.points.length; i++) {
+                this.graphics.lineTo(polygon.points[i].x + this.transform.position.x, polygon.points[i].y + this.transform.position.y);
             }
-            this.graphics.lineTo(hitbox.points[0].x + this.transform.position.x, hitbox.points[0].y + this.transform.position.y);
+            this.graphics.lineTo(polygon.points[0].x + this.transform.position.x, polygon.points[0].y + this.transform.position.y);
             this.graphics.fill({ color: 0x000000, alpha: 1 });
             //this.graphics.stroke({ color: 0xff0000, width: 1, alpha: .1 });
         }
@@ -163,9 +164,6 @@ export class Hitbox extends Component {
             UVWidth: this.edgeTexture.width
         });
         this.hitboxMesh.geometry = hbGeo;
-
-        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform, clear: false });
-
     }
 
     interiorHitbox() {
@@ -201,6 +199,10 @@ export class Hitbox extends Component {
             polygon.setPosition(this.transform.position.x, this.transform.position.y);
             polygon.updateBody();
         }
+    }
+
+    drawShadow(dt: number) {
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform, clear: false });
     }
 
 }

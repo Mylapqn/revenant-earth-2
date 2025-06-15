@@ -209,7 +209,11 @@ export class Terrain implements ISerializable, ISceneObject {
             prev = node;
         }
 
-        this.draw();
+
+
+
+
+        //this.draw();
 
         if (game.input.key("x")) {
             const data = this.getProperties(game.worldMouse.x);
@@ -220,7 +224,28 @@ export class Terrain implements ISerializable, ISceneObject {
         this.updateProperties(dt);
 
         this.changeFixer(editedNodes);
+
         this.considerNodes();
+    }
+
+    drawShadow(dt: number): void {
+        this.graphics.clear();
+        if (this.inspectMode != TerrainInspectMode.none) {
+            this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
+            for (const node of this.hitbox.points) {
+                this.graphics.lineTo(node.x, node.y);
+            }
+            this.graphics.fill(0x666666);
+            game.app.renderer.render({ container: this.graphics, target: Lightmap.texture, clear: false, transform: this.graphics.worldTransform });
+        }
+
+        this.graphics.clear();
+        this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
+        for (const node of this.hitbox.points) {
+            this.graphics.lineTo(node.x, node.y);
+        }
+        this.graphics.fill(0x151008);
+        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform, clear: false });
     }
 
     private spread(a: TerrainData, b: TerrainData, dt: number) {
@@ -413,21 +438,7 @@ export class Terrain implements ISerializable, ISceneObject {
         this.groundFogMesh.shader!.resources.group.uniforms.uRainAmount = game.weather.weatherData.rainIntensity * game.weather.rainFadeIn * game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold;
 
 
-        if (this.inspectMode != TerrainInspectMode.none) {
-            this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
-            for (const node of this.hitbox.points) {
-                this.graphics.lineTo(node.x, node.y);
-            }
-            this.graphics.fill(0x666666);
-            game.app.renderer.render({ container: this.graphics, target: Lightmap.texture, clear: false, transform: this.graphics.worldTransform });
-        }
-        this.graphics.clear();
-        this.graphics.moveTo(this.nodes[0].x, this.nodes[0].y);
-        for (const node of this.hitbox.points) {
-            this.graphics.lineTo(node.x, node.y);
-        }
-        this.graphics.fill(0x151008);
-        game.app.renderer.render({ container: this.graphics, target: Shadowmap.occluderTexture, transform: this.graphics.worldTransform, clear: false });
+
 
     }
 

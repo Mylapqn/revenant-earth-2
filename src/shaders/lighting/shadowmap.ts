@@ -38,19 +38,22 @@ export class Shadowmap {
         this.shaderMesh = new ShaderMesh({ frag: Shadowmap.fragment, customTextures: [{ name: "occluder", texture: this.occluderTexture }, { name: "uLightData", texture: Light.dataTexture }], customUniforms: defaultUniforms, size: new Vector(this.angles, Light.maxAmount), anchor: new Vector(0, 0) });
         this.resize();
     }
-
+    static clearOccluderTexture() {
+        game.app.renderer.render({ target: this.occluderTexture, clearColor: [0, 0, 0, 0], container: new Container() });
+        Shadowmap.occluderTexture.source.update();
+    }
     static update() {
+        Light.updateDataTexture();
 
         this.shaderMesh.setUniform("uPixelSize", [1 / game.camera.pixelScreen.x, 1 / game.camera.pixelScreen.y]);
         this.shaderMesh.setUniform("lightAmount", Light.list.length);
         this.shaderMesh.setUniform("viewport", [...game.camera.position.xy(), game.camera.pixelScreen.x, game.camera.pixelScreen.y]);
 
         game.app.renderer.render({ target: this.shadowDataTexture, container: this.shaderMesh });
-
-        game.app.renderer.render({ target: this.occluderTexture, clearColor: [0, 0, 0, 0], container: new Container() });
-        Shadowmap.occluderTexture.source.update();
     }
     static resize() {
-        this.occluderTexture.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
+        //this.occluderTexture.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
+        this.occluderTexture = RenderTexture.create({ width: game.camera.pixelScreen.x + 2, height: game.camera.pixelScreen.y + 2 });
+        this.shaderMesh.shader.resources.occluder = this.occluderTexture.source;
     }
 }

@@ -8,6 +8,7 @@ export type EntityEvents = {
     firstUpdate: [];
     update: [number];
     draw: [number];
+    drawShadow: [number];
     unload: [];
     interact: [];
     hoverOn: [];
@@ -105,6 +106,10 @@ export class Entity implements ISerializable, ISceneObject {
 
     draw(dt: number) {
         this.emit("draw", dt);
+    }
+
+    drawShadow(dt: number) {
+        this.emit("drawShadow", dt);
     }
 
     remove() {

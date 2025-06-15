@@ -70,17 +70,8 @@ export class Camera {
     }
 
 
-    update(dt: number) {
-        let targetPosition = new Vector(0, 0);
-        if (this.customTarget) {
-            targetPosition = this.customTarget.clone();
-        }
-        else {
-            targetPosition.set(this.targetPlayerPosition());
-        }
+    applyRender(dt: number) {
 
-        this.position.x = (targetPosition.x + this.position.x * 19) / 20;
-        this.position.y = (targetPosition.y + this.position.y * 19) / 20;
 
         this.screenPixelOffset = new Vector(-this.position.x + this.middle.x, -this.position.y + this.middle.y);
         this.pixelOffset = this.screenPixelOffset.clone().mult(1 / Game.pixelScale).floor();
@@ -101,6 +92,19 @@ export class Camera {
             x: game.player.position.x * Game.pixelScale,
             y: game.player.position.y * Game.pixelScale - this.viewport.y * .2
         }
+    }
+
+    processPosition(dt: number) {
+        let targetPosition = new Vector(0, 0);
+        if (this.customTarget) {
+            targetPosition = this.customTarget.clone();
+        }
+        else {
+            targetPosition.set(this.targetPlayerPosition());
+        }
+
+        this.position.x = (targetPosition.x + this.position.x * 19) / 20;
+        this.position.y = (targetPosition.y + this.position.y * 19) / 20;
     }
 
     processZoom(dt: number) {

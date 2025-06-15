@@ -1,5 +1,6 @@
 import { Door } from "../components/custom/door";
 import { Plant } from "../components/custom/plant";
+import { Planter } from "../components/custom/planter";
 import { game } from "../game";
 import { UI, UIElement, UIPanel } from "../ui/ui";
 import { sleep } from "../utils/utils";
@@ -61,7 +62,7 @@ export class Milestone {
         if (this._completed) return;
         if (this.tier != game.milestones.currentTier || !this.enabled) return;
         this._completed = true;
-        game.soundManager.soundLibrary.play("milestone",{singleInstance: true});
+        game.soundManager.soundLibrary.play("milestone", { singleInstance: true });
         const panel = UIElement.create({ type: "div", classes: ["milestone", "appear"], parent: UI.container, content: `` });
         const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Milestone achieved" });
         const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: this.name });
@@ -74,10 +75,10 @@ export class Milestone {
         details.htmlElement.classList.add("appear");
         game.score.addWithFx(this.reward, { x: .5, y: .15 });
         if (this.onComplete) this.onComplete();
-        
+
         game.milestones.displayQuests();
         this.parent?.checkChildren();
-        
+
         await sleep(5000 * waitMult);
         panel.htmlElement.classList.remove("appear");
         await sleep(3000);
@@ -121,10 +122,18 @@ export class MilestoneManager {
                     onComplete: () => {
                         game.camera.targetZoom = 1;
                         game.camera.zoomSpeed = 1;
+                        game.activeScene.findEntityByName("PlanterGood")!.getComponent(Planter)!.enabled = true;
+                        game.activeScene.findEntityByName("PlanterBad")!.getComponent(Planter)!.enabled = false;
                     }
                 },
                 {
-                    name: "Plant a seed", id: "tutPlant", reward: 0, details: "Press T to select a seed. Then click on the ground to plant it.",
+                    name: "Plant a seed in the watered planter", id: "tutPlant1", reward: 0, details: "Plants will thrive with water and nutrients. <br>Press T to select a seed.",
+                    onComplete: () => {
+                        game.activeScene.findEntityByName("PlanterBad")!.getComponent(Planter)!.enabled = true;
+                    }
+                },
+                {
+                    name: "Plant a seed in the dry planter", id: "tutPlant2", reward: 0, details: "Observe plants will struggle without water and nutrients.",
                     onComplete: () => {
                         const targetDoor = game.activeScene.findComponents(Door).find(comp => comp.doorId === "space-door-1");
                         targetDoor!.enabled = true;
@@ -139,7 +148,8 @@ export class MilestoneManager {
         game.events.on("playerBuild", entity => {
             if (entity.getComponent(Plant)) {
                 this.completeQuest("plantSeed", `You planted a ${entity.getComponent(Plant)!.species.name}`);
-                this.completeQuest("tutPlant", `You planted a ${entity.getComponent(Plant)!.species.name}`);
+                this.completeQuest("tutPlant1", `Observe how plants will thrive in the watered planter.`);
+                this.completeQuest("tutPlant2", `Observe plants will struggle without water and nutrients.`);
             }
         })
         game.events.on("plantGrow", plant => {

@@ -193,10 +193,11 @@ export class Player implements ISerializable {
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
 
-        this.updateLight();
-
+        
         this.playerHitbox.setPosition(this.position.x, this.position.y);
         this.playerHitbox.updateBody(true);
+
+        this.updateLight();
 
         this.groundedTimer -= dt;
         this.graphics.clear();
@@ -204,8 +205,8 @@ export class Player implements ISerializable {
         this.processCollision(dt);
 
         //console.log(this.limbSystem.limbGroups[0].passingPhase);
-        this.pixelLayer.renderMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
-        this.pixelLayer.renderMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
+        this.pixelLayer.displayMesh.x = (this.position.x - this.pixelLayer.renderTexture.width / 2) * Game.pixelScale;
+        this.pixelLayer.displayMesh.y = (this.position.y - this.pixelLayer.renderTexture.height / 2) * Game.pixelScale;
         this.pixelLayer.render();
         this.animatedSprite.tint = game.ambience.ambientColor().add(CustomColor.gray(game.activeScene.hasTerrain ? 0 : 200)).toPixi();
 

@@ -7,6 +7,7 @@ export interface ISceneObject {
     unload?(): void;
     update?(dt: number): void;
     draw?(dt: number): void;
+    drawShadow?(dt: number): void;
 }
 
 export class Scene implements ISerializable {
@@ -32,6 +33,14 @@ export class Scene implements ISerializable {
         for (const obj of this.objects) {
             if (obj instanceof Entity) {
                 if (obj.id === id) return obj;
+            }
+        }
+    }
+
+    findEntityByName(name: string) {
+        for (const obj of this.objects) {
+            if (obj instanceof Entity) {
+                if (obj.name === name) return obj;
             }
         }
     }
@@ -93,6 +102,12 @@ export class Scene implements ISerializable {
     draw(dt: number) {
         for (const obj of this.objects) {
             obj.draw?.(dt);
+        }
+    }
+
+    drawShadow(dt: number) {
+        for (const obj of this.objects) {
+            obj.drawShadow?.(dt);
         }
     }
 

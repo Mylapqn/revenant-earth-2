@@ -158,6 +158,8 @@ export class Game {
                         { alias: "space", src: "./space_tile.png" },
                         { alias: "monogram", src: "./font/monogram.ttf" },
                         { alias: "biochar", src: "./gfx/building/biochar.png" },
+                        { alias: "planter", src: "./gfx/building/planter.png" },
+                        { alias: "planter_inspect", src: "./gfx/building/planter_mask.png" },
                     ]
                 },
                 {
@@ -312,8 +314,6 @@ export class Game {
 
 
         ///////////////////////////////////////////////
-
-        Prefab.Planter({ scene: this.activeScene, x: 100, y: 100 });
     }
 
     update(ticker: Ticker) {
@@ -327,27 +327,31 @@ export class Game {
         const dt = realDt * this.timeScale * (!this.input.key("g") ? 1 : .2);
         this.elapsedTime += dt;
 
-        Shadowmap.update();
-        this.camera.processZoom(realDt);
-        Lightmap.update();
         TimedShader.update(this.elapsedTime);
 
         this.uiGraphics.clear();
         this.worldUiGraphics.clear();
+        Shadowmap.clearOccluderTexture();
 
         this.score.update(dt);
 
         this.tooltip.update(realDt);
 
 
+
+        this.camera.processPosition(dt);
+        this.camera.processZoom(realDt);
         for (const particleText of [...ParticleText.list]) {
             particleText.update(dt);
         }
         this.activeScene.update(dt);
+        this.activeScene.drawShadow(dt);
+        Shadowmap.update();
+        Lightmap.update();
         this.activeScene.draw(dt);
 
+        this.camera.applyRender(realDt);
 
-        this.camera.update(realDt);
 
 
         //this.worldDebugGraphics.circle(this.worldMouse.x, this.worldMouse.y, 5);
@@ -356,6 +360,7 @@ export class Game {
         for (const layer of PixelLayer.renderLayers) {
             layer.render();
         }
+
 
         const address = "http://localhost:3000/state.json";
         if (this.input.keyUp("tab") && !this.input.key("alt")) {

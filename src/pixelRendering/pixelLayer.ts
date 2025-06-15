@@ -10,6 +10,8 @@ import { Lightmap } from "../shaders/lighting/lightmap";
 import { Debug } from "../dev/debug";
 import { Vector, Vectorlike } from "../utils/vector";
 import { MouseButton } from "../input";
+import { Light } from "../shaders/lighting/light";
+import { Shadowmap } from "../shaders/lighting/shadowmap";
 
 export type PixelLayerOptions = ({
     autoResize: true;
@@ -28,7 +30,9 @@ export type PixelLayerOptions = ({
 export class PixelLayer {
     container: Container;
     renderTexture: RenderTexture;
+    displayTexture: RenderTexture;
     renderMesh: ShaderMesh;
+    displayMesh: ShaderMesh;
     worldSpace: boolean;
     autoResize: boolean;
     autoRender: boolean;
@@ -53,6 +57,7 @@ export class PixelLayer {
         this.worldSpace = options.worldSpace ?? true;
         this.container = new Container();
         this.renderTexture = RenderTexture.create({ width, height, antialias: false, scaleMode: 'nearest' });
+        this.displayTexture = RenderTexture.create({ width, height, antialias: false, scaleMode: 'nearest' });
         this.depth = options.depth ?? 1;
         this.autoRender = options.autoRender ?? true;
         let fragmentShader = fragmentShaderDefault;
@@ -83,10 +88,12 @@ export class PixelLayer {
             }
         }
         this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: fragmentShader, customUniforms: uniforms, customTextures: customTextures });
-        this.renderMesh.scale.set(Game.pixelScale);
+        this.renderMesh.scale.set(1);
+        this.displayMesh = new ShaderMesh({ texture: this.displayTexture, frag: fragmentShaderDefault });
+        this.displayMesh.scale.set(Game.pixelScale);
         this.initialResolution = { x: width, y: height };
         if (options.parent) {
-            options.parent.addChild(this.renderMesh);
+            options.parent.addChild(this.displayMesh);
         }
         if (this.autoResize) {
             PixelLayer.resizeLayers.add(this);
@@ -101,20 +108,19 @@ export class PixelLayer {
         if (this.worldSpace) {
             const offsets = game.camera.getCenteredPixelOffset(this.depth);
             if (this.autoResize) {
-                offsets.offset.x -= 1;
-                offsets.offset.y -= 1;
+                offsets.offset.x += 1;
+                offsets.offset.y += 1;
                 offsets.remainder.x -= 1;
                 offsets.remainder.y -= 1;
             }
-            let delta = Vector.fromLike(offsets.remainder).mult(Game.pixelScale).sub(this.renderMesh.position.clone()).mult(1 / Game.pixelScale);
             let deltaPixel = Vector.fromLike(offsets.offset).sub(this.container.position.clone()).mult(-1);
-            delta.add(deltaPixel);
             this.container.position.set(offsets.offset.x, offsets.offset.y);
-            this.renderMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
+            this.displayMesh.position.set(offsets.remainder.x * Game.pixelScale, offsets.remainder.y * Game.pixelScale);
             //if (game.input.mouse.getButton(MouseButton.Right)) delta.set({ x: 0, y: 0 });
             //Debug.log(delta.x);
             this.renderMesh.setUniform("uPosition", [offsets.offset.x / this.renderTexture.width, offsets.offset.y / this.renderTexture.height]);
-            this.renderMesh.setUniform("uRemainder", [delta.x / this.renderTexture.width, delta.y / this.renderTexture.height]);
+            this.renderMesh.setUniform("uRemainder", [deltaPixel.x / this.renderTexture.width, deltaPixel.y / this.renderTexture.height]);
+            //this.renderMesh.setUniform("uRemainder", [0,0]);
             this.renderMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
             if (this.depth > 1) this.renderMesh.setUniform("uPlayerPosition", game.camera.worldToRender(game.player.position).xy());
             if (this.depth < 1) {
@@ -133,19 +139,18 @@ export class PixelLayer {
 
         //TODO pixelLayer final stage is rendered in full resolution but it should be in pixel scale
         game.app.renderer.render({ container: this.container, target: this.renderTexture });
-        this.renderTexture.update();
+        game.app.renderer.render({ container: this.renderMesh, target: this.displayTexture });
     }
     resize(width: number, height: number) {
         if (this.autoResize) {
             width += 2;
             height += 2;
-            //TODO WHY THE FUCK DO I HAVE TO DO THIS????
-            //this.sprite.width = Math.floor(Game.pixelScale * width * width / this.initialResolution.x);
-            //this.sprite.height = Math.floor(Game.pixelScale * height * height / this.initialResolution.y);
         }
         this.renderMesh.setUniform("uResolution", [width, height]);
         this.renderTexture.resize(width, height);
         this.renderMesh.resize(width, height);
+        this.displayTexture.resize(width, height);
+        this.displayMesh.resize(width, height);
         if (this.onResize) {
             this.onResize(width, height);
         }

@@ -1,15 +1,32 @@
-import { Graphics } from "pixi.js";
+import { Assets, Graphics } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { Vector, Vectorlike } from "../../utils/vector";
 import { AtmoData } from "../../world/atmo";
-import { SurfaceMaterial, Terrain, TerrainData } from "../../world/terrain";
+import { SurfaceMaterial, Terrain, TerrainData, TerrainInspectMode } from "../../world/terrain";
 import { Box, SATVector } from "detect-collisions";
+import { Debug } from "../../dev/debug";
+import { BasicSprite } from "../generic/basicSprite";
+import { CustomColor } from "../../utils/color";
+
+type PartialData = { terrainData?: Partial<TerrainData>, atmoData?: Partial<AtmoData> };
 
 export class Planter extends Component {
     static componentType = "Planter";
     collider!: Box;
+    basicSprite!: BasicSprite;
+    inspectMode: TerrainInspectMode = TerrainInspectMode.none;
+    keepStats: PartialData = {};
+    private _enabled = true;
+    public get enabled() {
+        return this._enabled;
+    }
+    public set enabled(value) {
+        this._enabled = value;
+        if (this.collider)
+            this.collider.userData.material = value ? SurfaceMaterial.dirt : SurfaceMaterial.metal;
+    }
     constructor(entity: Entity) {
         super(entity);
         this.mockEnvironment();
@@ -20,26 +37,29 @@ export class Planter extends Component {
     atmoData: AtmoData = { pollution: 0 };
 
     override toData(): ComponentData {
-        const data = { terrainData: this.terrainData, atmoData: this.atmoData } as Parameters<this["applyData"]>[0];
+        const data = { terrainData: this.terrainData, atmoData: this.atmoData, keepStats: this.keepStats } as Parameters<this["applyData"]>[0];
         return super.toData(data);
     }
 
-    override applyData(data: { terrainData?: TerrainData, atmoData?: AtmoData }): void {
+    override applyData(data: { terrainData?: TerrainData, atmoData?: AtmoData, keepStats?: PartialData }): void {
         if (data.terrainData) {
             this.terrainData = data.terrainData;
         }
         if (data.atmoData) {
             this.atmoData = data.atmoData;
         }
+        this.keepStats = data.keepStats ?? {};
         this.mockEnvironment();
 
     }
 
     override init(): void {
-        this.collider = game.collisionSystem.createBox(new Vector(-this.radius/2, -this.radius/2), this.radius, this.radius, { userData: { material: SurfaceMaterial.dirt } });
+        const dimensions = { x: 50, y: 24 };
+        this.collider = game.collisionSystem.createBox(new Vector(-dimensions.x / 2, -dimensions.y / 2), dimensions.x, dimensions.y, { userData: { material: SurfaceMaterial.dirt } });
+        this.basicSprite = this.entity.getComponent(BasicSprite)!;
     }
 
-    readonly radius = 25;
+    readonly radius = 30;
 
     update(dt: number) {
         this.collider.setOffset(new SATVector(this.transform.position.x, this.transform.position.y));
@@ -50,6 +70,36 @@ export class Planter extends Component {
                 //data.moisture = Math.min(1, data.moisture + 0.1);
             }
         }
+        if (game.terrain.inspectMode != this.inspectMode) this.setInspect();
+        if (this.inspectMode != TerrainInspectMode.none) {
+            let inspect = this.environment.terrain.getProperties(0)[Terrain.inspectModes[this.inspectMode] as keyof TerrainData];
+            if (this.inspectMode == TerrainInspectMode.pollution || this.inspectMode == TerrainInspectMode.erosion) inspect = 1 - inspect;
+            this.setTint(inspect);
+        }
+        else {
+            this.basicSprite.sprite.tint = CustomColor.gray(200 * (1 - this.environment.terrain.getProperties(0).moisture) + 55).toPixi();
+        }
+        if (this.keepStats) {
+            if (this.keepStats.terrainData) this.terrainData = Object.assign(this.terrainData, this.keepStats.terrainData);
+            if (this.keepStats.atmoData) this.atmoData = Object.assign(this.atmoData, this.keepStats.atmoData);
+        }
+
+    }
+
+    setInspect() {
+        this.inspectMode = game.terrain.inspectMode;
+        if (this.inspectMode != TerrainInspectMode.none) {
+            this.basicSprite.sprite.texture = Assets.get("planter_inspect");
+        }
+        else {
+            this.basicSprite.sprite.texture = Assets.get("planter");
+            this.basicSprite.sprite.tint = 0xffffff;
+        }
+    }
+
+    setTint(value: number) {
+        let color = CustomColor.fromShader([1 - value, value, .1]).normalize();
+        this.basicSprite.sprite.tint = color.toPixi();
     }
 
     debugDraw(graphics: Graphics): void {

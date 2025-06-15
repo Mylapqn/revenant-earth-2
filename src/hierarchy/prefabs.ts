@@ -112,7 +112,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "vite.svg",
+                            asset: "planter",
                         },
                     },
                     {

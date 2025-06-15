@@ -1,6 +1,6 @@
 import fragment from './lightmap.frag?raw';
 import vertex from '../vert.vert?raw';
-import { RenderTexture, Texture } from 'pixi.js';
+import { Container, RenderTexture, Texture } from 'pixi.js';
 import { game } from '../../game';
 import { Light } from './light';
 import { Shadowmap } from './shadowmap';
@@ -44,17 +44,17 @@ export class Lightmap {
     }
 
     static update() {
-        Light.updateDataTexture();
         //Shadowmap.update();
         this.shaderMesh.setUniform("uPixelSize", [1 / game.camera.pixelScreen.x, 1 / game.camera.pixelScreen.y]);
         this.shaderMesh.setUniform("lightAmount", Light.list.length);
         this.shaderMesh.setUniform("viewport", [...game.camera.position.xy(), game.camera.pixelScreen.x, game.camera.pixelScreen.y]);
-        game.app.renderer.render({ target: this.texture, container: this.shaderMesh });
+        game.app.renderer.render({ target: this.texture, container: this.shaderMesh, clear: true});
     }
 
     static resize() {
-        if (game.camera)
+        if (game.camera) {
             this.texture.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
-        this.shaderMesh.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
+            this.shaderMesh.resize(game.camera.pixelScreen.x + 2, game.camera.pixelScreen.y + 2);
+        }
     }
 }

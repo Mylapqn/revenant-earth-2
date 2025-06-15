@@ -1,3 +1,4 @@
+import { Debug } from "./dev/debug";
 import { Game } from "./game";
 import { Vector } from "./utils/vector";
 
@@ -101,7 +102,8 @@ class Mouse {
     }
     private mouseMove(e: MouseEvent) {
         const pos = { x: e.clientX, y: e.clientY };
-        this.delta.set(pos.x - this.position.x, pos.y - this.position.y);
+        this.delta.add(new Vector(pos.x - this.position.x, pos.y - this.position.y));
+        //this.delta.set(pos.x - this.position.x, pos.y - this.position.y);
         this.position.set(pos);
         this.pixelPosition = this.position.clone().mult(1 / Game.pixelScale).floor();
         this.pixelDelta = this.delta.clone().mult(1 / Game.pixelScale).floor();

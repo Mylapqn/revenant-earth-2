@@ -7,7 +7,7 @@ import { Vector } from "../../utils/vector";
 import { Prefab } from "../../hierarchy/prefabs";
 import { EntityTooltip } from "../generic/entityTooltip";
 import { ShaderMeshRenderer } from "../generic/shaderMeshRenderer";
-import { lerp, RandomGenerator } from "../../utils/utils";
+import { clamp, lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
@@ -131,9 +131,6 @@ export class Plant extends Component {
             //this.tooltipComponent.tooltipData.set("species", this.species.name);
         }
         if (tdata == undefined) return;
-        if (this.health < 1) {
-            this.health = Math.min(1, this.health + dt * .001);
-        }
         if (adata.pollution > 0) {
             this.damage(dt * adata.pollution * .002 * this.species.statsPerTime.pollutionDamage, "air pollution");
             if (this.dead) return;
@@ -142,20 +139,31 @@ export class Plant extends Component {
             }
             this.shaderMeshComponent.renderMesh.tint = new Color({ r: 255, g: this.health * 255, b: this.health * 255, a: 1 });
         }
-        if (tdata.fertility > 0 && tdata.moisture > .1 && this.health > .1 && this.growth < this.species.statsPerGrowth.maxGrowth) {
-            let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * .2;
-            this.growth += addedGrowth;
-            game.score.add(addedGrowth);
-            this.envirnonmentProvider.terrain.consumeFertility(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.nutrients * 20);
-            this.envirnonmentProvider.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
-            this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, addedGrowth * this.species.statsPerGrowth.erosion * .05);
-            this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.water * .02);
+        if (tdata.fertility > 0 && tdata.moisture > .1 && this.health > .1) {
+            //grow if fert and moist
+            let addedGrowth = dt * Math.min(tdata.fertility, tdata.moisture) * .2;
+            let usedGrowth = 0;
+            if (this.health < 1) {
+                //heal if needed
+                this.health = Math.min(1, this.health + .03 * addedGrowth);
+                usedGrowth += addedGrowth * .8;
+                addedGrowth *= this.health * .2;
+            }
+            if (this.growth < this.species.statsPerGrowth.maxGrowth) {
+                //grow if under max
+                this.growth += addedGrowth;
+                game.score.add(addedGrowth);
+                usedGrowth += addedGrowth;
+            }
+            this.envirnonmentProvider.terrain.consumeFertility(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.nutrients * 30);
+            this.envirnonmentProvider.atmo.co2 -= usedGrowth * this.species.statsPerGrowth.co2;
+            this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, usedGrowth * this.species.statsPerGrowth.erosion * .05);
+            this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.water * .01);
         }
         if (this.health > 0) {
-            let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .05;
+            let requiredMoisture = dt * this.species.statsPerTime.water * (this.growth + 2) * .00005;
             if (tdata.moisture < requiredMoisture) {
-                this.damage(requiredMoisture - tdata.moisture, "lack of water");
-                tdata.moisture = 0;
+                this.damage((requiredMoisture - tdata.moisture) * 8 * clamp(1 - (this.growth / this.species.statsPerGrowth.maxGrowth), .2, 1), "lack of water");
             }
             else if (this.growth >= this.species.statsPerGrowth.maxGrowth) {
                 if (!this.fullyGrown) {
@@ -164,8 +172,9 @@ export class Plant extends Component {
                 }
                 this.seedProgress += dt * this.health * .1;
             }
+            this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, requiredMoisture);
         }
-        if (this.seedProgress > this.nextseed) {
+        if (this.seedProgress > this.nextseed && !this.plantedIn) {
             this.nextseed *= 2;
             let seedPos = this.transform.position.x + (80 * Math.random() - 40) * 10;
             let seedValid = true;
