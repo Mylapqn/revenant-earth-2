@@ -1,18 +1,17 @@
-import { Assets, Color, Graphics, Texture } from "pixi.js";
+import { Color, getUboData, Graphics } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { BasicSprite } from "../generic/basicSprite";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../utils/vector";
 import { Prefab } from "../../hierarchy/prefabs";
 import { EntityTooltip } from "../generic/entityTooltip";
 import { ShaderMeshRenderer } from "../generic/shaderMeshRenderer";
-import { clamp, lerp, RandomGenerator } from "../../utils/utils";
+import { lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
-import { Debug } from "../../dev/debug";
+import { IEvnironmentProvider, Planter } from "./planter";
 
 export class Plant extends Component {
     static componentType = "Plant";
@@ -32,6 +31,9 @@ export class Plant extends Component {
     bounds = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     fullyGrown = false;
     inView = false;
+    plantedIn?: Planter;
+    private tempPlantedIn?: number;
+
 
     constructor(parent: Entity) {
         super(parent);
@@ -41,6 +43,7 @@ export class Plant extends Component {
     }
 
     override init(): void {
+        if (this.tempPlantedIn) this.plantedIn = game.activeScene.findEntity(this.tempPlantedIn)?.getComponent(Planter);
         if (this.species.generatorConstructor === undefined) throw new Error("co se doje?");
         this.generator = new this.species.generatorConstructor(this);
         this.tooltipComponent = this.entity.getComponent(EntityTooltip);
@@ -56,15 +59,26 @@ export class Plant extends Component {
     }
 
     override toData(): ComponentData {
-        const data = { growth: this.growth, species: this.species.name, health: this.health };
+        const data = { growth: this.growth, species: this.species.name, health: this.health } as Parameters<this["applyData"]>[0];
+        if (this.plantedIn) data.plantedIn = this.plantedIn.entity.id;
         return super.toData(data);
     }
 
-    override applyData(data: { growth: number; species: string; health: number }): void {
+    override applyData(data: { growth: number; species: string; health: number, plantedIn?: number }): void {
         this.growth = data.growth;
         this.health = data.health ?? 1;
+        if (data.plantedIn) this.tempPlantedIn = data.plantedIn;
         //console.log(data.species);
         if (data.species) this.species = PlantSpecies.species.get(data.species)!;
+    }
+
+
+    get envirnonmentProvider(): IEvnironmentProvider {
+        if (this.plantedIn != undefined) return this.plantedIn.environment;
+        return {
+            atmo: game.atmo,
+            terrain: game.terrain
+        }
     }
 
     update(realDt: number) {
@@ -102,8 +116,8 @@ export class Plant extends Component {
             this.damage(1, "unknown reasons");
             return;
         }
-        let tdata = game.terrain.getProperties(this.transform.position.x);
-        let adata = game.atmo.getProperties(this.transform.position.x);
+        let tdata = this.envirnonmentProvider.terrain.getProperties(this.transform.position.x);
+        let adata = this.envirnonmentProvider.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
             this.tooltipComponent.tooltipName = this.species.name;
             this.tooltipComponent.tooltipData.set("treeHealth", parseFloat(this.health.toFixed(2)).toString());
@@ -131,10 +145,10 @@ export class Plant extends Component {
             let addedGrowth = dt * this.health * Math.min(tdata.fertility, tdata.moisture) * .2;
             this.growth += addedGrowth;
             game.score.add(addedGrowth);
-            game.terrain.consumeFertility(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.nutrients * 20);
-            game.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
-            game.terrain.fixErosion(this.transform.position.x + Math.random() * 60, addedGrowth * this.species.statsPerGrowth.erosion * .05);
-            game.terrain.removeMoisture(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.water * .02);
+            this.envirnonmentProvider.terrain.consumeFertility(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.nutrients * 20);
+            this.envirnonmentProvider.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
+            this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, addedGrowth * this.species.statsPerGrowth.erosion * .05);
+            this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.water * .02);
         }
         if (this.health > 0) {
             let requiredMoisture = dt * this.species.statsPerTime.water * this.growth * .05;
@@ -290,3 +304,5 @@ type BranchOptions = {
     length: number;
     thickness: number;
 }
+
+

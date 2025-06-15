@@ -101,4 +101,30 @@ export class Prefab {
         newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
         return newEntity;
     }
+
+
+    static Planter(params: PrefabParams) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Planter",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "vite.svg",
+                        },
+                    },
+                    {
+                        componentType: "Planter",
+                        data: {}
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
 }
