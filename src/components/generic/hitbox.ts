@@ -121,7 +121,7 @@ export class Hitbox extends Component {
         if (!convexPolygons) throw new Error("No convex polygons");
 
         for (const convexPolygon of convexPolygons) {
-            this.polygons.push(game.collisionSystem.createPolygon({ x: 0, y: 0 }, convexPolygon.map(node => new SATVector(node[0], node[1])), { userData: { material: SurfaceMaterial.metal } }));
+            this.polygons.push(game.collisionSystem.createPolygon({ x: 0, y: 0 }, convexPolygon.map(node => new SATVector(node[0], node[1])), { userData: { material: SurfaceMaterial.metal, interior: true } }));
         }
     }
 

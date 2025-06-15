@@ -1,4 +1,4 @@
-import { Application, Assets, AssetsManifest, Container, Graphics, Sprite, Ticker } from "pixi.js";
+import { Application, Assets, AssetsManifest, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -32,6 +32,7 @@ import { Shadowmap } from "./shaders/lighting/shadowmap";
 import { Score } from "./hierarchy/score";
 import { GameEventSystem } from "./hierarchy/eventSystem";
 import { MilestoneManager } from "./hierarchy/milestones";
+import { BuildingGhost } from "./hierarchy/buildingGhost";
 
 export let game: Game;
 
@@ -75,6 +76,8 @@ export class Game {
     bgLayers: PixelLayer[] = [];
     fgLayer!: PixelLayer;
     worldUiLayer!: PixelLayer;
+
+    buildingGhost!: BuildingGhost;
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -250,8 +253,12 @@ export class Game {
         this.worldUiContainer = this.worldUiLayer.container;
         this.worldUiGraphics = new Graphics({ parent: this.worldUiContainer });
 
+        this.buildingGhost = new BuildingGhost();
+
         Light.init();
         Lightmap.init();
+
+        UI.init();
 
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
@@ -271,7 +278,7 @@ export class Game {
         this.weather = new Weather();
 
 
-        UI.init();
+
         this.score.init();
         this.milestones.init();
         Debug.init();
@@ -312,7 +319,7 @@ export class Game {
         this.elapsedTime += dt;
 
         Shadowmap.update();
-        this.camera.processZoom(dt);
+        this.camera.processZoom(realDt);
         Lightmap.update();
         TimedShader.update(this.elapsedTime);
 
@@ -348,6 +355,7 @@ export class Game {
 
         if (!Debug.editorMode) {
             this.handleNormalInput();
+            this.buildingGhost.update();
             if (this.hacking) {
                 this.hacking.update();
             }
@@ -410,6 +418,12 @@ export class Game {
                     if (index == array.length) index = 0;
                     this.selectedSeed = array[index];
                 }
+                const species = PlantSpecies.species.get(this.selectedSeed)!;
+                Plant.plantGraphics({ graphics: this.buildingGhost.graphics, species: species, growth: Math.min(15, species.statsPerGrowth.maxGrowth), randomSeed: Math.random() * 1000, health: 1 });
+                this.buildingGhost.renderGraphics();
+                //this.buildingGhost.renderImage(Assets.get("biochar"))
+                this.buildingGhost.setEnabled(true);
+
             }
             /*if (this.input.keyDown("q")) {
                 let out = this.stateManager.serialise(StateMode.full);
@@ -450,14 +464,32 @@ export class Game {
             }
 
             if (this.selectedSeed) {
+                const tdata = this.terrain.getProperties(this.worldMouse.x);
+                if (tdata.fertility < 0.1) this.buildingGhost.valid = 1
+                else this.buildingGhost.valid = 2;
+                let hit = game.collisionSystem.raycast(Vector.fromLike(this.worldMouse).add({ x: 0, y: -20 }), Vector.fromLike(this.worldMouse).add({ x: 0, y: 50 }), (body) => { return body.userData?.terrain || body.userData?.interior });
+                if (hit) {
+                    const centerY = hit.body.minY + (hit.body.maxY - hit.body.minY) / 2;
+                    if (centerY < hit.point.y) {
+                        this.buildingGhost.valid = 0;
+                    }
+                    else {
+                        this.buildingGhost.snap = hit.point;
+                    }
+                }
+                else {
+                    this.buildingGhost.valid = 0;
+                }
                 this.tooltip.hover({ text: "SEED: " + this.selectedSeed });
-                if (this.input.mouse.getButtonUp(MouseButton.Left)) {
-                    let tree = Prefab.Plant({ x: this.worldMouse.x, y: this.worldMouse.y, species: this.selectedSeed, scene: this.activeScene })!;
+                if (this.input.mouse.getButtonUp(MouseButton.Left) && this.buildingGhost.valid != 0) {
+                    let tree = Prefab.Plant({ x: this.buildingGhost.container.position.x, y: this.buildingGhost.container.position.y, species: this.selectedSeed, scene: this.activeScene })!;
                     tree.getComponent(Plant)!.growth = 2;
                     this.selectedSeed = undefined;
                     this.events.emit("playerBuild", tree);
+                    this.buildingGhost.setEnabled(false);
                 }
                 if (this.input.mouse.getButtonUp(MouseButton.Right)) {
+                    this.buildingGhost.setEnabled(false);
                     this.selectedSeed = undefined;
                 }
             }

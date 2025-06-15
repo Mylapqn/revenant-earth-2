@@ -133,7 +133,7 @@ export class Plant extends Component {
             game.score.add(addedGrowth);
             game.terrain.consumeFertility(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.nutrients * 20);
             game.atmo.co2 -= addedGrowth * this.species.statsPerGrowth.co2;
-            game.terrain.fixErosion(this.transform.position.x + Math.random()*60, addedGrowth * this.species.statsPerGrowth.erosion * .05);
+            game.terrain.fixErosion(this.transform.position.x + Math.random() * 60, addedGrowth * this.species.statsPerGrowth.erosion * .05);
             game.terrain.removeMoisture(this.transform.position.x, addedGrowth * this.species.statsPerGrowth.water * .02);
         }
         if (this.health > 0) {
@@ -155,7 +155,7 @@ export class Plant extends Component {
             let seedPos = this.transform.position.x + (80 * Math.random() - 40) * 10;
             let seedValid = true;
             for (const plant of Plant.list) {
-                if (Math.abs(plant.entity.transform.position.x - seedPos) < 5) {
+                if (Math.abs(plant.entity.transform.position.x - seedPos) < 10) {
                     seedValid = false;
                     break;
                 }
@@ -185,14 +185,14 @@ export class Plant extends Component {
         }
     }
 
-    branch(options: BranchOptions) {
+    static branch(options: BranchOptions) {
         const random = options.random;
         let angle = options.angle;
         let length = options.length;
         let thickness = options.thickness;
         let pos = options.position;
         let growth = options.growth;
-        const color = this.species.generatorData.leaves ? CustomColor.randomAroundHSL(random, 20, 5, 0.3, 0.1, 0.3, 0.1).toPixi() : CustomColor.randomAroundHSL(random, 130 * this.health, 10, 0.4 * this.health + .3, 0.2, 0.3, 0.05).toPixi();
+        const color = options.species.generatorData.leaves ? CustomColor.randomAroundHSL(random, 20, 5, 0.3, 0.1, 0.3, 0.1).toPixi() : CustomColor.randomAroundHSL(random, 130 * options.health, 10, 0.4 * options.health + .3, 0.2, 0.3, 0.05).toPixi();
         for (let i = 0; i < growth; i++) {
             let remainingGrowth = growth - i;
             let radius = remainingGrowth * .2 + 1 * thickness;
@@ -201,7 +201,7 @@ export class Plant extends Component {
                 let angleOffset = (newRandom.float() - .5) * .6 * Math.PI;
                 thickness = Math.max(2, thickness);
                 if (i > growth * .2) {
-                    this.branch({ angle: angle + angleOffset, length: length, position: pos.clone(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * .5 });
+                    this.branch({ angle: angle + angleOffset, length: length, position: pos.clone(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * .5, species: options.species, graphics: options.graphics, health: options.health });
                 }
                 angle -= angleOffset;
                 thickness /= 2;
@@ -209,25 +209,25 @@ export class Plant extends Component {
             angle += (random.float() - .5) * .2 * Math.PI;
             //move angle towards default
             angle = lerp(angle, -Math.PI / 2, .15);
-            this.graphics.moveTo(pos.x, pos.y);
+            options.graphics.moveTo(pos.x, pos.y);
             const lengthMult = Math.min(1, remainingGrowth);
             pos.add(Vector.fromAngle(angle).mult(length * lengthMult));
-            this.graphics.lineTo(pos.x, pos.y);
-            this.graphics.stroke({ color: color, width: radius });
-            this.graphics.circle(pos.x, pos.y, radius / 2);
-            this.graphics.fill(color);
+            options.graphics.lineTo(pos.x, pos.y);
+            options.graphics.stroke({ color: color, width: radius });
+            options.graphics.circle(pos.x, pos.y, radius / 2);
+            options.graphics.fill(color);
         }
         const leavesRandom = random.child();
-        if (growth > 1 && this.species.generatorData.leaves) {
+        if (growth > 1 && options.species.generatorData.leaves) {
             const offset = 5 + growth * .08;
             for (let i = 0; i < 3 + growth * 2; i++) {
                 const xOff = leavesRandom.range(-offset, offset);
                 const yOff = leavesRandom.range(-offset, offset);
-                if (leavesRandom.float() < this.health)
-                    this.graphics.circle(pos.x + xOff, pos.y + yOff, 2.5 * this.health);
+                if (leavesRandom.float() < options.health)
+                    options.graphics.circle(pos.x + xOff, pos.y + yOff, 2.5 * options.health);
             }
-            const color = CustomColor.randomAroundHSL(leavesRandom, 130 * this.health, 10, 0.4 * this.health + .3, 0.2, 0.3, 0.05).toPixi();
-            this.graphics.fill(color);
+            const color = CustomColor.randomAroundHSL(leavesRandom, 130 * options.health, 10, 0.4 * options.health + .3, 0.2, 0.3, 0.05).toPixi();
+            options.graphics.fill(color);
         }
     }
 
@@ -236,34 +236,31 @@ export class Plant extends Component {
         if (hit) {
             this.entity.transform.position.y = hit.point.y;
         }
-        this.graphics.clear();
-        const branchAmount = Math.max(1, Math.min(this.growth * 5, this.species.generatorData.initialBranches));
+        Plant.plantGraphics({ graphics: this.graphics, species: this.species, growth: this.growth, randomSeed: this.randomSeed, health: this.health });
+        this.shaderMeshComponent.draw();
+        this.bounds = this.shaderMeshComponent.renderMesh.getLocalBounds();
+    }
+
+    static plantGraphics(options: { graphics: Graphics; species: PlantSpecies, growth: number, randomSeed: number, health: number }) {
+        options.graphics.clear();
+        const branchAmount = Math.max(1, Math.min(options.growth * 5, options.species.generatorData.initialBranches));
         let x = 0;
-        const random = new RandomGenerator(this.randomSeed);
+        const random = new RandomGenerator(options.randomSeed);
         for (let i = 0; i < branchAmount; i++) {
             this.branch({
-                growth: this.growth,
+                growth: options.growth,
                 angle: -Math.PI / 2,
-                length: this.species.generatorData.lengthPerGrowth,
+                length: options.species.generatorData.lengthPerGrowth,
                 position: new Vector(x, 0),
                 random: random.child(),
-                thickness: 1
+                thickness: 1,
+                graphics: options.graphics,
+                species: options.species,
+                health: options.health
             });
             x = random.int(-10, 10);
         }
-
-        //this.graphics.lineTo(0, -this.growth * 20);
-        //this.graphics.stroke({ color: 0x773300, width: this.growth });
-        //let y = -this.growth * 15;
-        //for (let i = 1; i <= this.growth; i++) {
-        //    let radius = (this.growth - i + 1) * 5
-        //    this.graphics.circle(0, y, radius);
-        //    y -= radius
-        //}
-        //this.graphics.stroke({ color: 0x449900, width: 2 });
-        //this.graphics.fill(0x338800);
-        this.shaderMeshComponent.draw();
-        this.bounds = this.shaderMeshComponent.renderMesh.getLocalBounds();
+        return options.graphics;
     }
 
     remove() {
@@ -283,6 +280,9 @@ export class Plant extends Component {
 }
 
 type BranchOptions = {
+    health: number;
+    graphics: Graphics;
+    species: PlantSpecies;
     growth: number;
     random: RandomGenerator;
     position: Vector;

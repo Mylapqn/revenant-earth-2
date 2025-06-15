@@ -5,12 +5,14 @@ import { ParticleText } from "../../hierarchy/particleText";
 import { UIElement, UIPanel } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
+import { Interactable } from "../generic/interactable";
 
 export class Door extends Component {
     static componentType = "Door";
     targetScene: string = "None";
     doorId: string = "default-door";
     enabled: boolean = true;
+    interactable!: Interactable;
 
     constructor(parent: Entity) {
         super(parent);
@@ -20,6 +22,9 @@ export class Door extends Component {
 
     override init(): void {
         //game.player.position.set(...this.transform.position.xy());
+        this.interactable = this.entity.getComponent(Interactable)!;
+        this.interactable.setText("Enter");
+        this.interactable.offset = new Vector(0, -15);
     }
 
     override toData(): ComponentData {
@@ -52,6 +57,7 @@ export class Door extends Component {
     }
 
     update(dt: number) {
+        //this.interactable.enabled = this.enabled;
     }
     debugOptions(buttons: UIElement[]): UIElement[] {
         buttons.push(new UIButton(`Go through`, () => { this.enter() }));

@@ -116,26 +116,26 @@ export class Camera {
     }
 
     worldToScreen(v: Vectorlike) {
-        return new Vector(v.x, v.y).mult(Game.pixelScale).sub(this.position).add(this.middle);
+        return new Vector(v.x, v.y).mult(Game.pixelScale).sub(this.position).add(this.middle).mult(this.zoom);
     }
     screenToWorld(v: Vectorlike) {
         return new Vector(v.x, v.y).mult(1 / this.zoom).add(this.position).sub(this.middle).mult(1 / Game.pixelScale);
     }
     screenToRender(v: Vectorlike) {
-        return new Vector(v.x, v.y).vecdiv(this.viewport)
+        return new Vector(v.x, v.y).vecdiv(this.screen)
     }
     renderToScreen(v: Vectorlike) {
-        return new Vector(v.x, v.y).vecmult(this.viewport)
+        return new Vector(v.x, v.y).vecmult(this.screen)
     }
     worldToRender(v: Vectorlike) {
         return this.screenToRender(this.worldToScreen(v));
     }
     inViewX(x: number, padding = 0) {
-        const screenPosX = x * Game.pixelScale - this.position.x + this.middle.x;
+        const screenPosX = (x * Game.pixelScale - this.position.x + this.middle.x) * this.zoom;
         return screenPosX > -padding && screenPosX < this.screen.x + padding;
     }
     inViewY(y: number, padding = 0) {
-        const screenPosY = y * Game.pixelScale - this.position.y + this.middle.y;
+        const screenPosY = (y * Game.pixelScale - this.position.y + this.middle.y) * this.zoom;
         return screenPosY > -padding && screenPosY < this.screen.y + padding;
     }
     inView(v: Vectorlike, padding = 0) {

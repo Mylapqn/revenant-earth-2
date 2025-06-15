@@ -151,3 +151,21 @@ export class UIContextMenu extends UIPanel {
         super.remove();
     }
 }
+
+export class UIWorldSpaceElement extends UIElement {
+    constructor(type: string, position: Vector, ...classes: string[]) {
+        super(type, ...classes);
+        this.htmlElement.style.position = "absolute";
+    }
+    setWorldPosition(position: Vector) {
+        if (game.camera.inViewX(position.x, 200)) {
+            const screenPos = game.camera.worldToScreen(position);
+            this.htmlElement.style.display = "";
+            this.htmlElement.style.left = screenPos.x + "px";
+            this.htmlElement.style.top = screenPos.y + "px";
+        }
+        else {
+            this.htmlElement.style.display = "none";
+        }
+    }
+}

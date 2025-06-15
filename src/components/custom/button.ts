@@ -5,6 +5,7 @@ import { ParticleText } from "../../hierarchy/particleText";
 import { UIElement } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
+import { Interactable } from "../generic/interactable";
 
 export class Button extends Component {
     static componentType = "Button";
@@ -18,6 +19,7 @@ export class Button extends Component {
 
     override init(): void {
         //game.player.position.set(...this.transform.position.xy());
+        this.entity.getComponent(Interactable)?.setText("Activate");
     }
 
     override toData(): ComponentData {
