@@ -156,7 +156,8 @@ export class Plant extends Component {
                 usedGrowth += addedGrowth;
             }
             this.envirnonmentProvider.terrain.consumeFertility(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.nutrients * 30);
-            this.envirnonmentProvider.atmo.co2 -= usedGrowth * this.species.statsPerGrowth.co2;
+            this.envirnonmentProvider.atmo.co2 -= usedGrowth * this.species.statsPerGrowth.co2 * .1;
+            this.envirnonmentProvider.atmo.co2 = clamp(this.envirnonmentProvider.atmo.co2, 200, 800);
             this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, usedGrowth * this.species.statsPerGrowth.erosion * .05);
             this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.water * .01);
         }

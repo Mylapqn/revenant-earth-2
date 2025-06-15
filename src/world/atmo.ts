@@ -29,7 +29,7 @@ export class Atmo implements ISerializable, ISceneObject {
 
     defaultAtmo(width: number) {
         for (let index = 0; index < width; index++) {
-            this.atmoData.push({ pollution: 1 });
+            this.atmoData.push({ pollution: .5 });
         }
     }
 

@@ -4,6 +4,7 @@ import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Terrain } from "../../world/terrain";
 import { Vector } from "../../utils/vector";
+import { Debug } from "../../dev/debug";
 
 export class Pollution extends Component {
     static componentType = "Pollution";
@@ -38,6 +39,7 @@ export class Pollution extends Component {
             adata.pollution += pollute;
             this.totalPolluted += pollute;
         }
+        Debug.log(this.totalPolluted);
         if (this.totalPolluted > this.nextText) {
             this.nextText += 1;
             new ParticleText("+1 pollution", this.transform.position.clone().add(new Vector(0, -40)));

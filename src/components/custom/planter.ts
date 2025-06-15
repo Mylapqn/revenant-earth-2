@@ -61,6 +61,11 @@ export class Planter extends Component {
 
     readonly radius = 30;
 
+    remove(): void {
+        game.collisionSystem.remove(this.collider);
+        super.remove();
+    }
+
     update(dt: number) {
         this.collider.setOffset(new SATVector(this.transform.position.x, this.transform.position.y));
         if (this.transform.position.distanceSquared(game.worldMouse) < this.radius ** 2) {

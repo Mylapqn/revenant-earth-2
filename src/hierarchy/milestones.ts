@@ -79,18 +79,19 @@ export class Milestone {
         game.milestones.displayQuests();
         this.parent?.checkChildren();
 
-        await sleep(5000 * waitMult);
+        await sleep(4000 * waitMult);
         panel.htmlElement.classList.remove("appear");
         await sleep(3000);
         panel.remove();
     }
-    checkChildren() {
+    async checkChildren() {
         for (let i = 1; i < this.children.length; i++) {
             if (this.children[i - 1].completed) this.children[i].enabled = true;
         }
         for (const child of this.children) {
             if (!child.completed) return false;
         }
+        await sleep(7000);
         this.complete();
     }
 }
