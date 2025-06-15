@@ -62,6 +62,9 @@ export class UITooltip {
                     const textElement = UI.customDiv(this.parentElement, "panel");
                     textElement.innerText = data[0].text;
                 }
+                if (data[0].customClasses) {
+                    this.parentElement.classList.add(...data[0].customClasses);
+                }
                 return;
             }
             for (const panel of data) {
@@ -94,6 +97,9 @@ export class UITooltip {
         if (data.highlight) {
             panelElement.classList.add("highlight");
         }
+        if (data.customClasses) {
+            panelElement.classList.add(...data.customClasses);
+        }
         return panelElement;
     }
 }
@@ -103,4 +109,5 @@ export type TooltipPanel = {
     text?: string;
     columns?: TooltipPanel[];
     highlight?: boolean;
+    customClasses?: string[];
 }

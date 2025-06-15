@@ -195,11 +195,13 @@ export class Terrain implements ISerializable, ISceneObject {
 
         const editedNodes = new Set<TerrainNode>();
         let prev = this.nodes[0];
+        const radius = 20;
+        const strength = 100;
         for (const node of this.nodes) {
-            if (node.distance(game.worldMouse) < 30 && game.input.mouse.getButton(MouseButton.Left) && !Debug.movingEntity && game.inputEnabled) {
+            if (node.distance(game.worldMouse) < radius && game.input.mouse.getButton(MouseButton.Left) && !Debug.movingEntity && game.inputEnabled) {
                 const dir = node.diff(game.worldMouse);
-                const length = dir.length() / 30;
-                node.add(dir.normalize().mult((1 - length) * (1 - length) * 10));
+                const length = dir.length() / radius;
+                node.add(dir.normalize().mult((1 - length) * (1 - length) * strength * dt));
                 editedNodes.add(node);
                 editedNodes.add(prev);
                 if (node.next) editedNodes.add(node.next);

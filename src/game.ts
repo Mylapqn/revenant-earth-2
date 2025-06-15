@@ -14,7 +14,7 @@ import { ParticleText } from "./hierarchy/particleText";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input, MouseButton } from "./input";
 import { TimedShader } from "./shaders/timedShader";
-import { UITooltip } from "./ui/tooltip";
+import { TooltipPanel, UITooltip } from "./ui/tooltip";
 import { Prefab } from "./hierarchy/prefabs";
 import { Atmo } from "./world/atmo";
 import { PlantSpecies } from "./plants/plantSpecies";
@@ -33,6 +33,7 @@ import { Score } from "./hierarchy/score";
 import { GameEventSystem } from "./hierarchy/eventSystem";
 import { MilestoneManager } from "./hierarchy/milestones";
 import { BuildingGhost } from "./hierarchy/buildingGhost";
+import { Buildable } from "./hierarchy/buildable";
 
 export let game: Game;
 
@@ -78,6 +79,7 @@ export class Game {
     worldUiLayer!: PixelLayer;
 
     buildingGhost!: BuildingGhost;
+    currentBuildable?: Buildable;
 
     collisionSystem!: System;
     tooltip!: UITooltip;
@@ -194,6 +196,7 @@ export class Game {
             lengthPerGrowth: 4,
             leaves: true
         });
+        Buildable.plantBuildable(PlantSpecies.species.get("Tree")!);
         new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: .1, erosion: 4, maxGrowth: 7 },
             { pollution: 0, water: 3, pollutionDamage: .5 },
             {
@@ -202,6 +205,7 @@ export class Game {
                 leaves: false
             }
         );
+        Buildable.plantBuildable(PlantSpecies.species.get("Grass")!);
 
 
         this.skyContainer = new Container({ parent: this.app.stage });
@@ -418,11 +422,7 @@ export class Game {
                     if (index == array.length) index = 0;
                     this.selectedSeed = array[index];
                 }
-                const species = PlantSpecies.species.get(this.selectedSeed)!;
-                Plant.plantGraphics({ graphics: this.buildingGhost.graphics, species: species, growth: Math.min(15, species.statsPerGrowth.maxGrowth), randomSeed: Math.random() * 1000, health: 1 });
-                this.buildingGhost.renderGraphics();
-                //this.buildingGhost.renderImage(Assets.get("biochar"))
-                this.buildingGhost.setEnabled(true);
+                Buildable.activate("Seed: " + this.selectedSeed);
 
             }
             /*if (this.input.keyDown("q")) {
@@ -463,34 +463,30 @@ export class Game {
                 new ParticleText(Terrain.inspectModes[this.terrain.inspectMode], this.player.position);
             }
 
-            if (this.selectedSeed) {
-                const tdata = this.terrain.getProperties(this.worldMouse.x);
-                if (tdata.fertility < 0.1) this.buildingGhost.valid = 1
-                else this.buildingGhost.valid = 2;
-                let hit = game.collisionSystem.raycast(Vector.fromLike(this.worldMouse).add({ x: 0, y: -20 }), Vector.fromLike(this.worldMouse).add({ x: 0, y: 50 }), (body) => { return body.userData?.terrain || body.userData?.interior });
-                if (hit) {
-                    const centerY = hit.body.minY + (hit.body.maxY - hit.body.minY) / 2;
-                    if (centerY < hit.point.y) {
-                        this.buildingGhost.valid = 0;
-                    }
-                    else {
-                        this.buildingGhost.snap = hit.point;
+            if (this.currentBuildable) {
+                const result = this.currentBuildable.checkPosition(this.worldMouse);
+                if (result.valid) {
+                    this.buildingGhost.valid = result.warning ? 1 : 2;
+                    this.buildingGhost.snap = result.snap;
+                    if (this.input.mouse.getButtonUp(MouseButton.Left)) {
+                        const entity = this.currentBuildable.onBuild(result.snap!);
+                        this.events.emit("playerBuild", entity);
+                        this.currentBuildable.deactivate();
                     }
                 }
                 else {
                     this.buildingGhost.valid = 0;
-                }
-                this.tooltip.hover({ text: "SEED: " + this.selectedSeed });
-                if (this.input.mouse.getButtonUp(MouseButton.Left) && this.buildingGhost.valid != 0) {
-                    let tree = Prefab.Plant({ x: this.buildingGhost.container.position.x, y: this.buildingGhost.container.position.y, species: this.selectedSeed, scene: this.activeScene })!;
-                    tree.getComponent(Plant)!.growth = 2;
-                    this.selectedSeed = undefined;
-                    this.events.emit("playerBuild", tree);
-                    this.buildingGhost.setEnabled(false);
+                    this.buildingGhost.snap = undefined;
                 }
                 if (this.input.mouse.getButtonUp(MouseButton.Right)) {
-                    this.buildingGhost.setEnabled(false);
-                    this.selectedSeed = undefined;
+                    this.currentBuildable.deactivate();
+                }
+                if (this.currentBuildable) {
+                    const tooltips: TooltipPanel[] = [{ text: this.currentBuildable.name, highlight: true }];
+                    if (result.reason && !result.valid) tooltips.push({ text: "CANNOT PLACE: " + result.reason, customClasses: ["error"] });
+                    if (result.reason && result.valid) tooltips.push({ text: result.reason });
+                    if (result.warning) tooltips.push({ text: "WARNING:\n" + result.warning, customClasses: ["warning"] });
+                    this.tooltip.hover(...tooltips);
                 }
             }
         }
