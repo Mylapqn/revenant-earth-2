@@ -23,22 +23,25 @@ export class TerrainAlign extends Component {
         this.entity.off("update", (dt) => this.update(dt));
         super.remove();
     }
+    init() {
+        this.align();
+    }
     update(dt: number) {
 
         if (game.camera.inViewX(this.transform.position.x, 200)) {
-            //this.accumulation += dt;
             if (!this.inView) {
-                //this.accumulation = 0;
-                let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -1000 }), this.entity.transform.position.clone().add({ x: 0, y: 1000 }), (body) => { return body.userData?.terrain });
-                if (hit) {
-                    this.entity.transform.position.y = hit.point.y - this.yOffset;
-                }
+                this.align();
             }
             this.inView = true;
         }
         else {
             this.inView = false;
-            //this.accumulation = 1;
+        }
+    }
+    align() {
+        let hit = game.collisionSystem.raycast(this.entity.transform.position.clone().add({ x: 0, y: -1000 }), this.entity.transform.position.clone().add({ x: 0, y: 1000 }), (body) => { return body.userData?.terrain });
+        if (hit) {
+            this.entity.transform.position.y = hit.point.y - this.yOffset;
         }
     }
 }

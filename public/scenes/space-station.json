@@ -662,7 +662,7 @@
                     },
                     "keepStats": {
                         "terrainData": {
-                            "moisture":0.9
+                            "moisture": 0.9
                         }
                     }
                 }
@@ -722,6 +722,58 @@
                         "x": 0,
                         "y": 0
                     }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "name": "Director",
+        "component": [
+            {
+                "id": 46,
+                "componentType": "AnimatedSprite",
+                "data": {
+                    "asset": "./anim/director.json"
+                }
+            },
+            {
+                "id": 47,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -166,
+                        "y": 16
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 48,
+                "componentType": "SpriteDirection",
+                "data": {
+                    "direction": -1
+                }
+            },
+            {
+                "id": 49,
+                "componentType": "Interactable",
+                "data": {
+                    "text": "Talk",
+                    "offset": {
+                        "x": 0,
+                        "y": -24
+                    }
+                }
+            },
+            {
+                "id": 49,
+                "componentType": "TalkComponent",
+                "data": {
+                    "talkId": "spaceDirector"
                 }
             }
         ]

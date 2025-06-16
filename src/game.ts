@@ -154,6 +154,7 @@ export class Game {
                 {
                     name: "bundle", assets: [
                         { alias: "player_anim", src: "./anim/player2.json" },
+                        { alias: "director_anim", src: "./anim/director.json" },
                         { alias: "bg", src: "./bg2.png" },
                         { alias: "metal_bg", src: "./interior_bg.png" },
                         { alias: "space", src: "./space_tile.png" },
@@ -278,14 +279,15 @@ export class Game {
         this.defaultScene();
 
 
-        Entity.fromData({ kind: "Entity", name: "Global",
+        Entity.fromData({
+            kind: "Entity", name: "Global",
             component: [
                 {
                     componentType: "Inventory",
                     data: {}
                 }
             ]
-         }, this.globalScene);
+        }, this.globalScene);
 
         this.tooltip = new UITooltip();
 
