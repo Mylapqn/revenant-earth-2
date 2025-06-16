@@ -3,7 +3,7 @@ import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
 import { UI, UIElement, UIWorldSpaceElement } from "../../ui/ui";
-import { Vector } from "../../utils/vector";
+import { Vector, Vectorlike } from "../../utils/vector";
 import { BasicSprite } from "./basicSprite";
 
 export class Interactable extends Component {
@@ -26,13 +26,16 @@ export class Interactable extends Component {
         this.spriteComponent = this.entity.getComponent(BasicSprite);
     }
 
-    applyData(data?: { text?: string }): void {
+    applyData(data?: { text?: string, offset?: Vectorlike }): void {
         this.htmlElement = new UIWorldSpaceElement("div", new Vector());
         UI.container.appendChild(this.htmlElement.htmlElement);
 
         this.promptElement = UIElement.create({ type: "div", parent: this.htmlElement.htmlElement, classes: ["prompt"], content: "F" });
         this.promptTextElement = UIElement.create({ type: "div", parent: this.htmlElement.htmlElement, classes: ["prompt-text"], content: "Interact" });
-        if(data?.text) this.setText(data.text);
+        data = data ?? {};
+        this.setText(data.text ?? "Interact");
+        this.offset = Vector.fromLike(data.offset ?? { x: 0, y: 0 });
+
 
         super.applyData(data);
     }
@@ -45,7 +48,7 @@ export class Interactable extends Component {
     setText(text: string) { this.promptTextElement.htmlElement.innerHTML = text; }
 
     update(dt: number) {
-        if(!this.enabled){
+        if (!this.enabled) {
             this.htmlElement.htmlElement.style.display = "none";
             return;
         }

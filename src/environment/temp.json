@@ -1,0 +1,32 @@
+{
+    "kind": "Entity",
+    "id": 10,
+    "name": "Window",
+    "component": [
+        {
+            "id": 43,
+            "componentType": "AnimatedSprite",
+            "data": {
+                "asset": "./anim/director.json"
+            }
+        },
+        {
+            "id": 44,
+            "componentType": "Transform",
+            "data": {
+                "position": {
+                    "x": -163,
+                    "y": 16
+                },
+                "velocity": {
+                    "x": 0,
+                    "y": 0
+                }
+            }
+        },
+        {
+            "id": 45,
+            "componentType": "SpriteDirection"
+        }
+    ]
+}

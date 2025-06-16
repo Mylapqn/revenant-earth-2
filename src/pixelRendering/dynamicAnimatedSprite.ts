@@ -1,7 +1,7 @@
 import { AnimatedSprite, Spritesheet } from "pixi.js";
 
 export class DynamicAnimatedSprite extends AnimatedSprite {
-    spritesheet:Spritesheet;
+    spritesheet: Spritesheet;
     constructor(spritesheet: Spritesheet) {
         spritesheet.textureSource.scaleMode = "nearest";
         if (spritesheet.data.meta.frameTags) {
@@ -12,10 +12,11 @@ export class DynamicAnimatedSprite extends AnimatedSprite {
                 }
             }
         }
-        super({ textures: [spritesheet.textures[0]], autoUpdate: true});
+        super({ textures: [spritesheet.textures[0]], autoUpdate: true });
         AnimatedSprite
         this.animationSpeed = .15;
         this.spritesheet = spritesheet;
+        this.swapAnimation(spritesheet.data.meta.frameTags![0].name);
     }
     swapAnimation(animationName: string) {
         if (this.textures === this.spritesheet.animations[animationName]) return;

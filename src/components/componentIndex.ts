@@ -18,6 +18,8 @@ import { TerrainAlign } from "./generic/terrainAlign";
 import { Trigger } from "./generic/trigger";
 import { Planter } from "./custom/planter";
 import { Inventory } from "./generic/inventory";
+import { AnimatedSpriteRenderer } from "./generic/animatedSprite";
+import { TalkComponent } from "./generic/talk";
 
 
 export function initComponents(){
@@ -40,4 +42,6 @@ export function initComponents(){
     Component.register(Trigger);
     Component.register(Planter);
     Component.register(Inventory);
+    Component.register(AnimatedSpriteRenderer);
+    Component.register(TalkComponent);
 }
