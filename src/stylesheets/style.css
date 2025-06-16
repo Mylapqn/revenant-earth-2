@@ -258,6 +258,7 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    /*will-change: width, contents, transform;*/
 }
 
 .talk.appear {
@@ -271,4 +272,8 @@ button:hover {
     text-transform: uppercase;
     min-width: 300px;
     text-shadow: black 2px 2px 4px;
+}
+
+.hidden {
+    display: none;
 }

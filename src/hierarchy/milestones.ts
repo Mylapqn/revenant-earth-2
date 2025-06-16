@@ -1,6 +1,7 @@
 import { Door } from "../components/custom/door";
 import { Plant } from "../components/custom/plant";
 import { Planter } from "../components/custom/planter";
+import { TalkComponent } from "../components/generic/talk";
 import { game } from "../game";
 import { UI, UIElement, UIPanel } from "../ui/ui";
 import { sleep } from "../utils/utils";
@@ -11,7 +12,7 @@ export type SubMilestoneOptions = {
     reward: number,
     parent?: Milestone,
     details?: string,
-    onComplete?: () => void
+    onComplete?: (data?: any) => void
 };
 
 export type MilestoneOptions = SubMilestoneOptions & {
@@ -31,7 +32,7 @@ export class Milestone {
     sequential = true;
     enabled = true;
     details?: string;
-    onComplete?: () => void;
+    onComplete?: (data?: any) => void;
     public get completed() {
         return this._completed;
     }
@@ -57,7 +58,7 @@ export class Milestone {
         game.milestones.milestones.set(this.id, this);
         this.reward = reward ?? 0;
     }
-    async complete(detailsText?: string) {
+    async complete(detailsText?: string, data?: any) {
         const waitMult = 1;
         if (this._completed) return;
         if (this.tier != game.milestones.currentTier || !this.enabled) return;
@@ -74,7 +75,7 @@ export class Milestone {
         title.htmlElement.classList.add("appear");
         details.htmlElement.classList.add("appear");
         game.score.addWithFx(this.reward, { x: .5, y: .15 });
-        if (this.onComplete) this.onComplete();
+        if (this.onComplete) this.onComplete(data);
 
         game.milestones.displayQuests();
         this.parent?.checkChildren();
@@ -117,7 +118,7 @@ export class MilestoneManager {
             ]
         });
         const tutorialQuest = new Milestone({
-            name: "Tutorial", id: "tutorial", reward: 1000, tier: 0, subTasks: [
+            name: "Introduction", id: "tutorial", reward: 1000, tier: 0, subTasks: [
                 {
                     name: "Try your movement", id: "tutMovement", reward: 0, details: "Use WASD to move around. Reach the room on the right to continue.",
                     onComplete: () => {
@@ -125,6 +126,12 @@ export class MilestoneManager {
                         game.camera.zoomSpeed = 1;
                         game.activeScene.findEntityByName("PlanterGood")!.getComponent(Planter)!.enabled = true;
                         game.activeScene.findEntityByName("PlanterBad")!.getComponent(Planter)!.enabled = false;
+                    }
+                },
+                {
+                    name: "Talk to the UNERA director", id: "tutTalk", reward: 0, details: "Press F to interact with the director. He will give you some instructions.",
+                    onComplete: (data:TalkComponent) => {
+                        data.talkId = "spaceDirectorTutorial";
                     }
                 },
                 {
@@ -160,6 +167,9 @@ export class MilestoneManager {
             if (triggerName == "movementComplete") this.completeQuest("tutMovement");
             if (triggerName == "planetLanding") this.completeQuest("tutPlanet");
         })
+        game.events.on("talkEnd", talk => {
+            if (talk.talkId == "spaceDirectorGreeting") this.completeQuest("tutTalk", "", talk);
+        })
         this.displayQuests();
     }
     displayQuests() {
@@ -180,5 +190,5 @@ export class MilestoneManager {
         }
     }
     getQuest(id: string) { return this.milestones.get(id); }
-    completeQuest(id: string, detailsText?: string) { this.milestones.get(id)?.complete(detailsText); }
+    completeQuest(id: string, detailsText?: string, data?: any) { this.milestones.get(id)?.complete(detailsText, data); }
 }

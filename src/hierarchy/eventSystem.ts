@@ -1,4 +1,5 @@
 import { Plant } from "../components/custom/plant";
+import { TalkComponent } from "../components/generic/talk";
 import { Entity } from "./entity";
 
 export type GameEvents = {
@@ -8,6 +9,7 @@ export type GameEvents = {
     plantGrow: [Plant],
     triggerEnter: [string],
     triggerExit: [string],
+    talkEnd: [TalkComponent]
 }
 
 export type Callback<T extends keyof GameEvents> = (...args: GameEvents[T]) => void;

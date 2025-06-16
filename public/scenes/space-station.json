@@ -773,7 +773,7 @@
                 "id": 49,
                 "componentType": "TalkComponent",
                 "data": {
-                    "talkId": "spaceDirector"
+                    "talkId": "spaceDirectorGreeting"
                 }
             }
         ]

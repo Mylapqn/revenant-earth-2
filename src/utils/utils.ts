@@ -47,4 +47,6 @@ export const placeholderGeometry = new Geometry({ attributes: { aPosition: [0, 1
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+export const nextFrame = () => new Promise((r) => requestAnimationFrame(r));
+
 export const limitAbs = (n: number, max: number) => Math.sign(n) * Math.min(Math.abs(n), max);
