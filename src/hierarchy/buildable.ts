@@ -1,4 +1,4 @@
-import { Texture } from "pixi.js";
+import { Assets, Texture } from "pixi.js";
 import { game } from "../game";
 import { PlantSpecies } from "../plants/plantSpecies";
 import { Vector, Vectorlike } from "../utils/vector";
@@ -95,6 +95,7 @@ export class Buildable {
         });
     }
 
+
     activate() {
         game.buildingGhost.setEnabled(true);
         this.drawGhost();
@@ -112,5 +113,16 @@ export class Buildable {
             buildable.activate();
         }
         if (!buildable) console.error("Buildable not found: " + name);
+    }
+
+    static async initBuildables() {
+        new Buildable({
+            name: "Sprinkler",
+            onBuild: (position) => {
+                const prefab = Prefab.SprinklerArray({ position: position, scene: this.activeScene })[0];
+                return prefab;
+            },
+            texture: await Assets.load("./gfx/building/biochar.png"),
+        })
     }
 }

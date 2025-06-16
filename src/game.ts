@@ -213,6 +213,8 @@ export class Game {
         );
         Buildable.plantBuildable(PlantSpecies.species.get("Grass")!);
 
+        await Buildable.initBuildables();
+
 
         this.skyContainer = new Container({ parent: this.app.stage });
         this.mainContainer = new Container({ parent: this.app.stage });
@@ -463,7 +465,7 @@ export class Game {
             }
 
             if (this.input.keyDown("c")) {
-                Prefab.SprinklerArray({ x: this.worldMouse.x, y: this.worldMouse.y, scene: this.activeScene });
+                Buildable.activate("Sprinkler");
             }
 
             if (this.input.keyDown("+")) {
