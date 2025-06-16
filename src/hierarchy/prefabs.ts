@@ -1,3 +1,4 @@
+import { SprinklerCore } from "../components/custom/sprinklerCore";
 import { game } from "../game";
 import { Entity } from "./entity";
 import { Scene } from "./scene";
@@ -100,6 +101,94 @@ export class Prefab {
 
         newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
         return newEntity;
+    }
+
+
+    static SprinklerCore(params: PrefabParams) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "SprinklerCore",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "window_big.png",
+                        },
+                    },
+                    {
+                        componentType: "SprinklerCore",
+                        data: {}
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20
+                        }
+                    },
+                    {
+                        componentType: "Interactable",
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
+
+    static SprinklerParts(params: PrefabParams & { core?: Entity }) {
+
+        let parentData = {};
+        if (params.core) {
+            parentData = {
+                sprinklerCore: params.core.id
+            }
+        }
+
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Sprinkler",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "vite.svg",
+                        },
+                    },
+                    {
+                        componentType: "Sprinkler",
+                        data: {
+                            ...parentData
+                        }
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 0
+                        }
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
+
+    static SprinklerArray(params: PrefabParams) {
+        const parts: Array<Entity> = [];
+        const core = Prefab.SprinklerCore(params);
+        parts.push(core);
+        for (let i = -1; i < 2; i++) {
+            const part = Prefab.SprinklerParts({ ...params, x: core.transform.position.x + (i * 30 * 3), core: core });
+            parts.push(part);
+        }
+
+        return parts;
     }
 
 
