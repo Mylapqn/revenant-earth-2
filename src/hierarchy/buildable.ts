@@ -119,7 +119,7 @@ export class Buildable {
         new Buildable({
             name: "Sprinkler",
             onBuild: (position) => {
-                const prefab = Prefab.SprinklerArray({ position: position, scene: this.activeScene })[0];
+                const prefab = Prefab.SprinklerArray({ position: position, scene: game.activeScene })[0];
                 return prefab;
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
