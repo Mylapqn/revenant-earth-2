@@ -1,6 +1,10 @@
 import { Application } from 'pixi.js';
 import { Game } from './game';
-import './stylesheets/style.css'
+import './stylesheets/style.css';
+import './stylesheets/menu.css';
+import './stylesheets/inventory.css';
+import './stylesheets/quest.css';
+import './stylesheets/hacking.css';
 import { DevSync } from './dev/devsync';
 
 async function init() {

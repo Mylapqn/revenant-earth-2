@@ -1,0 +1,74 @@
+
+.hacking {
+    position: absolute;
+    width: 1000px;
+    height: 800px;
+    background-color: black;
+    top: 0;
+    left: 0;
+    font-family: "monogram";
+    font-size: 32px;
+    color: var(--hacking-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+.hacking #textArea {
+    flex-grow: 1;
+    overflow-x: hidden;
+}
+
+.hacking .buttonArea {
+    min-height: 64px;
+    display: flex;
+    background-color: rgb(20, 20, 20);
+    margin-bottom: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.buttonArea button {
+    height: fit-content;
+    width: fit-content;
+}
+
+.hacking button {
+
+    text-wrap: nowrap;
+    font-size: inherit;
+    font-family: inherit;
+    background-color: transparent;
+    color: var(--hacking-color);
+    border: 2px solid var(--hacking-color-muted);
+    background-color: black;
+    color: inherit;
+    margin-right: 10px;
+    padding: 0 10px 4px 10px;
+}
+
+.hacking button:hover {
+    background-color: var(--hacking-color-muted);
+    color: white;
+}
+
+.buttonBorderless button {
+    border: none;
+    margin: 0;
+    background: transparent;
+    color: white;
+}
+
+#hackingTooltip {
+    position: absolute;
+    background-color: rgb(0, 0, 0);
+    top: 0;
+    left: 0;
+    font-family: "monogram";
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    padding: 20px;
+    display: none;
+    z-index: 2;
+}

@@ -1,0 +1,70 @@
+.milestone {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "Chakra Petch";
+    font-size: 20px;
+    margin: 10px;
+    color: white;
+    text-align: center;
+    transition: all 3s ease-out;
+    opacity: 0;
+    width: 50vw;
+}
+
+.milestone h1 {
+    font-size: 3em;
+}
+
+.milestone * {
+    transition: all 3s ease-out;
+    letter-spacing: normal;
+    opacity: 0;
+}
+
+.milestone .appear {
+    letter-spacing: .1em;
+    opacity: 1;
+}
+
+.milestone.appear {
+    opacity: 1;
+}
+
+.quest-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 20px;
+    font-family: "Chakra Petch";
+    font-size: 20px;
+    color: white;
+    text-align: left;
+    max-width: 400px;
+}
+
+.quest-list h1 {
+    font-size: inherit;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.quest-list p {
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.quest>p {
+    font-weight: bold;
+}
+
+.quest .sub-quest {
+    margin-left: 10px;
+}
+
+.quest .details {
+    margin-left: 20px;
+    font-weight: 100;
+    opacity: .5;
+}

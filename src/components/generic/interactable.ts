@@ -10,7 +10,7 @@ export class Interactable extends Component {
     static componentType = "Interactable";
     spriteComponent?: BasicSprite;
     highlighted = false;
-    htmlElement!: UIWorldSpaceElement;
+    parentElement!: UIWorldSpaceElement;
     promptElement!: UIElement;
     promptTextElement!: UIElement;
     enabled = true;
@@ -27,11 +27,11 @@ export class Interactable extends Component {
     }
 
     applyData(data?: { text?: string, offset?: Vectorlike }): void {
-        this.htmlElement = new UIWorldSpaceElement("div", new Vector());
-        UI.container.appendChild(this.htmlElement.htmlElement);
+        this.parentElement = new UIWorldSpaceElement("div", new Vector());
+        UI.container.appendChild(this.parentElement.htmlElement);
 
-        this.promptElement = UIElement.create({ type: "div", parent: this.htmlElement.htmlElement, classes: ["prompt"], content: "F" });
-        this.promptTextElement = UIElement.create({ type: "div", parent: this.htmlElement.htmlElement, classes: ["prompt-text"], content: "Interact" });
+        this.promptElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt"], content: "F" });
+        this.promptTextElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt-text"], content: "Interact" });
         data = data ?? {};
         this.setText(data.text ?? "Interact");
         this.offset = Vector.fromLike(data.offset ?? { x: 0, y: 0 });
@@ -41,7 +41,7 @@ export class Interactable extends Component {
     }
 
     remove(): void {
-        this.htmlElement?.remove();
+        this.parentElement?.remove();
         super.remove();
     }
 
@@ -49,10 +49,10 @@ export class Interactable extends Component {
 
     update(dt: number) {
         if (!this.enabled) {
-            this.htmlElement.htmlElement.style.display = "none";
+            this.parentElement.htmlElement.style.display = "none";
             return;
         }
-        this.htmlElement.setWorldPosition(this.transform.position.clone().add(this.offset));
+        this.parentElement.setWorldPosition(this.transform.position.clone().add(this.offset));
         if (game.camera.inViewX(this.transform.position.x, 200)) {
             let x = Math.abs(game.player.position.x - this.transform.position.x);
             let y = Math.abs(game.player.position.y - this.transform.position.y);

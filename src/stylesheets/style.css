@@ -47,79 +47,6 @@ body {
     padding: 20px;
 }
 
-.hacking {
-    position: absolute;
-    width: 1000px;
-    height: 800px;
-    background-color: black;
-    top: 0;
-    left: 0;
-    font-family: "monogram";
-    font-size: 32px;
-    color: var(--hacking-color);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    z-index: 1;
-}
-
-.hacking #textArea {
-    flex-grow: 1;
-    overflow-x: hidden;
-}
-
-.hacking .buttonArea {
-    min-height: 64px;
-    display: flex;
-    background-color: rgb(20, 20, 20);
-    margin-bottom: 10px;
-    padding: 10px;
-    flex-wrap: wrap;
-}
-
-.buttonArea button {
-    height: fit-content;
-    width: fit-content;
-}
-
-.hacking button {
-
-    text-wrap: nowrap;
-    font-size: inherit;
-    font-family: inherit;
-    background-color: transparent;
-    color: var(--hacking-color);
-    border: 2px solid var(--hacking-color-muted);
-    background-color: black;
-    color: inherit;
-    margin-right: 10px;
-    padding: 0 10px 4px 10px;
-}
-
-.hacking button:hover {
-    background-color: var(--hacking-color-muted);
-    color: white;
-}
-
-.buttonBorderless button {
-    border: none;
-    margin: 0;
-    background: transparent;
-    color: white;
-}
-
-#hackingTooltip {
-    position: absolute;
-    background-color: rgb(0, 0, 0);
-    top: 0;
-    left: 0;
-    font-family: "monogram";
-    font-size: 32px;
-    color: rgb(255, 255, 255);
-    padding: 20px;
-    display: none;
-    z-index: 2;
-}
 
 #tooltip {
     position: absolute;
@@ -217,112 +144,6 @@ body {
     border-right: 2px solid white;
 }
 
-.fullscreenMenu {
-    font-family: "Chakra Petch";
-    font-size: 16px;
-    color: rgb(255, 255, 255);
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: #18467E;
-    background: radial-gradient(circle, #1E3753 0%, #0D1825 80%);
-    background: radial-gradient(circle, #194880 0%, #12335C 80%);
-    mask-image: radial-gradient(black 50%, transparent 51%);
-    mask-repeat: no-repeat;
-    mask-position: 50% 50%;
-    mask-size: 0 0;
-    width: 100vw;
-    height: 100vh;
-    animation-duration: .4s;
-    animation-timing-function: ease-in-out;
-    animation-fill-mode: both;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    display: none;
-    padding: 10px;
-}
-
-.menuAppear {
-    display: flex;
-    animation-name: menuAppear;
-}
-
-.menuHide {
-    display: flex;
-    animation-name: menuAppear2;
-    animation-direction: reverse;
-}
-
-@keyframes menuAppear {
-    0% {
-        display: none;
-        mask-size: 0 0;
-        mask-position: 50% 50%;
-    }
-
-    1% {
-        display: flex;
-    }
-
-    99% {
-        mask-size: 200vw 200vw;
-        mask-position: 50% 50%;
-    }
-
-    100% {
-        mask-size: 500vw 500vw;
-    }
-}
-
-@keyframes menuAppear2 {
-    0% {
-        display: none;
-        mask-size: 0 0;
-        mask-position: 50% 50%;
-    }
-
-    1% {
-        display: flex;
-    }
-
-    99% {
-        mask-size: 200vw 200vw;
-        mask-position: 50% 50%;
-    }
-
-    100% {
-        mask-size: 500vw 500vw;
-    }
-}
-
-.menuBG {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 10px;
-    z-index: -10;
-}
-
-.menuBorder {
-    width: 100%;
-    height: 100%;
-    border: 1px solid #ffffff48;
-    padding: 10px;
-    border-radius: 2px;
-}
-
-.menuPattern {
-    width: 100%;
-    height: 100%;
-    background-image: radial-gradient(circle, #ffffff4f 8%, transparent 10%);
-    background-size: 15px 15px;
-}
-
 .drop-menu {
     width: max-content;
     display: flex;
@@ -381,77 +202,6 @@ button:hover {
     color: white;
 }
 
-.milestone {
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: "Chakra Petch";
-    font-size: 20px;
-    margin: 10px;
-    color: white;
-    text-align: center;
-    transition: all 3s ease-out;
-    opacity: 0;
-    width:50vw;
-}
-
-.milestone h1 {
-    font-size: 3em;
-}
-
-.milestone * {
-    transition: all 3s ease-out;
-    letter-spacing: normal;
-    opacity: 0;
-}
-
-.milestone .appear {
-    letter-spacing: .1em;
-    opacity: 1;
-}
-
-.milestone.appear {
-    opacity: 1;
-}
-
-.quest-list {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 20px;
-    font-family: "Chakra Petch";
-    font-size: 20px;
-    color: white;
-    text-align: left;
-    max-width: 400px;
-}
-
-.quest-list h1 {
-    font-size: inherit;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-}
-
-.quest-list p {
-    margin-bottom: 5px;
-    text-align: left;
-}
-
-.quest>p {
-    font-weight: bold;
-}
-
-.quest .sub-quest {
-    margin-left: 10px;
-}
-
-.quest .details {
-    margin-left: 20px;
-    font-weight: 100;
-    opacity: .5;
-}
-
 .prompt {
     display: flex;
     justify-content: center;
@@ -494,131 +244,31 @@ button:hover {
     width: 100px;
 }
 
-
-.inventoryPanel {
-    max-width: 645px;
-    width: 100%;
-    background: #233243;
-    height: 757px;
-}
-
-.categoryFilterWrapper {
-    width: 100%;
+.talk {
+    position: absolute;
+    top: -40px;
+    left: 0px;
+    width: 0px;
+    transition: width 0.3s ease-in-out;
+    font-weight: bold;
+    transform: translate(-50%, -100%);
+    overflow: hidden;
+    word-wrap: nowrap;
+    text-align: center;
     display: flex;
-    font-family: Chakra Petch;
-    font-weight: 300;
-    font-size: 20px;
-    line-height: 111.00000000000001%;
-    letter-spacing: 0%;
-    vertical-align: middle;
-    text-transform: uppercase;
-
-}
-
-.categoryFilterWrapper>div {
-    width: 100%;
+    justify-content: center;
     align-items: center;
-    display: flex;
-    padding: 17px 33px;
-    cursor: pointer;
 }
 
-.itemHeader {
-    width: 100%;
-    align-items: center;
-    display: flex;
-    padding-top: 29px;
-    padding-bottom: 17px;
-    font-family: Chakra Petch;
-    font-weight: 700;
+.talk.appear {
+    width: 300px;
+}
+
+.talk p {
+    color: white;
+    font-family: "Chakra Petch";
     font-size: 20px;
-    line-height: 111.00000000000001%;
-    letter-spacing: 0%;
-    vertical-align: middle;
     text-transform: uppercase;
-}
-
-.itemHeader>div:nth-child(1) {
-    padding-left: 33px;
-}
-
-.itemHeader>div:nth-child(2) {
-    padding-left: 93px;
-}
-
-.itemHeader>div:nth-child(3) {
-    margin-left: auto;
-    padding-right: 33px;
-}
-
-.categoryFilterWrapper>div.active {
-    background: #136DD9;
-}
-
-.itemHolder {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.inventoryItem {
-    display: flex;
-    padding: 17px 33px;
-    align-items: center;
-    cursor: pointer;
-}
-
-.itemImage {
-    flex-shrink: 0;
-    width: 83px;
-    margin-right: 58px;
-    aspect-ratio: 1 / 1;
-}
-
-.inventoryItem:nth-child(odd) {
-    background: #1C2938;
-}
-
-.inventoryItem:nth-child(even) {
-    background: #202F41;
-}
-
-.inventoryItem.active,
-.inventoryItem:hover {
-    background: #136DD9;
-}
-
-.itemTextWrapper {
-    width: 100%;
-}
-
-.itemName {
-    font-family: Chakra Petch;
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 111.00000000000001%;
-    letter-spacing: 0%;
-    vertical-align: middle;
-    text-transform: uppercase;
-}
-
-.itemDescription {
-    font-family: Chakra Petch;
-    font-weight: 300;
-    font-style: italic;
-    font-size: 20px;
-    line-height: 111.00000000000001%;
-    letter-spacing: 0%;
-    vertical-align: middle;
-}
-
-
-.itemAmount {
-    font-family: Chakra Petch;
-    font-weight: 300;
-    font-size: 50px;
-    line-height: 111.00000000000001%;
-    letter-spacing: 0%;
-    vertical-align: middle;
-    text-transform: uppercase;
+    min-width: 300px;
+    text-shadow: black 2px 2px 4px;
 }
