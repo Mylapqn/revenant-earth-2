@@ -123,6 +123,14 @@ export class Buildable {
                 return prefab;
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
-        })
+        });
+        new Buildable({
+            name: "Biochar Kiln",
+            onBuild: (position) => {
+                const prefab = Prefab.BiocharKiln({ position: position, scene: game.activeScene });
+                return prefab;
+            },
+            texture: await Assets.load("./gfx/building/biochar.png"),
+        });
     }
 }
