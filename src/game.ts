@@ -461,7 +461,7 @@ export class Game {
             }
 
             if (this.input.keyDown("c")) {
-                Prefab.BiocharKiln({ x: this.worldMouse.x, y: this.worldMouse.y, scene: this.activeScene });
+                Prefab.SprinklerArray({ x: this.worldMouse.x, y: this.worldMouse.y, scene: this.activeScene });
             }
 
             if (this.input.keyDown("+")) {
