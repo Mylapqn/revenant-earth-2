@@ -47,6 +47,7 @@ export class SprinklerCore extends Component {
         if (this.active && this.power) {
             if (!this.power.consume(0.25 * dt)) {
                 this.active = false;
+                this.setInteractPrompt();
             }
         }
 
@@ -56,5 +57,9 @@ export class SprinklerCore extends Component {
 
     toggle() {
         this.active = !this.active;
+        this.setInteractPrompt();
+    }
+    setInteractPrompt() {
+        this.entity.getComponent(Interactable)?.setText(this.active ? "Deactivate" : "Activate");
     }
 }

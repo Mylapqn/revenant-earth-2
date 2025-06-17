@@ -234,14 +234,16 @@ button:hover {
     position: absolute;
     top: 0;
     left: 24px;
-    width: 0;
-    transition: width 0.1s ease-in-out;
+    width: fit-content;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.1s ease-in-out;
     transform: translate(0, -50%);
     overflow: hidden;
 }
 
 .prompt-text.highlight {
-    width: 100px;
+    clip-path: inset(0 0 0 0);
+    width: fit-content;
 }
 
 .talk {
