@@ -241,4 +241,32 @@ export class Prefab {
         newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
         return newEntity;
     }
+
+    static SolarPanel(params: PrefabParams) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Solar Panel",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "window.png",
+                        },
+                    },
+                    {
+                        componentType: "SolarPanel",
+                        data: {}
+                    },
+                    {
+                        componentType: "Power",
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
 }

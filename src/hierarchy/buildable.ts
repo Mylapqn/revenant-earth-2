@@ -132,13 +132,22 @@ export class Buildable {
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
         });
-                new Buildable({
+        new Buildable({
             name: "Battery",
             onBuild: (position) => {
                 const prefab = Prefab.Battery({ position: position, scene: game.activeScene });
                 return prefab;
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
+        });
+
+        new Buildable({
+            name: "Solar Panel",
+            onBuild: (position) => {
+                const prefab = Prefab.SolarPanel({ position: position, scene: game.activeScene });
+                return prefab;
+            },
+            texture: await Assets.load("./window.png"),
         });
     }
 }

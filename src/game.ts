@@ -396,7 +396,6 @@ export class Game {
         this.milestones.popups.update();
 
 
-
         //clears input
         this.input.update();
     }

@@ -34,13 +34,13 @@ export class UI {
     static fullscreenMenu: UIFullscreenMenu;
 }
 
-export class UIElement {
-    public htmlElement: HTMLElement;
+export class UIElement<T extends HTMLElement = HTMLElement> {
+    public htmlElement: T;
     public parent?: UIElement;
     public children: UIElement[];
     constructor(type: string, ...classes: string[]) {
         this.children = [];
-        this.htmlElement = document.createElement(type);
+        this.htmlElement = document.createElement(type) as T;
         this.htmlElement.classList.add(...classes);
         this.htmlElement.addEventListener("mouseenter", () => {
             UI.mouseOverUI++;
@@ -72,8 +72,8 @@ export class UIElement {
             this.children.push(element);
         }
     }
-    static create(options: { type: string, classes?: string[], parent: HTMLElement, content?: string }) {
-        const element = new UIElement(options.type, ...(options.classes ?? []));
+    static create<T extends HTMLElement>(options: { type: string, classes?: string[], parent: HTMLElement, content?: string }): UIElement<T> {
+        const element = new UIElement<T>(options.type, ...(options.classes ?? []));
         options.parent.appendChild(element.htmlElement);
         if (options.content) element.htmlElement.innerHTML = options.content;
         return element;
@@ -86,44 +86,42 @@ export class UIPanel extends UIElement {
         super("div");
     }
 }
-
 export class UIFullscreenMenu {
     element: HTMLDivElement;
     shown = false;
-    itemHolder: HTMLDivElement;
+    itemHolder: UIElement;
     constructor() {
         this.element = UI.customDiv(document.body, "fullscreenMenu");
-        const bg = UI.customDiv(this.element, "menuBG");
-        const border = UI.customDiv(bg, "menuBorder");
-        const pattern = UI.customDiv(border, "menuPattern");
-        const title = UI.customDiv(this.element, "menuTitle");
-        title.innerText = "Revenant Earth 2";
+        const bg = UIElement.create({ type: "div", classes: ["menuBG"], parent: this.element });
+        const border = UIElement.create({ type: "div", classes: ["menuBorder"], parent: bg.htmlElement });
+        const pattern = UIElement.create({ type: "div", classes: ["menuPattern"], parent: border.htmlElement });
+        const title = UIElement.create({ type: "div", classes: ["menuTitle"], content: "Revenant Earth 2", parent: this.element });
 
-        const inventoryPanel = UI.customDiv(this.element, "inventoryPanel");
-        const categoryFilter = UI.customDiv(inventoryPanel, "categoryFilterWrapper");
-        const seedFilter = UI.customDiv(categoryFilter);
-        seedFilter.classList.add("active");
-        seedFilter.innerText = "Seeds";
-        seedFilter.addEventListener("click", () => {
+        const inventoryPanel = UIElement.create({ type: "div", classes: ["inventoryPanel"], parent: this.element });
+        const categoryFilter = UIElement.create({ type: "div", classes: ["categoryFilterWrapper"], parent: inventoryPanel.htmlElement });
+        const seedFilter = UIElement.create({ type: "div", parent: categoryFilter.htmlElement });
+        seedFilter.htmlElement.classList.add("active");
+        seedFilter.htmlElement.innerText = "Seeds";
+        seedFilter.htmlElement.addEventListener("click", () => {
             this.selectedGroup = ItemGroup.Seed;
-            equipmentFilter.classList.remove("active");
-            seedFilter.classList.add("active");
+            equipmentFilter.htmlElement.classList.remove("active");
+            seedFilter.htmlElement.classList.add("active");
             this.renderItems(game.player.inventory);
         });
 
-        const equipmentFilter = UI.customDiv(categoryFilter);
-        equipmentFilter.innerText = "Equipment";
-        equipmentFilter.addEventListener("click", () => {
+        const equipmentFilter = UIElement.create({ type: "div", parent: categoryFilter.htmlElement });
+        equipmentFilter.htmlElement.innerText = "Equipment";
+        equipmentFilter.htmlElement.addEventListener("click", () => {
             this.selectedGroup = ItemGroup.Tool;
-            seedFilter.classList.remove("active");
-            equipmentFilter.classList.add("active");
+            seedFilter.htmlElement.classList.remove("active");
+            equipmentFilter.htmlElement.classList.add("active");
             this.renderItems(game.player.inventory);
         });
-        const itemHeader = UI.customDiv(inventoryPanel, "itemHeader");
-        UI.customDiv(itemHeader).innerText = "Icon";
-        UI.customDiv(itemHeader).innerText = "Name";
-        UI.customDiv(itemHeader).innerText = "Amount";
-        this.itemHolder = UI.customDiv(inventoryPanel, "itemHolder");
+        const itemHeader = UIElement.create({ type: "div", classes: ["itemHeader"], parent: inventoryPanel.htmlElement });
+        UIElement.create({ type: "div", parent: itemHeader.htmlElement }).htmlElement.innerText = "Icon";
+        UIElement.create({ type: "div", parent: itemHeader.htmlElement }).htmlElement.innerText = "Name";
+        UIElement.create({ type: "div", parent: itemHeader.htmlElement }).htmlElement.innerText = "Amount";
+        this.itemHolder = UIElement.create({ type: "div", classes: ["itemHolder"], parent: inventoryPanel.htmlElement });
 
 
     }
@@ -146,7 +144,7 @@ export class UIFullscreenMenu {
     }
 
     renderItems(inventory?: Inventory) {
-        this.itemHolder.innerHTML = "";
+        this.itemHolder.htmlElement.innerHTML = "";
         if (!inventory) return;
         for (const [type, amount] of inventory.items) {
             const info = itemDefinitions[type]
@@ -156,17 +154,17 @@ export class UIFullscreenMenu {
     }
 
     renderItem(item: ItemDefinition, amount: number) {
-        const inventoryItem = UI.customDiv(this.itemHolder, "inventoryItem");
-        UI.customElement<HTMLImageElement>("img", inventoryItem, "itemImage").src = item.icon;
-        const itemTextWrapper = UI.customDiv(inventoryItem, "itemTextWrapper");
-        const itemName = UI.customDiv(itemTextWrapper, "itemName");
-        itemName.innerText = item.name;
-        const itemDescription = UI.customDiv(itemTextWrapper, "itemDescription");
-        itemDescription.innerText = item.description;
-        const itemAmount = UI.customDiv(inventoryItem, "itemAmount");
-        itemAmount.innerText = amount.toString();
+        const inventoryItem = UIElement.create({ type: "div", classes: ["inventoryItem"], parent: this.itemHolder.htmlElement });
+        UIElement.create<HTMLImageElement>({ type: "img", classes: ["itemImage"], parent: inventoryItem.htmlElement }).htmlElement.src = item.icon;
+        const itemTextWrapper = UIElement.create({ type: "div", classes: ["itemTextWrapper"], parent: inventoryItem.htmlElement });
+        const itemName = UIElement.create({ type: "div", classes: ["itemName"], parent: itemTextWrapper.htmlElement });
+        itemName.htmlElement.innerText = item.name;
+        const itemDescription = UIElement.create({ type: "div", classes: ["itemDescription"], parent: itemTextWrapper.htmlElement });
+        itemDescription.htmlElement.innerText = item.description;
+        const itemAmount = UIElement.create({ type: "div", classes: ["itemAmount"], parent: inventoryItem.htmlElement });
+        itemAmount.htmlElement.innerText = amount.toString();
 
-        inventoryItem.addEventListener("click", () => {
+        inventoryItem.htmlElement.addEventListener("click", () => {
             game.player.buildable(item.name);
         })
     }

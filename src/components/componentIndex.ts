@@ -23,6 +23,7 @@ import { Sprinkler } from "./custom/sprinkler";
 import { AnimatedSpriteRenderer } from "./generic/animatedSprite";
 import { TalkComponent } from "./generic/talk";
 import { Power, PowerNetwork } from "./generic/power";
+import { SolarPanel } from "./custom/solarPanel";
 
 
 export function initComponents(){
@@ -51,4 +52,5 @@ export function initComponents(){
     Component.register(TalkComponent);
     Component.register(Power);
     Component.register(PowerNetwork);
+    Component.register(SolarPanel);
 }
