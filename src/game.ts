@@ -465,7 +465,7 @@ export class Game {
                     if (index == array.length) index = 0;
                     this.selectedSeed = array[index];
                 }
-                Buildable.activate("Seed: " + this.selectedSeed);
+                Buildable.activate(this.selectedSeed);
 
             }
             /*if (this.input.keyDown("q")) {

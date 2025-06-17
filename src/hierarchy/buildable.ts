@@ -91,7 +91,7 @@ export class Buildable {
                 Plant.plantGraphics({ graphics: game.buildingGhost.graphics, species: species, growth: Math.min(15, species.statsPerGrowth.maxGrowth), randomSeed: Math.random() * 1000, health: 1 });
                 game.buildingGhost.renderGraphics();
             },
-            name: "Seed: " + species.name
+            name: species.name
         });
     }
 

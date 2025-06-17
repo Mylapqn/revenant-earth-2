@@ -22,7 +22,7 @@
 
 .left-menu {
     position: absolute;
-    top: 45%;
+    top: 47%;
     left: 0;
     width: calc(50vw - 300px);
     width: 30vw;
@@ -49,6 +49,7 @@
     backdrop-filter: blur(4px);
     padding-right: 30px;
     transition: all 0.2s ease-in-out;
+    text-transform: uppercase;
 }
 
 .left-menu:not(:hover) .menu-item:first-of-type {

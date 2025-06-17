@@ -166,7 +166,7 @@ export class UIFullscreenMenu {
     }
 
     renderItem(item: ItemDefinition, amount: number) {
-        const inventoryItem = UIElement.create({ type: "div", classes: ["inventoryItem"], parent: this.itemHolder.htmlElement });
+        const inventoryItem = UIElement.create({ type: "div", classes: ["inventoryItem"], parent: this.itemHolder.htmlElement, soundEffects: true });
         UIElement.create<HTMLImageElement>({ type: "img", classes: ["itemImage"], parent: inventoryItem.htmlElement }).htmlElement.src = item.icon;
         const itemTextWrapper = UIElement.create({ type: "div", classes: ["itemTextWrapper"], parent: inventoryItem.htmlElement });
         const itemName = UIElement.create({ type: "div", classes: ["itemName"], parent: itemTextWrapper.htmlElement });
