@@ -253,13 +253,18 @@ export class Player implements ISerializable {
 
     updateLight() {
         if (!Debug.editorMode) {
-            this.light.position.set(this.position.clone().add({ x: 0, y: -20 }));
-            let dist = game.player.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).length() / 200;
-            dist = clamp(dist);
-            this.light.width = (1 - dist) * (1 - dist) * 1.8 + .2;
-            this.light.intensity = (dist) * 2 + 1;
-            this.light.range = dist * 200 + 200;
-            this.light.angle = this.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).toAngle() - Math.PI;
+            if (game.weather.dayRatio < .5 || !game.activeScene.hasTerrain) {
+                this.light.position.set(this.position.clone().add({ x: 0, y: -20 }));
+                let dist = game.player.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).length() / 200;
+                dist = clamp(dist);
+                this.light.width = (1 - dist) * (1 - dist) * 1.8 + .2;
+                this.light.intensity = (dist) * 2 + 1;
+                this.light.range = dist * 200 + 200;
+                this.light.angle = this.position.clone().add({ x: 0, y: -20 }).sub(game.worldMouse).toAngle() - Math.PI;
+            }
+            else {
+                this.light.intensity = 0;
+            }
         }
         else {
             this.light.position.set(game.worldMouse);
