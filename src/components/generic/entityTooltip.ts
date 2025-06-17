@@ -63,14 +63,14 @@ export class EntityTooltip extends Component {
                 this.spriteComponent.sprite.tint = 0xffffff;
             }
         }
-        if (this.shaderMeshComponent) {
+        /*if (this.shaderMeshComponent) {
             if (this.highlighted) {
                 this.shaderMeshComponent.renderMesh.tint = 0x00ffff;
             }
             else {
                 this.shaderMeshComponent.renderMesh.tint = 0xffffff;
             }
-        }
+        }*/
         if (this.highlighted && game.input.mouse.getButtonUp(MouseButton.Left)) {
             //game.keys["f"] = false; //FOR TESTING ONLY
             this.entity.emit("interact");

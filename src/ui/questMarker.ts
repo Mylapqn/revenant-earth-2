@@ -28,6 +28,11 @@ export class QuestMarker {
         return marker;
     }
     static init() {
+        if (QuestMarker.list.length > 0) {
+            for (const marker of [...QuestMarker.list]) {
+                marker.remove();
+            }
+        }
         QuestMarker.list = [];
     }
     static update() {
@@ -70,7 +75,7 @@ export class QuestMarker {
     }
     remove() {
         const index = QuestMarker.list.indexOf(this);
-        if(index > -1) {
+        if (index > -1) {
             this.parentElement.remove();
             QuestMarker.list.splice(index, 1);
         }

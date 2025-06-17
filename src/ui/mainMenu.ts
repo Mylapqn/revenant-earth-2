@@ -1,4 +1,5 @@
 import { game, Game } from "../game";
+import { nextFrame, sleep } from "../utils/utils";
 import { Vector } from "../utils/vector";
 import { FadeScreen } from "./fadeScreen";
 import { UIElement } from "./ui";
@@ -31,20 +32,26 @@ export class MainMenu {
         this.logoElement.src = "public/logo.svg";
         this.leftMenuElement = UIElement.create({ type: "div", classes: ["left-menu"], parent: this.parentElement }).htmlElement;
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Play", soundEffects: true }).htmlElement.onclick = () => this.startGame();
+        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Continue", soundEffects: true }).htmlElement.onclick = () => this.continueGame();
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Options", soundEffects: true }).htmlElement.onclick = () => this.startGame();
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Credits", soundEffects: true }).htmlElement.onclick = () => this.startGame();
         this.parentElement.onmousemove = (e) => this.mouseMove(e);
         this.init();
+        MainMenu.instance = this;
     }
     init() {
         this.gameLoadedPromise = game.load();
         this.updating = true;
     }
     show() {
-
+        this.updating = true;
+        this.parentElement.style.display = "flex";
+        //game.timeScale = 0;
     }
     hide() {
         this.updating = false;
+        this.parentElement.style.display = "none";
+        //game.timeScale = 1;
     }
     update() {
         const now = performance.now();
@@ -67,13 +74,44 @@ export class MainMenu {
         if (this.updating) this.mousePosition.set(e.clientX, e.clientY);
     }
     async startGame() {
+        if(game.inited){
+            game.destroyGame();
+        }
         await FadeScreen.fadeIn();
+        const quote = UIElement.create({ type: "div", classes: ["quote"], parent: FadeScreen.element, content: "We don’t dream of the stars anymore. We dream of wind, fresh air, and water that wasn’t produced in a lab.<p>- Zora Solano, Environmental Technician on UNERA Space Station</p>" });
+        await nextFrame();
+        quote.htmlElement.classList.add("appear");
         this.updating = false;
-        this.parentElement.remove();
+        this.hide();
+        const sleepTimer = sleep(3000);
         if (!game.loaded && this.gameLoadedPromise) {
             await this.gameLoadedPromise;
         }
+        await sleepTimer;
+        quote.htmlElement.classList.remove("appear");
+        await sleep(1000);
         await game.init();
+        await game.initTutorial();
         await FadeScreen.fadeOut();
+        quote.remove();
     }
+    async continueGame() {
+        if (game.inited) {
+            this.hide();
+            this.game.initWorld();
+            return;
+        }
+        if (!game.loaded && this.gameLoadedPromise) {
+            await this.gameLoadedPromise;
+        }
+        const gameInit = game.init();
+        const fadeScreen = FadeScreen.fadeIn(300);
+        this.updating = false;
+        if (!game.inited && gameInit) await gameInit;
+        this.hide();
+        await game.initWorld();
+        await fadeScreen;
+        await FadeScreen.fadeOut(300);
+    }
+    static instance?: MainMenu;
 }

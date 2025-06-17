@@ -205,8 +205,11 @@ export class Plant extends Component {
             this.drawPlant();
             if (oldHealth > 0)
                 new ParticleText("died from " + reason, this.transform.position.clone().add(new Vector(0, -40)));
-            this.tooltipComponent?.tooltipData.clear();
-            this.tooltipComponent?.tooltipData.set("status", "died from " + reason);
+            if(this.tooltipComponent){
+                this.tooltipComponent.tooltipData.clear();
+                this.tooltipComponent.tooltipData.set("status", "died from " + reason);
+                this.tooltipComponent.enabled = false;
+            }
         }
     }
 

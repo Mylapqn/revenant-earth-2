@@ -195,7 +195,7 @@ export class Debug {
         this.debugView = false;
         this.editorMode = false;
         this.hitboxEditor = new HitboxEditor();
-        this.debugTextElement = UI.customDiv(document.body, "debugText");
+        this.debugTextElement = UI.customDiv(UI.container, "debugText");
     }
     private static debugTooltip() {
         const columns: TooltipPanel[] = [];

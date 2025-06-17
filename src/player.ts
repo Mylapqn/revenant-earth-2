@@ -19,6 +19,7 @@ import { SurfaceMaterial } from "./world/terrain";
 import { Light } from "./shaders/lighting/light";
 import { Inventory } from "./components/generic/inventory";
 import { Buildable } from "./hierarchy/buildable";
+import { UI } from "./ui/ui";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -50,7 +51,7 @@ export class Player implements ISerializable {
 
     constructor() {
         this.statsDisplay = document.createElement("div");
-        document.body.appendChild(this.statsDisplay);
+        UI.container.appendChild(this.statsDisplay);
         this.statsDisplay.classList.add("stats");
 
         this.healthBar = new UIProgressBar("Health", this.statsDisplay);
