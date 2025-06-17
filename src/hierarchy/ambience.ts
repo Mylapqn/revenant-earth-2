@@ -38,14 +38,13 @@ export class Ambience implements ISceneObject, ISerializable {
         this.scene?.unregister(this);
     }
     ambientColor() {
-        //0: midnight, 0.5: sunrise/sunset, 1: noon
-        const dayRatio = game.weather.dayRatio;
-        const sunsetRatio = clamp(1 - Math.abs(dayRatio - .6) * 4);
+        const nightRatio = 1-game.weather.dayRatio;
+        const sunsetRatio = clamp(1 - Math.abs(nightRatio - .6) * 4);
         const sunsetIntensity = Math.pow(sunsetRatio, 2);
         if (!game.activeScene.hasTerrain) return CustomColor.fromShader(game.ambience.data.ambientColor);
         let ambientColor = (CustomColor.fromShader(game.ambience.data.ambientColor).mix(CustomColor.fromShader([1.2, 1.2, 1.3]), 1 - game.atmo.getProperties(game.player.position.x).pollution));
         ambientColor = ambientColor.mix(ambientColor.mult(new CustomColor(150, 160, 180)), (game.weather.weatherData.rainBuildup / game.weather.weatherData.rainThreshold) || 0);
-        ambientColor = ambientColor.mix(new CustomColor(30, 20, 60), dayRatio);
+        ambientColor = ambientColor.mix(new CustomColor(30, 20, 60), nightRatio);
         ambientColor = ambientColor.add(CustomColor.white(), game.weather.currentThunder * 2);
         ambientColor = ambientColor.mix(CustomColor.fromShader([1., .4, .1]), sunsetIntensity);
 

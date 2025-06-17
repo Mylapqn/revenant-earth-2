@@ -32,7 +32,7 @@ export class Weather implements ISerializable, ISceneObject {
      *  0: midnight, 0.5: sunrise/sunset, 1: noon
      */
     get dayRatio() {
-        return (Math.sin((this.weatherData.dayTime / this.dayLength + .5) * Math.PI * 2) * .5 + .5) || 0;
+        return 1-(Math.sin((this.weatherData.dayTime / this.dayLength + .5) * Math.PI * 2) * .5 + .5) || 0;
     }
 
     cloudMesh: CloudMesh;
