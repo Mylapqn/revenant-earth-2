@@ -10,8 +10,8 @@ export class Power extends Component {
         return super.toData({ power: this.capacity });
     }
 
-    override applyData(data?: { power: number }): void {
-        if (data) this.capacity = data.power;
+    override applyData(data?: { capacity: number }): void {
+        if (data && data.capacity) this.capacity = data.capacity;
     }
 
     network!: PowerNetwork;
@@ -55,7 +55,7 @@ export class PowerNetwork extends Component {
     }
 
     override applyData(data?: { power: number }): void {
-        if (data) this.power = data.power;
+        if (data && data.power) this.power = data.power;
     }
 
     capacity = 0;

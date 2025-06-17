@@ -9,7 +9,8 @@ export enum Item {
     grass,
     sprinkler,
     biocharKiln,
-    battery
+    battery,
+    solarPanel
 }
 
 
@@ -50,5 +51,11 @@ export const itemDefinitions: Record<Item, ItemDefinition> = {
         name: "Battery",
         description: "Ba, ze nic terry",
         icon: "vite.svg"
+    },
+    [Item.solarPanel]: {
+        group: ItemGroup.Tool,
+        name: "Solar Panel",
+        description: "energy when sun",
+        icon: "window.png"
     },
 }

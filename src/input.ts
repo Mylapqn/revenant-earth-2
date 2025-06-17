@@ -1,5 +1,6 @@
 import { Debug } from "./dev/debug";
 import { Game } from "./game";
+import { UI } from "./ui/ui";
 import { Vector } from "./utils/vector";
 
 export class Input {
@@ -98,6 +99,7 @@ class Mouse {
         document.addEventListener('contextmenu', event => event.preventDefault());
     }
     private mouseButtons(e: MouseEvent) {
+        if(UI.mouseOverUI > 0) return;
         this.buttonsHeld = e.buttons;
     }
     private mouseMove(e: MouseEvent) {

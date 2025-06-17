@@ -1,3 +1,4 @@
+import { Debug } from "../dev/debug";
 import { game } from "../game";
 import { ISceneObject, Scene } from "../hierarchy/scene";
 import { ISerializable, StateMode, KindedObject } from "../hierarchy/serialise";
@@ -81,8 +82,8 @@ export class Atmo implements ISerializable, ISceneObject {
 
         this.processGlobal(dt);
 
-        //console.log(`temp: ${this.celsius}, co2: ${this.co2}`);
-        //console.log(this.energyMove);
+        Object.entries(game.atmo.energyMove).forEach(([k, v]) => Debug.log(k + ": " + v.toFixed(1)));
+
         this.energyMove = {};
 
     }
@@ -95,21 +96,28 @@ export class Atmo implements ISerializable, ISceneObject {
     }
 
     get heatCapacity() {
-        return 400; //* this.atmoData.length;
+        return 400 * this.atmoData.length * 2;
     }
 
     processGlobal(dt: number) {
-        const influx = 340;
+        //const influx = 340;
+        const influx = Math.max((game.weather.dayRatio - 0.25) * 1.25 * 1000, 0);
+        Debug.log(`game.weather.dayRatio: ${game.weather.dayRatio}`);
+
+        const reflect = (game.weather.weatherData.rainBuildup / 30) * 0.8;
+
         const absorb = 0.7;
         const SB = 5.67 * 10 ** -8;
 
         let addWatts = influx * absorb;
+        let reflected = addWatts * reflect;
         const co2Watts = co2ToWatts(this.co2) * 1.5;
         if (!isNaN(co2Watts) && co2Watts > 0) {
             this.energy(co2Watts * dt, "co2");
         }
 
         this.energy(addWatts * dt, "influx");
+        this.energy(-reflected * dt, "reflected");
 
         const radiateWatts = this.temp ** 4 * SB;
         this.energy(-radiateWatts * dt, "radiate");
