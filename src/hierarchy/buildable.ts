@@ -40,7 +40,7 @@ export class Buildable {
         let hit = game.collisionSystem.raycast(Vector.fromLike(position).add({ x: 0, y: -20 }), Vector.fromLike(position).add({ x: 0, y: 50 }), (body) => { return body.userData?.material != undefined && this.allowedMaterials.includes(body.userData.material) });
         const result: { valid: boolean, snap?: Vectorlike } = { valid: true };
         if (hit) {
-            console.log(hit);
+            //console.log(hit);
             const centerY = hit.body.minY + (hit.body.maxY - hit.body.minY) / 2;
             if (centerY < hit.point.y) {
                 result.valid = false;

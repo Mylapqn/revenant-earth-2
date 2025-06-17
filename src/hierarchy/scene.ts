@@ -77,7 +77,7 @@ export class Scene implements ISerializable {
         if (game.activeScene !== this) game.activeScene.unload();
         game.activeScene = this;
         this.stateManager.deserialise(this.data, this);
-        console.log(this.data.length);
+        //console.log(this.data.length);
         if (!this.hasTerrain) {
             game.terrainContainer.visible = false;
         }

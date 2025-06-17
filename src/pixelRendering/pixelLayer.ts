@@ -136,8 +136,6 @@ export class PixelLayer {
             this.renderMesh.setUniform("uAmbient", game.ambience.ambientColor().toShader());
         }
 
-
-        //TODO pixelLayer final stage is rendered in full resolution but it should be in pixel scale
         game.app.renderer.render({ container: this.container, target: this.renderTexture });
         game.app.renderer.render({ container: this.renderMesh, target: this.displayTexture });
     }

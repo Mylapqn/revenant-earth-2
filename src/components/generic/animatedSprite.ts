@@ -5,6 +5,8 @@ import { game } from "../../game";
 import { SpriteDirection } from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
 import { DynamicAnimatedSprite } from "../../pixelRendering/dynamicAnimatedSprite";
+import { ColorFillFilter } from "../../shaders/filter/colorFill/colorFillFilter";
+import { CustomColor } from "../../utils/color";
 
 
 
@@ -35,6 +37,7 @@ export class AnimatedSpriteRenderer extends Component {
         if (this.containerName) {
             if (this.containerName == "bg") container = game.bgContainer;
             if (this.containerName == "light") container = game.foliageContainer;
+            if (this.containerName == "blockLight") container = game.entityContainer;
             if (this.containerName == "ui") container = game.worldUiContainer;
         }
         container.addChild(this.sprite);
@@ -56,6 +59,11 @@ export class AnimatedSpriteRenderer extends Component {
             this.sprite.position.set(this.transform.position.x, this.transform.position.y);
             this.sprite.visible = true;
             if (this.containerName == "light") game.app.renderer.render({ container: this.sprite, target: Lightmap.texture, clear: false, transform: this.sprite.worldTransform });
+            if (this.containerName == "blockLight") {
+                this.sprite.filters = [new ColorFillFilter(CustomColor.gray(128))];
+                game.app.renderer.render({ container: this.sprite, target: Lightmap.texture, clear: false, transform: this.sprite.worldTransform });
+                this.sprite.filters = [];
+            }
         }
         else {
             this.sprite.visible = false;

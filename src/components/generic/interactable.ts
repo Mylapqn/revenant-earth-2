@@ -1,8 +1,8 @@
 import { game } from "../../game";
-import { Component } from "../../hierarchy/component";
+import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
-import { UI, UIElement, UIWorldSpaceElement } from "../../ui/ui";
+import { UI, UIElement, UIAbsoluteElement } from "../../ui/ui";
 import { Vector, Vectorlike } from "../../utils/vector";
 import { BasicSprite } from "./basicSprite";
 
@@ -10,12 +10,12 @@ export class Interactable extends Component {
     static componentType = "Interactable";
     spriteComponent?: BasicSprite;
     highlighted = false;
-    parentElement!: UIWorldSpaceElement;
+    parentElement!: UIAbsoluteElement;
     promptElement!: UIElement;
     promptTextElement!: UIElement;
     enabled = true;
     offset = new Vector(0, 0);
-
+    initialText!:string;
 
     constructor(parent: Entity) {
         super(parent);
@@ -26,14 +26,21 @@ export class Interactable extends Component {
         this.spriteComponent = this.entity.getComponent(BasicSprite);
     }
 
-    applyData(data?: { text?: string, offset?: Vectorlike }): void {
-        this.parentElement = new UIWorldSpaceElement("div", new Vector());
-        UI.container.appendChild(this.parentElement.htmlElement);
+    toData(): ComponentData {
+        const data: any = {};
+        data.offset = this.offset.toLike();
+        data.text = this.initialText;
+        return super.toData(data);
+    }
 
+    applyData(data?: { text?: string, offset?: Vectorlike }): void {
+        this.parentElement = new UIAbsoluteElement("div", new Vector());
+        UI.container.appendChild(this.parentElement.htmlElement);
         this.promptElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt"], content: "F" });
         this.promptTextElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt-text"], content: "Interact" });
         data = data ?? {};
-        this.setText(data.text ?? "Interact");
+        this.initialText = data.text ?? "Interact";
+        this.setText(this.initialText);
         this.offset = Vector.fromLike(data.offset ?? { x: 0, y: 0 });
 
 
@@ -52,13 +59,15 @@ export class Interactable extends Component {
             this.parentElement.htmlElement.style.display = "none";
             return;
         }
-        this.parentElement.setWorldPosition(this.transform.position.clone().add(this.offset));
-        if (game.camera.inViewX(this.transform.position.x, 200)) {
-            let x = Math.abs(game.player.position.x - this.transform.position.x);
-            let y = Math.abs(game.player.position.y - this.transform.position.y);
-            if (x < 20 && y < 40) {
+        const offsetPosition = this.transform.position.clone().add(this.offset);
+        this.parentElement.setWorldPosition(offsetPosition);
+        if (game.camera.inViewX(offsetPosition.x, 200)) {
+            let x = Math.abs(game.player.position.x - offsetPosition.x);
+            let y = Math.abs(game.player.position.y - offsetPosition.y);
+            if (x < 30 && y < 40) {
                 if (!this.highlighted) {
                     this.highlighted = true;
+                    game.soundManager.soundLibrary.play("hover",{ volume: 0.2 ,speed:0.5});
                 }
             }
             else {
@@ -76,7 +85,7 @@ export class Interactable extends Component {
                 }
             }*/
             if (this.highlighted && game.input.keyDown("f")) {
-                //game.keys["f"] = false; //FOR TESTING ONLY
+                game.soundManager.soundLibrary.play("click");
                 this.entity.emit("interact");
             }
             this.promptElement.htmlElement.classList.toggle("highlight", this.highlighted);

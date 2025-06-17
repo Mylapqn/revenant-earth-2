@@ -39,7 +39,7 @@ export class Pollution extends Component {
             adata.pollution += pollute;
             this.totalPolluted += pollute;
         }
-        Debug.log(this.totalPolluted);
+        //Debug.log(this.totalPolluted);
         if (this.totalPolluted > this.nextText) {
             this.nextText += 1;
             new ParticleText("+1 pollution", this.transform.position.clone().add(new Vector(0, -40)));

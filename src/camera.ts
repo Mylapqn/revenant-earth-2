@@ -134,6 +134,12 @@ export class Camera {
     worldToRender(v: Vectorlike) {
         return this.screenToRender(this.worldToScreen(v));
     }
+    renderToCentered(v: Vectorlike) {
+        return new Vector(v.x, v.y).mult(2).sub(new Vector(1, 1));
+    }
+    centeredToRender(v: Vectorlike) {
+        return new Vector(v.x, v.y).add(new Vector(1, 1)).mult(0.5)
+    }
     inViewX(x: number, padding = 0) {
         const screenPosX = (x * Game.pixelScale - this.position.x + this.middle.x) * this.zoom;
         return screenPosX > -padding && screenPosX < this.screen.x + padding;

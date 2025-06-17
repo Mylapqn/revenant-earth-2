@@ -1,4 +1,4 @@
-import { Application, Assets, AssetsManifest, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
+import { Application, Assets, AssetsManifest, ColorMatrixFilter, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -31,9 +31,10 @@ import { Lightmap } from "./shaders/lighting/lightmap";
 import { Shadowmap } from "./shaders/lighting/shadowmap";
 import { Score } from "./hierarchy/score";
 import { GameEventSystem } from "./hierarchy/eventSystem";
-import { MilestoneManager } from "./hierarchy/milestones";
 import { BuildingGhost } from "./hierarchy/buildingGhost";
 import { Buildable } from "./hierarchy/buildable";
+import { MilestoneManager } from "./hierarchy/milestoneManager";
+import { QuestMarker } from "./ui/questMarker";
 
 export let game: Game;
 
@@ -271,6 +272,7 @@ export class Game {
         Lightmap.init();
 
         UI.init();
+        QuestMarker.init();
 
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
@@ -301,7 +303,7 @@ export class Game {
 
 
         this.score.init();
-        this.milestones.init();
+        this.milestones.initQuests();
         Debug.init();
         //game.loadScene("Space Station");
 
@@ -390,6 +392,8 @@ export class Game {
         Debug.update(realDt);
 
         UI.update();
+        QuestMarker.update();
+        this.milestones.popups.update();
 
 
 

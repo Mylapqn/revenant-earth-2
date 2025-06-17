@@ -734,7 +734,8 @@
                 "id": 46,
                 "componentType": "AnimatedSprite",
                 "data": {
-                    "asset": "./anim/director.json"
+                    "asset": "./anim/director.json",
+                    "container": "blockLight"
                 }
             },
             {
@@ -742,7 +743,7 @@
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -166,
+                        "x": -120,
                         "y": 16
                     },
                     "velocity": {
@@ -755,7 +756,7 @@
                 "id": 48,
                 "componentType": "SpriteDirection",
                 "data": {
-                    "direction": -1
+                    "lookAtPlayer": true
                 }
             },
             {

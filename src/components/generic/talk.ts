@@ -20,10 +20,13 @@ export class TalkComponent extends Component {
         return this._talkId;
     }
     public set talkId(value: TalkType) {
+        if (value == this._talkId) return;
         this._talkId = value;
         this.talk = TalkComponent.talkDatabase[this.talkId];
         this.talkIndex = 0;
+        //if(this.talkTimer > 0) this.showTalk();
     }
+    autoTalk: number = 0;
     enabled: boolean = true;
     private talk: string[] = TalkComponent.talkDatabase[this.talkId];
     talkIndex = 0;
@@ -34,7 +37,7 @@ export class TalkComponent extends Component {
     constructor(parent: Entity) {
         super(parent);
         this.onEntity("update", (dt) => this.update(dt));
-        this.onEntity("interact", () => this.activate());
+        this.onEntity("interact", () => this.click());
     }
 
     override init(): void {
@@ -55,28 +58,42 @@ export class TalkComponent extends Component {
         this.talkId = data.talkId;
     }
 
+    click() {
+        this.autoTalk = 0;
+        this.activate();
+    }
+
     activate() {
         this.createTalk(this.talk[this.talkIndex]);
         this.talkIndex++;
         if (this.talkIndex >= this.talk.length) {
             this.talkIndex = 0;
-            game.events.emit("talkEnd",this);
+            this.interactable.setText("Talk");
+            game.events.emit("talkEnd", this);
         }
+        else {
+            this.interactable.setText("Next");
+        }
+    }
+
+    async showTalk() {
+        await this.createTalk(this.talk[this.talkIndex]);
     }
 
     async createTalk(text: string) {
         if (this.talkTimer > 0) {
             this.talkElement.htmlElement.classList.remove("appear");
             this.talkTimer = 0;
+            this.hideTimer = 0;
             await sleep(200);
         }
         else {
             this.setVisible(true);
             await nextFrame();
         }
-        this.talkContent.htmlElement.innerText = text;
+        this.talkContent.htmlElement.innerHTML = text;
         this.talkElement.htmlElement.classList.add("appear");
-        this.talkTimer = text.length * .1 + 2;
+        this.talkTimer = text.length * .05 + 2;
     }
 
     update(dt: number) {
@@ -88,6 +105,10 @@ export class TalkComponent extends Component {
                 this.talkTimer = 0;
                 this.hideTimer = 1;
             }
+            else if (this.autoTalk > 0 && this.talkTimer > 0 && this.talkTimer < .5) {
+                this.autoTalk--;
+                this.activate();
+            }
         }
         if (this.hideTimer > 0) {
             this.hideTimer -= dt;
@@ -95,9 +116,10 @@ export class TalkComponent extends Component {
                 this.setVisible(false);
             }
         }
+
     }
     setVisible(visible: boolean) {
-        this.talkElement.htmlElement.classList.toggle("hidden", !visible);
+        this.talkElement?.htmlElement.classList.toggle("hidden", !visible);
         this.hideTimer = 0;
     }
     debugOptions(buttons: UIElement[]): UIElement[] {
@@ -106,8 +128,10 @@ export class TalkComponent extends Component {
     }
 
     static talkDatabase = {
-        "spaceDirectorGreeting": ["Good evening.", "I'm the director of the UNERA project.", "I came to congratulate you on being chosen for the Earth Restoration Mission.", "Let's just do a few pre-flight checks."],
-        "spaceDirectorTutorial": ["Try planting a plant in the left planter. This one has plenty of water and nutrition.", "See how the plant grows well in such conditions."],
+        "spaceDirectorGreeting": ["Good evening.", "I'm the director of the <b>UNERA project.</b>", "I came to congratulate you on being chosen for the Earth Restoration Mission.", "Let's just do a few pre-flight checks.", "Try planting a plant in the <b>left planter</b>. It has <b>plenty of water</b> and nutrition.<br>See how the plant grows well in such conditions."],
+        "spaceDirectorTutorialLeft": ["Try planting a plant in the <b>left planter</b>. It has <b>plenty of water</b> and nutrition.", "See how the plant grows well in such conditions."],
+        "spaceDirectorTutorialRight": ["Now try it in the <b>right planter</b>. It has <b>dry and poor soil</b>.", "See how the plant struggles in such conditions."],
+        "spaceDirectorTutorialComplete": ["That's it! You're ready for the mission.", "You can proceed to the <b>door on the right</b> and board the landing capsule.", "Good luck!"],
         "default": ["Hi.", "They only gave me default dialogue :("],
     }
 }

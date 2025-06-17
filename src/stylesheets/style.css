@@ -246,32 +246,37 @@ button:hover {
 
 .talk {
     position: absolute;
-    top: -40px;
+    top: -30px;
     left: 0px;
-    width: 0px;
-    transition: width 0.3s ease-in-out;
-    font-weight: bold;
+    transition: clip-path 0.3s ease-in-out;
+    clip-path: inset(0 50% 0 50%);
     transform: translate(-50%, -100%);
     overflow: hidden;
-    word-wrap: nowrap;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
     /*will-change: width, contents, transform;*/
 }
 
 .talk.appear {
-    width: 300px;
+    clip-path: inset(0 0 0 0);
 }
 
 .talk p {
+    text-align: center;
     color: white;
     font-family: "Chakra Petch";
     font-size: 20px;
-    text-transform: uppercase;
-    min-width: 300px;
-    text-shadow: black 2px 2px 4px;
+    width: max-content;
+    max-width: 300px;
+    text-shadow: black 0px 2px 0px;
+    background-color: #00000001;
+    /*background-color: #3d4045;*/
+    backdrop-filter: blur(4px);
+    padding: 10px;
+}
+
+.talk p b {
+    color:#ffb908;
+    text-wrap: nowrap;
 }
 
 .hidden {

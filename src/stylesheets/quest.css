@@ -13,8 +13,17 @@
     width: 50vw;
 }
 
+.milestone.issue {
+    transition: all 1s ease-out;
+}
+
+
 .milestone h1 {
     font-size: 3em;
+}
+
+.milestone.issue h1 {
+    font-size: 2em;
 }
 
 .milestone * {
@@ -23,9 +32,17 @@
     opacity: 0;
 }
 
+.milestone.issue * {
+    transition: all 1s ease-out;
+}
+
 .milestone .appear {
     letter-spacing: .1em;
     opacity: 1;
+}
+
+.milestone.issue .appear {
+    letter-spacing: normal;
 }
 
 .milestone.appear {
@@ -67,4 +84,33 @@
     margin-left: 20px;
     font-weight: 100;
     opacity: .5;
+}
+
+.marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.marker p {
+    color: white;
+    text-align: center;
+    font-family: "Chakra Petch";
+    font-size: 20px;
+    position: absolute;
+    width: max-content;
+    max-width: 200px;
+    transform: translate(-50%, -50%);
+}
+
+.marker .arrow {
+    position: absolute;
+    top: 0px;
+    left:0px;
+    translate: -50% -50%;
+    rotate: 45deg;
+    width: 30px;
+    height: 30px;
+    border-right: 4px solid white;
+    border-bottom: 4px solid white;
 }

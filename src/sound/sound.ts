@@ -39,6 +39,9 @@ export class SoundManager {
         this.soundLibrary.add("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false });
         this.soundLibrary.add("score", { url: "./sound/ui/score2.mp3", loop: false, singleInstance: false, speed: 2, autoPlay: false });
         this.soundLibrary.add("milestone", { url: "./sound/ui/milestone.mp3", loop: false, singleInstance: false, autoPlay: false });
+        this.soundLibrary.add("click", { url: "./sound/ui/pack/RevenantEarth_UI_clickMain_v2.wav", loop: false, singleInstance: false, autoPlay: false });
+        this.soundLibrary.add("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false });
+        this.soundLibrary.add("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false });
     }
 }
 

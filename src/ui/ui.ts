@@ -210,10 +210,11 @@ export class UIContextMenu extends UIPanel {
     }
 }
 
-export class UIWorldSpaceElement extends UIElement {
-    constructor(type: string, position: Vector, ...classes: string[]) {
+export class UIAbsoluteElement extends UIElement {
+    constructor(type: string, worldPosition: Vector, ...classes: string[]) {
         super(type, ...classes);
         this.htmlElement.style.position = "absolute";
+        this.setWorldPosition(worldPosition);
     }
     setWorldPosition(position: Vector) {
         if (game.camera.inViewX(position.x, 200)) {
@@ -225,5 +226,13 @@ export class UIWorldSpaceElement extends UIElement {
         else {
             this.htmlElement.style.display = "none";
         }
+    }
+    setRenderPosition(position: Vector) {
+        this.htmlElement.style.left = position.x*100 + "%";
+        this.htmlElement.style.top = position.y*100 + "%";
+    }
+    setScreenPosition(position: Vector) {
+        this.htmlElement.style.left = position.x + "px";
+        this.htmlElement.style.top = position.y + "px";
     }
 }

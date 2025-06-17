@@ -79,9 +79,6 @@ export class WindowRenderer extends Component {
     draw(dt: number) {
         if (this.directionComponent != undefined) this.renderMesh.scale.x = this.directionComponent.direction;
         this.renderMesh.position.set(this.transform.position.x, this.transform.position.y);
-        //TODO Emissive texture?
-        //game.app.renderer.render({ container: this.renderMesh, target: Lightmap.texture, transform: new Matrix().translate((this.renderMesh.x - game.camera.position.x) / 4 + game.camera.pixelScreen.x / 2, (this.renderMesh.y - game.camera.position.y) / 4 + game.camera.pixelScreen.y / 2), clear: false });
-
         game.app.renderer.render({ container: this.emissiveMesh, target: Lightmap.texture, clear: false, transform: this.renderMesh.worldTransform });
     }
 }
