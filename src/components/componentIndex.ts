@@ -22,6 +22,7 @@ import { SprinklerCore } from "./custom/sprinklerCore";
 import { Sprinkler } from "./custom/sprinkler";
 import { AnimatedSpriteRenderer } from "./generic/animatedSprite";
 import { TalkComponent } from "./generic/talk";
+import { Power, PowerNetwork } from "./generic/power";
 
 
 export function initComponents(){
@@ -48,4 +49,6 @@ export function initComponents(){
     Component.register(Sprinkler);
     Component.register(AnimatedSpriteRenderer);
     Component.register(TalkComponent);
+    Component.register(Power);
+    Component.register(PowerNetwork);
 }

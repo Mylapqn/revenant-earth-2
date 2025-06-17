@@ -132,5 +132,13 @@ export class Buildable {
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
         });
+                new Buildable({
+            name: "Battery",
+            onBuild: (position) => {
+                const prefab = Prefab.Battery({ position: position, scene: game.activeScene });
+                return prefab;
+            },
+            texture: await Assets.load("./gfx/building/biochar.png"),
+        });
     }
 }

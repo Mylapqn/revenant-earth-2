@@ -13,7 +13,9 @@ export class Inventory extends Component {
         super(parent);
         this.items.set(Item.grass, 10);
         this.items.set(Item.tree, 3);
-        this.items.set(Item.vite, 999);
+        this.items.set(Item.sprinkler, 999);
+        this.items.set(Item.biocharKiln, 999);
+        this.items.set(Item.battery, 999);
     }
 
     add(item: Item, amount: number) {

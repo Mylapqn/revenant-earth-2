@@ -140,12 +140,12 @@ export class Entity implements ISerializable, ISceneObject {
             entity.createComponent(Transform);
         }
 
+        scene?.register(entity);
+        entity.scene = scene;
+
         for (const [key, component] of entity.components) {
             component.init();
         }
-
-        scene?.register(entity);
-        entity.scene = scene;
         return entity;
     }
 
@@ -167,9 +167,7 @@ export class Entity implements ISerializable, ISceneObject {
     }
 
     static deserialise(deserialise: any, scene?: Scene) {
-        const entity = Entity.fromData(deserialise as EntityData);
-        scene?.register(entity);
-        if (scene) entity.scene = scene;
+        const entity = Entity.fromData(deserialise as EntityData, scene);
     }
 
     serialise(mode: StateMode): KindedObject | false {
