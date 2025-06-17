@@ -73,8 +73,7 @@ export class MilestoneManager {
                 {
                     name: "Try your movement", id: "tutMovement", reward: 0, details: "Use WASD to move around. Reach the room on the right to continue.", celebrate: false,
                     onComplete: () => {
-                        game.camera.targetZoom = 1;
-                        game.camera.zoomSpeed = 1;
+                        game.camera.targetZoom = 1.2;
                         game.activeScene.findEntityByName("PlanterGood")!.getComponent(Planter)!.enabled = false;
                         game.activeScene.findEntityByName("PlanterBad")!.getComponent(Planter)!.enabled = false;
                         //new QuestMarker(game.activeScene.findEntityByName("Director")!.transform.position);
@@ -91,6 +90,7 @@ export class MilestoneManager {
                 {
                     name: "Plant a seed in the watered planter", id: "tutPlant1", reward: 0, details: "Plants will thrive with water and nutrients. <br>Press T to select a seed.", celebrate: false,
                     onIssue: (milestone: Milestone) => {
+                        game.camera.targetZoom = 1;
                         game.activeScene.findEntityByName("PlanterGood")!.getComponent(Planter)!.enabled = true;
                         milestone.marker = QuestMarker.atEntity(game.activeScene.findEntityByName("PlanterGood")!, "Plant a seed here");
                     },
@@ -109,6 +109,8 @@ export class MilestoneManager {
                         milestone.marker = QuestMarker.atEntity(game.activeScene.findEntityByName("PlanterBad")!, "Plant a seed here");
                     },
                     onComplete: () => {
+                        game.camera.targetZoom = 1;
+                        game.camera.zoomSpeed = 1;
                         const director = game.activeScene.findEntityByName("Director")!.getComponent(TalkComponent)!;
                         director.talkId = "spaceDirectorTutorialComplete";
                         director.activate();
@@ -123,7 +125,6 @@ export class MilestoneManager {
                 this.currentTier = 1;
             }
         });
-        tutorialQuest.issue(true);
         game.events.on("playerBuild", entity => {
             if (entity.getComponent(Plant)) {
                 this.completeQuest("plantSeed", `You planted a ${entity.getComponent(Plant)!.species.name}`);

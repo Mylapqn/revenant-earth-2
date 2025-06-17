@@ -24,7 +24,7 @@ import { UI } from "./ui/ui";
 import { SoundManager } from "./sound/sound";
 import { Debug } from "./dev/debug";
 import { HitboxLibrary } from "./environment/hitboxLibrary";
-import { displayNumber, RandomGenerator } from "./utils/utils";
+import { displayNumber, RandomGenerator, sleep } from "./utils/utils";
 import { Ambience } from "./hierarchy/ambience";
 import { Light } from "./shaders/lighting/light";
 import { Lightmap } from "./shaders/lighting/lightmap";
@@ -77,7 +77,7 @@ export class Game {
 
     skyLayer!: PixelLayer;
     bgLayers: PixelLayer[] = [];
-    fgLayer!: PixelLayer;
+    //fgLayer!: PixelLayer;
     worldUiLayer!: PixelLayer;
 
     buildingGhost!: BuildingGhost;
@@ -99,6 +99,9 @@ export class Game {
     milestones = new MilestoneManager();
 
     score: Score;
+    backgroundTextures!: Set<Texture>;
+
+    loaded = false;
 
     public get inputEnabled(): boolean {
         return !Debug.editorMode && !this.hacking
@@ -117,22 +120,6 @@ export class Game {
         this.app = app;
         this.input = new Input();
 
-        window.addEventListener("resize", () => this.resize());
-
-        window.addEventListener("beforeunload", (e) => {
-            if (this.input.key("control") && !this.input.key("r")) e.preventDefault();
-        });
-
-        document.addEventListener("contextmenu", (e) => e.preventDefault());
-        document.addEventListener("click", (e) => {
-            [];
-            if (this.input.key("control")) {
-                const nearest = this.nearestEntity(this.worldMouse);
-
-                //if (nearest) DevSync.trigger(nearest.toData());
-            }
-        });
-
         this.score = new Score();
     }
 
@@ -145,11 +132,8 @@ export class Game {
         Shadowmap.resize();
     }
 
-    async init() {
-        (window as any).__PIXI_DEVTOOLS__ = {
-            app: this.app
-        };
-        this.app.renderer.canvas.getContext("webgl2")?.getExtension("EXT_color_buffer_float");
+    async load() {
+        const startTime = performance.now();
         const manifest: AssetsManifest = {
             bundles: [
                 {
@@ -179,9 +163,42 @@ export class Game {
         }
         Assets.init({ manifest });
         await Assets.loadBundle(["bundle"]);
+        this.backgroundTextures = new Set(Object.values((await Assets.loadBundle(["backgrounds"])).backgrounds));
 
         await this.hitboxLibrary.init();
         await this.soundManager.loadSounds();
+        const endTime = performance.now();
+        console.log("Game loaded in", endTime - startTime, "ms");
+        this.loaded = true;
+    }
+
+    /**
+     * Initializes the game. Can only be called after `load()`.
+     */
+    async init() {
+        if (!this.loaded) throw new Error("Game not loaded");
+        (window as any).__PIXI_DEVTOOLS__ = {
+            app: this.app
+        };
+
+        window.addEventListener("resize", () => this.resize());
+
+        window.addEventListener("beforeunload", (e) => {
+            if (this.input.key("control") && !this.input.key("r")) e.preventDefault();
+        });
+
+        document.addEventListener("contextmenu", (e) => e.preventDefault());
+        document.addEventListener("click", (e) => {
+            [];
+            if (this.input.key("control")) {
+                const nearest = this.nearestEntity(this.worldMouse);
+
+                //if (nearest) DevSync.trigger(nearest.toData());
+            }
+        });
+
+        this.app.renderer.canvas.getContext("webgl2")?.getExtension("EXT_color_buffer_float");
+
 
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
@@ -239,7 +256,7 @@ export class Game {
             const bgl = new PixelLayer({ autoResize: true, autoRender: true, depth: i / layers, parent: this.skyContainer });
             this.bgLayers.push(bgl);
             if (i >= layers - 3)
-                bgl.randomTerrainWithSprites(new Set(Object.values((await Assets.loadBundle(["backgrounds"])).backgrounds)));
+                bgl.randomTerrainWithSprites(this.backgroundTextures);
             else {
                 bgl.randomTerrain();
             }
@@ -247,8 +264,8 @@ export class Game {
 
 
         this.pixelLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1, parent: this.mainContainer, worldSpace: true });
-        this.fgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1.5, parent: this.fgContainer, worldSpace: true });
-        this.fgLayer.randomTerrain(40);
+        //this.fgLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 1.5, parent: this.fgContainer, worldSpace: true });
+        //this.fgLayer.randomTerrain(40);
 
         //this.app.stage.addChild(this.terrainContainer = new Container());
         this.app.stage.addChild((this.playerContainer = new Container()));
@@ -306,7 +323,6 @@ export class Game {
         this.milestones.initQuests();
         Debug.init();
         //game.loadScene("Space Station");
-
         for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 300 + 50) {
             Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Tree", growth: 30, health: 0 });
         }
@@ -319,13 +335,15 @@ export class Game {
         }
         this.resize();
         this.loadScene("Space Station");
-        this.camera.zoom = 3;
-        this.camera.targetZoom = 3;
+        this.camera.zoom = 2;
+        this.camera.targetZoom = 2;
         this.camera.zoomSpeed = .3;
         this.camera.position.set(this.camera.targetPlayerPosition());
+        
         setTimeout(() => {
-            this.camera.targetZoom = 2;
-        }, 500);
+            this.milestones.issueQuest("tutorial", true);
+            this.camera.targetZoom = 1.5;
+        }, 1000)
 
         this.app.ticker.add(this.update, this);
     }

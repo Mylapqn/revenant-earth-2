@@ -38,11 +38,15 @@ export class UIElement {
     public htmlElement: HTMLElement;
     public parent?: UIElement;
     public children: UIElement[];
+    hoverSFX = false;
+    clickSFX = false;
+    onclick?: () => void;
     constructor(type: string, ...classes: string[]) {
         this.children = [];
         this.htmlElement = document.createElement(type);
         this.htmlElement.classList.add(...classes);
         this.htmlElement.addEventListener("mouseenter", () => {
+            if (this.hoverSFX) game.soundManager.play("hover");
             UI.mouseOverUI++;
             UI.lastHoveredElement = this;
         });
@@ -51,6 +55,11 @@ export class UIElement {
             if (UI.mouseOverUI == 0)
                 UI.lastHoveredElement = undefined;
         });
+        this.htmlElement.addEventListener("click", () => {
+            if (this.clickSFX) game.soundManager.play("click");
+            if (this.onclick)
+                this.onclick();
+        })
     }
     remove() {
         while (this.children.length > 0) {
@@ -72,8 +81,10 @@ export class UIElement {
             this.children.push(element);
         }
     }
-    static create(options: { type: string, classes?: string[], parent: HTMLElement, content?: string }) {
+    static create(options: { type: string, classes?: string[], parent: HTMLElement, content?: string, soundEffects?: boolean }) {
         const element = new UIElement(options.type, ...(options.classes ?? []));
+        element.hoverSFX = options.soundEffects ?? false;
+        element.clickSFX = options.soundEffects ?? false;
         options.parent.appendChild(element.htmlElement);
         if (options.content) element.htmlElement.innerHTML = options.content;
         return element;

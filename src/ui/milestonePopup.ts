@@ -25,17 +25,17 @@ export class MilestonePopupManager {
         const waitMult = 1;
         game.soundManager.soundLibrary.play("milestone", { singleInstance: true });
 
-        const panel = UIElement.create({ type: "div", classes: ["milestone", "appear"], parent: UI.container, content: `` });
+        const panel = UIElement.create({ type: "div", classes: ["milestone"], parent: UI.container, content: `` });
         this.currentPopup = panel;
         const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Milestone achieved" });
         const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: options.questName });
         const details = UIElement.create({ type: "p", parent: panel.htmlElement, content: options.detailsText ?? "", classes: ["details"] });
         requestAnimationFrame(() => {
+            panel.htmlElement.classList.add("appear");
             header.htmlElement.classList.add("appear");
         });
 
         await sleep(500 * waitMult);
-
         title.htmlElement.classList.add("appear");
         details.htmlElement.classList.add("appear");
         if (options.reward && options.reward != 0)
@@ -53,12 +53,13 @@ export class MilestonePopupManager {
         const waitMult = 1;
         game.soundManager.soundLibrary.play("quest_issue", { singleInstance: true, volume: 0.2 });
 
-        const panel = UIElement.create({ type: "div", classes: ["milestone", "appear", "issue"], parent: UI.container, content: `` });
+        const panel = UIElement.create({ type: "div", classes: ["milestone", "issue"], parent: UI.container, content: `` });
         this.currentPopup = panel;
         const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Task issued" });
         const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: options.questName });
         const details = UIElement.create({ type: "p", parent: panel.htmlElement, content: options.detailsText ?? "", classes: ["details"] });
         requestAnimationFrame(() => {
+            panel.htmlElement.classList.add("appear");
             header.htmlElement.classList.add("appear");
         });
 

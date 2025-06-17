@@ -5,12 +5,14 @@
     transform: translate(-50%, -50%);
     font-family: "Chakra Petch";
     font-size: 20px;
-    margin: 10px;
+    padding: 80px 10px;
     color: white;
     text-align: center;
     transition: all 3s ease-out;
     opacity: 0;
     width: 50vw;
+    /*text-shadow: black 0px 2px 4px;*/
+    background: radial-gradient(closest-side, #0000003b 0%, #00000000 100%);
 }
 
 .milestone.issue {

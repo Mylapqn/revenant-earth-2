@@ -28,6 +28,7 @@ export class SoundManager {
             await this.loadOneshot(name, url, volume);
         }
     }
+    public play(sound: string) { if (game.loaded) this.soundLibrary.play(sound); }
     async loadSounds() {
         pixiSound.volumeAll = .5;
         this.loadOneshotRange("footstep_dirt", "./sound/footsteps/dirt/footsmuddry_%.wav", 5, 1);

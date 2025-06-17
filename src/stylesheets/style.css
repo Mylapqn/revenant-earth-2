@@ -268,7 +268,8 @@ button:hover {
     width: max-content;
     max-width: 300px;
     text-shadow: black 0px 2px 0px;
-    background-color: #00000001;
+    background-color: #0000007b;
+    background: radial-gradient(closest-side, #0000009f 0%, #00000000 100%);
     /*background-color: #3d4045;*/
     backdrop-filter: blur(4px);
     padding: 10px;
