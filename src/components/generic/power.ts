@@ -13,7 +13,7 @@ export class Power extends Component {
     capacity = 0;
 
     override toData(): ComponentData {
-        return super.toData({ power: this.capacity });
+        return super.toData({ capacity: this.capacity });
     }
 
     override applyData(data?: { capacity: number }): void {
