@@ -2,6 +2,7 @@ import { Game, game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
+import { FadeScreen } from "../../ui/fadeScreen";
 import { UIElement, UIPanel } from "../../ui/ui";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
@@ -46,9 +47,12 @@ export class Door extends Component {
         this.enter();
     }
 
-    enter() {
-        game.loadScene(this.targetScene);
-        const targetDoor = game.activeScene.findComponents(Door).find(comp => comp.doorId === this.doorId);
+    async enter() {
+        if(FadeScreen.inProgress) return;
+        await FadeScreen.fadeIn(200);
+        const scene = game.loadScene(this.targetScene);
+        FadeScreen.fadeOut(700);
+        const targetDoor = scene.findComponents(Door).find(comp => comp.doorId === this.doorId);
         if (targetDoor) {
             game.player.position = targetDoor.transform.position.clone();
             game.camera.position = targetDoor.transform.position.clone().mult(Game.pixelScale);

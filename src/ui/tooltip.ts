@@ -12,7 +12,7 @@ export class UITooltip {
     constructor() {
         this.parentElement = document.createElement("div");
         this.parentElement.id = "tooltip";
-        document.body.appendChild(this.parentElement);
+        UI.container.appendChild(this.parentElement);
     }
     update(dt: number) {
         this.timeSinceLastUpdate += dt;

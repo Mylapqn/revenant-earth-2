@@ -35,6 +35,8 @@ import { BuildingGhost } from "./hierarchy/buildingGhost";
 import { Buildable } from "./hierarchy/buildable";
 import { MilestoneManager } from "./hierarchy/milestoneManager";
 import { QuestMarker } from "./ui/questMarker";
+import { FadeScreen } from "./ui/fadeScreen";
+import { MainMenu } from "./ui/mainMenu";
 
 export let game: Game;
 
@@ -95,13 +97,14 @@ export class Game {
     frameHistory: number[] = [];
     ambience!: Ambience;
 
-    events = new GameEventSystem();
-    milestones = new MilestoneManager();
+    events!: GameEventSystem;
+    milestones!: MilestoneManager;
 
     score: Score;
     backgroundTextures!: Set<Texture>;
 
     loaded = false;
+    inited = false;
 
     public get inputEnabled(): boolean {
         return !Debug.editorMode && !this.hacking
@@ -177,6 +180,7 @@ export class Game {
      */
     async init() {
         if (!this.loaded) throw new Error("Game not loaded");
+        if (this.inited) throw new Error("Game already initialized");
         (window as any).__PIXI_DEVTOOLS__ = {
             app: this.app
         };
@@ -188,17 +192,13 @@ export class Game {
         });
 
         document.addEventListener("contextmenu", (e) => e.preventDefault());
-        document.addEventListener("click", (e) => {
-            [];
-            if (this.input.key("control")) {
-                const nearest = this.nearestEntity(this.worldMouse);
-
-                //if (nearest) DevSync.trigger(nearest.toData());
-            }
-        });
 
         this.app.renderer.canvas.getContext("webgl2")?.getExtension("EXT_color_buffer_float");
+        this.scenes = new Map<string, Scene>();
+        this.bgLayers = [];
 
+        this.events = new GameEventSystem();
+        this.milestones = new MilestoneManager();
 
         this.stateManager = new StateManager();
         this.progressDatabase = new ProgressDatabase();
@@ -207,6 +207,7 @@ export class Game {
         this.globalScene.name = "Global";
         this.activeScene = new Scene();
         game.scenes.set(this.activeScene.name, this.activeScene);
+        game.scenes.set("Menu", new Scene());
         Ambience.deserialise({ kind: "Ambience", ambienceData: { music: "", sound: "wind", background: "bg", ambientColor: [1.5, 1, .5] } }, this.activeScene);
         //this.soundManager.soundLibrary.stop("wind");
         initHandlers();
@@ -334,18 +335,39 @@ export class Game {
             Prefab.Rock({ scene: this.activeScene, x: x, y: 100, type: rand.int(0, 5) });
         }
         this.resize();
+        this.app.ticker.add(this.update, this);
+        this.inited = true;
+    }
+
+    async initTutorial() {
         this.loadScene("Space Station");
         this.camera.zoom = 2;
         this.camera.targetZoom = 2;
         this.camera.zoomSpeed = .3;
         this.camera.position.set(this.camera.targetPlayerPosition());
-        
+
         setTimeout(() => {
             this.milestones.issueQuest("tutorial", true);
             this.camera.targetZoom = 1.5;
         }, 1000)
+    }
 
-        this.app.ticker.add(this.update, this);
+    async initWorld() {
+        this.loadScene("Scene");
+        this.camera.position.set(this.camera.targetPlayerPosition());
+        this.milestones.currentTier = 1;
+    }
+
+    destroyGame() {
+        this.app.ticker.remove(this.update, this);
+        this.app.stage.removeChildren();
+        UI.destroy();
+        window.removeEventListener("resize", this.resize);
+        window.removeEventListener("beforeunload", (e) => {
+            if (this.input.key("control") && !this.input.key("r")) e.preventDefault();
+        });
+        document.removeEventListener("contextmenu", (e) => e.preventDefault());
+        this.inited = false;
     }
 
     update(ticker: Ticker) {
@@ -421,6 +443,7 @@ export class Game {
     loadScene(name: string) {
         this.activeScene.serialise(StateMode.full);
         this.scenes.get(name)!.load();
+        return this.activeScene;
     }
 
     nearestEntity(position: Vectorlike) {
@@ -496,6 +519,10 @@ export class Game {
             }
             if (this.input.keyDown("r")) {
                 this.weather.weatherData.rainBuildup += 2;
+            }
+            if (this.input.keyDown("escape")) {
+                game.loadScene("Menu");
+                MainMenu.instance?.show();
             }
             if (this.input.keyDown("č")) {
                 this.weather.weatherData.dayTime += this.weather.dayLength / 8;

@@ -31,6 +31,10 @@ export class UI {
         UI.fullscreenMenu = new UIFullscreenMenu();
         //setTimeout(() => UI.fullscreenMenu.toggle(true), 100);
     }
+    static destroy(){
+        UI.container.remove();
+        UI.fullscreenMenu.element.remove();
+    }
     static fullscreenMenu: UIFullscreenMenu;
 }
 

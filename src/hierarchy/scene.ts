@@ -75,6 +75,7 @@ export class Scene implements ISerializable {
 
     load() {
         if (game.activeScene !== this) game.activeScene.unload();
+        else return;
         game.activeScene = this;
         this.stateManager.deserialise(this.data, this);
         //console.log(this.data.length);
