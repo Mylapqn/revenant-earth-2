@@ -18,7 +18,8 @@ export class SolarPanel extends Component {
 
     update(dt: number): void {
         const flux = Math.max(game.weather.dayRatio - 0.5, 0) * 2 * 1000 * (1 - (game.weather.weatherData.rainBuildup / 30));
-        const watts = flux * dt * 0.2;
-        this.power?.provide(watts);
+        const area = 1.6 * 3;
+        const watts = flux * dt * 0.2 * area;
+        this.power?.provide(watts / 1000);
     }
 }

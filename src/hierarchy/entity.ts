@@ -13,6 +13,7 @@ export type EntityEvents = {
     interact: [];
     hoverOn: [];
     hoverOff: [];
+    hovered: [];
 };
 
 export type Callback<T extends keyof EntityEvents> = (...args: EntityEvents[T]) => void;
