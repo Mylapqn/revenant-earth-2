@@ -158,11 +158,11 @@ export class Plant extends Component {
             this.envirnonmentProvider.terrain.consumeFertility(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.nutrients * 3);
             this.envirnonmentProvider.atmo.co2 -= usedGrowth * this.species.statsPerGrowth.co2 * .1;
             this.envirnonmentProvider.atmo.co2 = clamp(this.envirnonmentProvider.atmo.co2, 200, 800);
-            this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, usedGrowth * this.species.statsPerGrowth.erosion * .05);
-            this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.water * .01);
+            this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, usedGrowth * this.species.statsPerGrowth.erosion * .002);
+            this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.water * .0025);
         }
         if (this.health > 0) {
-            let requiredMoisture = dt * this.species.statsPerTime.water * (this.growth + 2) * .00005;
+            let requiredMoisture = dt * this.species.statsPerTime.water * (this.growth + 2) * .000025;
             if (tdata.moisture < requiredMoisture) {
                 this.damage((requiredMoisture - tdata.moisture) * 8 * clamp(1 - (this.growth / this.species.statsPerGrowth.maxGrowth), .2, 1), "lack of water");
             }

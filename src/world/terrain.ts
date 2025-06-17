@@ -364,7 +364,7 @@ export class Terrain implements ISerializable, ISceneObject {
                 evaporated = 0.001 * game.atmo.celsius * dt;
             }
             // has water
-            evaporated += a.moisture * 0.0001 * game.atmo.celsius * dt;
+            evaporated += a.moisture * 0.00002 * game.atmo.celsius * dt;
 
             if (a.moisture - evaporated < 0) {
                 evaporated = a.moisture;

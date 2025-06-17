@@ -39,6 +39,7 @@ export class EntityTooltip extends Component {
 
     update(dt: number) {
         if (!this.enabled) return;
+        this.entity.emit("hovered");
         let x = Math.abs(game.worldMouse.x - this.transform.position.x);
         let y = Math.abs(game.worldMouse.y - this.transform.position.y);
         if (x < 20 && y < 40) {

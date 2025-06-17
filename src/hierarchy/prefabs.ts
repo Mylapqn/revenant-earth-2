@@ -120,6 +120,7 @@ export class Prefab {
                         componentType: "SprinklerCore",
                         data: {}
                     },
+                    { componentType: "Power" },
                     {
                         componentType: "TerrainAlign",
                         data: {
@@ -128,6 +129,9 @@ export class Prefab {
                     },
                     {
                         componentType: "Interactable",
+                    },
+                    {
+                        componentType: "EntityTooltip",
                     }
                 ],
             },

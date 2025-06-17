@@ -1,8 +1,14 @@
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { EntityTooltip } from "./entityTooltip";
 
 export class Power extends Component {
     static componentType = "Power";
+
+    constructor(entity: Entity) {
+        super(entity);
+        this.onEntity("hovered", () => this.powerInfo());
+    }
 
     capacity = 0;
 
@@ -20,6 +26,13 @@ export class Power extends Component {
 
     provide(amount: number) { this.network.provide(amount); }
 
+    tooltip?: EntityTooltip;
+
+    powerInfo() {
+        if (!this.tooltip) return;
+        this.tooltip.tooltipData.set("power", (this.network.power).toFixed(1) + "/" + (this.network.capacity).toFixed(1) + "kWh");
+    }
+
     init(): void {
         if (this.entity.scene) {
             let network = this.entity.scene.findComponent(PowerNetwork);
@@ -36,6 +49,7 @@ export class Power extends Component {
 
             network.connect(this);
         } else console.error("No scene");
+        this.tooltip = this.entity.getComponent(EntityTooltip);
     }
 
     override remove(): void {
