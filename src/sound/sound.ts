@@ -34,16 +34,16 @@ export class SoundManager {
         this.loadOneshotRange("footstep_dirt", "./sound/footsteps/dirt/footsmuddry_%.wav", 5, 1);
         this.loadOneshotRange("footstep_metal", "./sound/footsteps/metal/footsteps_metal-%.mp3", 5, 1, .3);
         this.loadOneshotRange("thunder", "./sound/sfx/thunder/thunder_%.mp3", 3, 1);
-        this.soundLibrary.add("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true });
-        this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true });
-        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false });
-        this.soundLibrary.add("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false });
-        this.soundLibrary.add("score", { url: "./sound/ui/score2.mp3", loop: false, singleInstance: false, speed: 2, autoPlay: false });
-        this.soundLibrary.add("milestone", { url: "./sound/ui/milestone.mp3", loop: false, singleInstance: false, autoPlay: false });
-        this.soundLibrary.add("click", { url: "./sound/ui/pack/RevenantEarth_UI_clickMain_v2.wav", loop: false, singleInstance: false, autoPlay: false });
-        this.soundLibrary.add("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false,volume:.5 });
-        this.soundLibrary.add("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false });
-        this.soundLibrary.add("sprinkler", { url: "./sound/sfx/sprinkler.mp3", loop: false, singleInstance: false, autoPlay: false, volume: .2 });
+        this.soundLibrary.add("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true, preload: true });
+        this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true, preload: true });
+        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false, preload: true });
+        this.soundLibrary.add("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false, preload: true });
+        this.soundLibrary.add("score", { url: "./sound/ui/score2.mp3", loop: false, singleInstance: false, speed: 2, autoPlay: false, preload: true });
+        this.soundLibrary.add("milestone", { url: "./sound/ui/milestone.mp3", loop: false, singleInstance: false, autoPlay: false, preload: true });
+        this.soundLibrary.add("click", { url: "./sound/ui/pack/RevenantEarth_UI_clickMain_v2.wav", loop: false, singleInstance: false, autoPlay: false, preload: true });
+        this.soundLibrary.add("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false, volume: .5, preload: true });
+        this.soundLibrary.add("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false, preload: true });
+        this.soundLibrary.add("sprinkler", { url: "./sound/sfx/sprinkler.mp3", loop: false, singleInstance: false, autoPlay: false, volume: .2, preload: true });
     }
 }
 

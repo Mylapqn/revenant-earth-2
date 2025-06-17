@@ -83,7 +83,7 @@ export class MainMenu {
         quote.htmlElement.classList.add("appear");
         this.updating = false;
         this.hide();
-        const sleepTimer = sleep(3000);
+        const sleepTimer = sleep(5000);
         if (!game.loaded && this.gameLoadedPromise) {
             await this.gameLoadedPromise;
         }
