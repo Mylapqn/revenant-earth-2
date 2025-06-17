@@ -1,4 +1,4 @@
-import { Application, Assets, AssetsManifest, ColorMatrixFilter, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
+import { Application, Assets, AssetsBundle, AssetsManifest, ColorMatrixFilter, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -150,6 +150,8 @@ export class Game {
                         { alias: "biochar", src: "./gfx/building/biochar.png" },
                         { alias: "planter", src: "./gfx/building/planter.png" },
                         { alias: "planter_inspect", src: "./gfx/building/planter_mask.png" },
+                        { alias: "sprinkler", src: "./gfx/building/water_sprinkler.png" },
+                        { alias: "sprinkler_active", src: "./gfx/building/water_sprinkler_active.png" },
                     ]
                 },
                 {
@@ -166,6 +168,8 @@ export class Game {
         }
         Assets.init({ manifest });
         await Assets.loadBundle(["bundle"]);
+        Assets.get("sprinkler_active").source.scaleMode = 'nearest';
+        Assets.get("sprinkler").source.scaleMode = 'nearest';
         this.backgroundTextures = new Set(Object.values((await Assets.loadBundle(["backgrounds"])).backgrounds));
 
         await this.hitboxLibrary.init();

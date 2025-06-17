@@ -67,7 +67,7 @@ export class Interactable extends Component {
             if (x < 30 && y < 40) {
                 if (!this.highlighted) {
                     this.highlighted = true;
-                    game.soundManager.soundLibrary.play("hover",{ volume: 0.2 ,speed:0.5});
+                    //game.soundManager.soundLibrary.play("hover",{ volume: 0.2 ,speed:0.5});
                 }
             }
             else {

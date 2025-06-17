@@ -1,4 +1,4 @@
-import { sound as pixiSound, Sound, SoundLibrary } from "@pixi/sound";
+import { sound as pixiSound, PlayOptions, Sound, SoundLibrary } from "@pixi/sound";
 import { game } from "../game";
 import { ParticleText } from "../hierarchy/particleText";
 import { Vector, Vectorlike } from "../utils/vector";
@@ -28,7 +28,7 @@ export class SoundManager {
             await this.loadOneshot(name, url, volume);
         }
     }
-    public play(sound: string) { if (game.loaded) this.soundLibrary.play(sound); }
+    public play(sound: string, options?: PlayOptions) { if (game.loaded) this.soundLibrary.play(sound, options); }
     async loadSounds() {
         pixiSound.volumeAll = .5;
         this.loadOneshotRange("footstep_dirt", "./sound/footsteps/dirt/footsmuddry_%.wav", 5, 1);
@@ -43,6 +43,7 @@ export class SoundManager {
         this.soundLibrary.add("click", { url: "./sound/ui/pack/RevenantEarth_UI_clickMain_v2.wav", loop: false, singleInstance: false, autoPlay: false });
         this.soundLibrary.add("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false });
         this.soundLibrary.add("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false });
+        this.soundLibrary.add("sprinkler", { url: "./sound/sfx/sprinkler.mp3", loop: false, singleInstance: false, autoPlay: false, volume: .2 });
     }
 }
 

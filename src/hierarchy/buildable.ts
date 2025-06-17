@@ -122,7 +122,7 @@ export class Buildable {
                 const prefab = Prefab.SprinklerArray({ position: position, scene: game.activeScene })[0];
                 return prefab;
             },
-            texture: await Assets.load("./gfx/building/biochar.png"),
+            texture: await Assets.load("./gfx/building/water_tank.png"),
         });
         new Buildable({
             name: "Biochar Kiln",

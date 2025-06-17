@@ -113,7 +113,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "window_big.png",
+                            asset: "./gfx/building/water_tank.png",
                         },
                     },
                     {
@@ -123,7 +123,7 @@ export class Prefab {
                     {
                         componentType: "TerrainAlign",
                         data: {
-                            yOffset: 20
+                            yOffset: 26
                         }
                     },
                     {
@@ -155,7 +155,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "vite.svg",
+                            asset: "./gfx/building/water_sprinkler.png",
                         },
                     },
                     {
@@ -167,7 +167,7 @@ export class Prefab {
                     {
                         componentType: "TerrainAlign",
                         data: {
-                            yOffset: 0
+                            yOffset: 16
                         }
                     }
                 ],
