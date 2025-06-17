@@ -9,6 +9,7 @@ import { VolumeCurve } from "../sound/sound";
 import { Debug } from "../dev/debug";
 import { ParticleText } from "../hierarchy/particleText";
 
+
 export class Weather implements ISerializable, ISceneObject {
     weatherData: WeatherData = {
         rainBuildup: 0,
@@ -26,6 +27,13 @@ export class Weather implements ISerializable, ISceneObject {
     thunderCount: number = 0;
     weatherSpeed = .5;
     rainFadeIn = 0;
+
+    /**
+     *  0: midnight, 0.5: sunrise/sunset, 1: noon
+     */
+    get dayRatio() {
+        return (Math.sin((this.weatherData.dayTime / this.dayLength + .5) * Math.PI * 2) * .5 + .5) || 0;
+    }
 
     cloudMesh: CloudMesh;
 

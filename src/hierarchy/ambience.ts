@@ -39,7 +39,7 @@ export class Ambience implements ISceneObject, ISerializable {
     }
     ambientColor() {
         //0: midnight, 0.5: sunrise/sunset, 1: noon
-        const dayRatio = (Math.sin((game.weather.weatherData.dayTime / game.weather.dayLength + .5) * Math.PI * 2) * .5 + .5) || 0;
+        const dayRatio = game.weather.dayRatio;
         const sunsetRatio = clamp(1 - Math.abs(dayRatio - .6) * 4);
         const sunsetIntensity = Math.pow(sunsetRatio, 2);
         if (!game.activeScene.hasTerrain) return CustomColor.fromShader(game.ambience.data.ambientColor);
