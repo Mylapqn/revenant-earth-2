@@ -205,9 +205,9 @@ export class Plant extends Component {
             this.drawPlant();
             if (oldHealth > 0)
                 new ParticleText("died from " + reason, this.transform.position.clone().add(new Vector(0, -40)));
-            if(this.tooltipComponent){
+            if (this.tooltipComponent) {
+                //this.tooltipComponent.tooltipData.set("status", "died from " + reason);
                 this.tooltipComponent.tooltipData.clear();
-                this.tooltipComponent.tooltipData.set("status", "died from " + reason);
                 this.tooltipComponent.enabled = false;
             }
         }
@@ -298,7 +298,7 @@ export class Plant extends Component {
     }
 
     setCullVisible(visible: boolean) {
-        if (this.tooltipComponent != undefined)
+        if (this.tooltipComponent != undefined && this.health > 0)
             this.tooltipComponent.enabled = visible;
         this.shaderMeshComponent.renderMesh.visible = visible;
         this.shaderMeshComponent.renderMesh.shader.enabled = visible;

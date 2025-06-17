@@ -5,6 +5,7 @@ import { Entity } from "../../hierarchy/entity";
 import { BasicSprite } from "../generic/basicSprite";
 import { SprinklerCore } from "./sprinklerCore";
 import { filters } from "@pixi/sound";
+import { clamp } from "../../utils/utils";
 
 export class Sprinkler extends Component {
     static componentType = "Sprinkler";
@@ -59,6 +60,6 @@ export class Sprinkler extends Component {
         game.terrain.addMoisture(this.transform.position.x + game.terrain.dataWidth, sprinklerRate / 4);
         game.terrain.addMoisture(this.transform.position.x - game.terrain.dataWidth, sprinklerRate / 4);
         game.terrain.addMoisture(this.transform.position.x, sprinklerRate / 2);
-        if(game.camera.inViewX(this.transform.position.x, 0)) game.soundManager.play("sprinkler",{volume: 0.01,filters:[new filters.StereoFilter((this.transform.position.x - game.player.position.x)*.2)]});
+        if (game.camera.inViewX(this.transform.position.x, 0)) game.soundManager.play("sprinkler", { volume: 0.01, filters: [new filters.StereoFilter(clamp((this.transform.position.x - game.player.position.x) * .2, -1, 1))] });
     }
 }
