@@ -1,6 +1,6 @@
 import { Body, Ellipse } from "detect-collisions";
 import { Game, game } from "./game";
-import { Assets, Graphics, Matrix, Sprite, Spritesheet } from "pixi.js";
+import { Assets, buildAdaptiveBezier, Graphics, Matrix, Sprite, Spritesheet } from "pixi.js";
 import { Vector, Vectorlike } from "./utils/vector";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { LimbSystem } from "./limbs/limbSystem";
@@ -18,6 +18,7 @@ import { Lightmap } from "./shaders/lighting/lightmap";
 import { SurfaceMaterial } from "./world/terrain";
 import { Light } from "./shaders/lighting/light";
 import { Inventory } from "./components/generic/inventory";
+import { Buildable } from "./hierarchy/buildable";
 
 export class Player implements ISerializable {
     position = new Vector(1100, -50);
@@ -196,7 +197,7 @@ export class Player implements ISerializable {
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
 
-        
+
         this.playerHitbox.setPosition(this.position.x, this.position.y);
         this.playerHitbox.updateBody(true);
 
@@ -270,6 +271,10 @@ export class Player implements ISerializable {
 
     serialise(mode: StateMode): false | PlayerData {
         return { kind: "Player", position: this.position, velocity: this.velocity };
+    }
+
+    buildable(name: string) {
+        Buildable.activate(name);
     }
 
     static deserialise(data: PlayerData, scene?: Scene) {

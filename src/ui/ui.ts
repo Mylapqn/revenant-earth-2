@@ -113,7 +113,7 @@ export class UIFullscreenMenu {
 
         const equipmentFilter = UI.customDiv(categoryFilter);
         equipmentFilter.innerText = "Equipment";
-                equipmentFilter.addEventListener("click", () => {
+        equipmentFilter.addEventListener("click", () => {
             this.selectedGroup = ItemGroup.Tool;
             seedFilter.classList.remove("active");
             equipmentFilter.classList.add("active");
@@ -125,7 +125,7 @@ export class UIFullscreenMenu {
         UI.customDiv(itemHeader).innerText = "Amount";
         this.itemHolder = UI.customDiv(inventoryPanel, "itemHolder");
 
-        
+
     }
 
     selectedGroup = ItemGroup.Seed;
@@ -165,6 +165,10 @@ export class UIFullscreenMenu {
         itemDescription.innerText = item.description;
         const itemAmount = UI.customDiv(inventoryItem, "itemAmount");
         itemAmount.innerText = amount.toString();
+
+        inventoryItem.addEventListener("click", () => {
+            game.player.buildable(item.name);
+        })
     }
 }
 
@@ -228,8 +232,8 @@ export class UIAbsoluteElement extends UIElement {
         }
     }
     setRenderPosition(position: Vector) {
-        this.htmlElement.style.left = position.x*100 + "%";
-        this.htmlElement.style.top = position.y*100 + "%";
+        this.htmlElement.style.left = position.x * 100 + "%";
+        this.htmlElement.style.top = position.y * 100 + "%";
     }
     setScreenPosition(position: Vector) {
         this.htmlElement.style.left = position.x + "px";

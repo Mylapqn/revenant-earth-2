@@ -7,7 +7,9 @@ export enum ItemGroup {
 export enum Item {
     tree,
     grass,
-    vite
+    sprinkler,
+    biocharKiln,
+    battery
 }
 
 
@@ -31,10 +33,22 @@ export const itemDefinitions: Record<Item, ItemDefinition> = {
         description: "Grass description",
         icon: "tree.png"
     },
-    [Item.vite]: {
+    [Item.sprinkler]: {
         group: ItemGroup.Tool,
-        name: "Vite",
-        description: "Vite, ze nic nevite",
+        name: "Sprinkler",
+        description: "Vite, ze nic nesprinkler",
         icon: "vite.svg"
-    }
+    },
+    [Item.biocharKiln]: {
+        group: ItemGroup.Tool,
+        name: "Biochar Kiln",
+        description: "Biochar, ze nic neskilnkler",
+        icon: "vite.svg"
+    },
+    [Item.battery]: {
+        group: ItemGroup.Tool,
+        name: "Battery",
+        description: "Ba, ze nic terry",
+        icon: "vite.svg"
+    },
 }

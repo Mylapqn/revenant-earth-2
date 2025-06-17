@@ -191,6 +191,31 @@ export class Prefab {
         return parts;
     }
 
+    static Battery(params: PrefabParams) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Battery",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "vite.svg",
+                        },
+                    },
+                    {
+                        componentType: "Power",
+                        data: { capacity: 100 }
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
+
 
     static Planter(params: PrefabParams) {
         let newEntity = Entity.fromData(
