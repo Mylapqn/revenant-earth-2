@@ -163,6 +163,7 @@ export class UIFullscreenMenu {
             this.element.classList.add("menuHide");
             this.element.classList.remove("menuAppear");
             this.shown = false;
+            UI.mouseOverUI = 0;
         }
     }
 
