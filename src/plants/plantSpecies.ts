@@ -24,5 +24,5 @@ export class PlantSpecies {
 }
 
 export type PlantStatsPerGrowth = { co2: number; nutrients: number; biomass: number; water: number; erosion: number, maxGrowth: number };
-export type PlantStatsPerTime = { pollution: number; water: number; pollutionDamage: number };
+export type PlantStatsPerTime = { pollution: number; water: number; pollutionDamage: number, grassiness: number };
 export type PlantGeneratorData = { initialBranches: number; lengthPerGrowth: number; leaves: boolean };

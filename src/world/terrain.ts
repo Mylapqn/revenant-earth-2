@@ -14,7 +14,7 @@ import surfaceFragment from "../shaders/terrain/terrainSurface.frag?raw";
 import groundFogVertex from "../shaders/terrain/groundFog.vert?raw";
 import groundFogFragment from "../shaders/terrain/groundFog.frag?raw";
 
-import { placeholderGeometry, lerp } from "../utils/utils";
+import { placeholderGeometry, lerp, clamp } from "../utils/utils";
 import { HitboxGeometry } from "../shaders/hitboxGeometry";
 import { Debug } from "../dev/debug";
 import { Shadowmap } from "../shaders/lighting/shadowmap";
@@ -162,7 +162,8 @@ export class Terrain implements ISerializable, ISceneObject {
                 pollution: Math.abs(Math.cos(r * Math.PI * 2) * 0.8),
                 fertility: Math.abs(Math.cos(r * Math.PI * 3 + Math.PI / 8) * 0.2),
                 erosion: Math.abs(Math.cos(r * Math.PI * 4 - Math.PI / 2) * 0.9),
-                moisture: 0.3
+                moisture: 0.3,
+                grassiness: 0
             });
         }
 
@@ -283,7 +284,7 @@ export class Terrain implements ISerializable, ISceneObject {
         if (index >= this.terrainData.length) index = this.terrainData.length - 1;
         if (index < 0) index = 0;
         let a = this.terrainData[index];
-        if (a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0 };
+        if (a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0,grassiness: 0 };
         return a;
     }
 
@@ -343,6 +344,12 @@ export class Terrain implements ISerializable, ISceneObject {
         return grams;
     }
 
+    addGrass(x: number | Vectorlike, value: number) {
+        const a = this.getProperties(x);
+        a.grassiness += value;
+        if (a.grassiness > 1) a.grassiness = 1;
+    }
+
     updateProperties(dt: number) {
         for (let index = 0; index < this.terrainData.length - 1; index++) {
             const a = this.terrainData[index];
@@ -384,6 +391,9 @@ export class Terrain implements ISerializable, ISceneObject {
         // energy to evaporate
         const energy = evaporated * 1000;
         game.atmo.energy(-energy, "evaporation");
+
+        a.grassiness -= a.grassiness * 0.02 * dt;
+        a.grassiness = clamp(a.grassiness, 0, 1);
     }
 
     draw() {
@@ -401,8 +411,8 @@ export class Terrain implements ISerializable, ISceneObject {
             const tdata = this.getProperties(node.x);
             const adata = game.atmo.getProperties(node.x);
 
-            terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion);
-            terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion);
+            terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion, tdata.grassiness);
+            terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion, tdata.grassiness);
 
             atmoStats.push(adata.pollution);
             atmoStats.push(adata.pollution);
@@ -531,4 +541,5 @@ export type TerrainData = {
     fertility: number;
     erosion: number;
     moisture: number;
+    grassiness: number;
 };

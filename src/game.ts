@@ -223,14 +223,14 @@ export class Game {
 
 
         new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1, maxGrowth: 50 },
-            { pollution: 1, water: 1, pollutionDamage: 1 }, {
+            { pollution: 1, water: 1, pollutionDamage: 1, grassiness: 0 }, {
             initialBranches: 1,
             lengthPerGrowth: 4,
             leaves: true
         });
         Buildable.plantBuildable(PlantSpecies.species.get("Tree")!);
         new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: .1, erosion: 4, maxGrowth: 7 },
-            { pollution: 0, water: 3, pollutionDamage: .5 },
+            { pollution: 0, water: 3, pollutionDamage: .5, grassiness: 1 },
             {
                 initialBranches: 8,
                 lengthPerGrowth: 2,

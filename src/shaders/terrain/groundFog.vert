@@ -2,11 +2,11 @@
 
 in vec2 aPosition;
 in vec2 aUV;
-in vec3 aTerrainStats;
+in vec4 aTerrainStats;
 in float aAtmoStats;
 
 out vec2 vUV;
-out vec3 vTerrainStats;
+out vec4 vTerrainStats;
 out float vPollution;
 out vec2 vWorldUV;
 

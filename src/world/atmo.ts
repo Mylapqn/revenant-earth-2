@@ -102,7 +102,7 @@ export class Atmo implements ISerializable, ISceneObject {
     processGlobal(dt: number) {
         //const influx = 340;
         const influx = Math.max((game.weather.dayRatio - 0.25) * 1.25 * 1000, 0);
-        Debug.log(`game.weather.dayRatio: ${game.weather.dayRatio}`);
+        //Debug.log(`game.weather.dayRatio: ${game.weather.dayRatio}`);
 
         const reflect = (game.weather.weatherData.rainBuildup / 30) * 0.8;
 

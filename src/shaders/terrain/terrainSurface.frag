@@ -3,8 +3,8 @@ precision mediump float;
 uniform sampler2D uSampler;
 uniform int uInspectMode;
 in vec2 vUV;
-//moisture, fertility, erosion
-in vec3 vTerrainStats;
+//moisture, fertility, erosion, grassiness
+in vec4 vTerrainStats;
 in float vTerrainInspect;
 out vec4 color;
 
@@ -108,7 +108,7 @@ void main() {
     vec2 uv = vUV;
     color = texture(uSampler, uv);
     float voronoi = voronoi(uv * 5.f).r;
-    float cracks = clamp(step(voronoi, max(.03f, vTerrainStats.b * (1.f - uv.y) * .3f - .1f)) * (1.f - uv.y) * vTerrainStats.b, 0.f, 1.f);
+    float cracks = clamp(step(voronoi, max(.03f, vTerrainStats.z * (1.f - uv.y) * .3f - .1f)) * (1.f - uv.y) * vTerrainStats.z, 0.f, 1.f);
     float noise = fractalNoise(uv * 1.f, 4, 2.f, .8f);
     float HFnoise = fractalNoise(uv * 1.f, 5, 2.f, .9f);
     float baseMask = (2.f - uv.y * 3.f) * (noise + .2f);
@@ -118,15 +118,16 @@ void main() {
     wetness = clamp(wetness - voronoi * vTerrainStats.b * 2.f, 0.f, 1.f);
     wetness = posterise(wetness, 2);
     float fertility = clamp((1.5f - uv.y) * mix(1.f, noise, .6f) * vTerrainStats.y * 3.f, 0.f, 1.f);
-    fertility = posterise(fertility,2);
+    fertility = posterise(fertility, 2);
     vec3 baseColor = vec3(0.34f, 0.22f, 0.17f);
     vec3 wetColor = vec3(0.61f, 0.44f, 0.41f);
     vec3 dryColor = vec3(0.51f, 0.44f, 0.42f);
     vec3 fertColor = vec3(0.23f, 0.05f, 0.04f);
     vec3 crackColor = vec3(0.07f, 0.06f, 0.06f);
+    vec3 grassColor = vec3(0.35f, 0.57f, 0.24f);
     vec3 inspectLowColor = vec3(0.56f, 0.09f, 0.01f);
     vec3 inspectHighColor = vec3(0.07f, 0.93f, 0.17f);
-    float inspect = posterise(vTerrainInspect*1.1, 5);
+    float inspect = posterise(vTerrainInspect * 1.1f, 5);
     vec3 inspectColor = normalize(vec3(1.f - inspect, inspect, 0.1f)) * .8f;
     //inspectColor = mix(inspectLowColor, inspectHighColor, inspect);
     vec3 mixedColor = baseColor;
@@ -134,10 +135,11 @@ void main() {
     mixedColor *= mix(vec3(1.f), wetColor, wetness);
     //mixedColor = mix(mixedColor, baseColor*1.4f, cracks);
     mixedColor = mix(mixedColor, crackColor, cracks);
-    mixedColor = mix(mixedColor, baseColor * 1.4f, surfaceLight);
+    vec3 surfaceColor = mix(baseColor * 1.4f, grassColor, step(clamp(HFnoise * .9f + .1f, 0.f, 1.f), vTerrainStats.w));
+    mixedColor = mix(mixedColor, surfaceColor, surfaceLight);
     color = vec4(mixedColor, 1.f);
     color.rgb = mix(color.rgb, inspectColor, float(uInspectMode));
-    baseMask = mix(baseMask, step(.5f, (1.f - uv.y) * .7f + HFnoise * .5f * clamp(.2f + inspect * .2f, 0.f, 1.f)), float(uInspectMode));
+    baseMask = mix(baseMask, step(.5f, (1.f - uv.y) * .7f + HFnoise * .5f * clamp(.2f + inspect * .2f, 0.f, .99f)), float(uInspectMode));
     //color = vec4(1.);
     color *= baseMask;
     //color = vec4(fertility);

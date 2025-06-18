@@ -3,7 +3,7 @@ precision mediump float;
 uniform sampler2D uSampler;
 in vec2 vUV;
 //moisture, fertility, erosion
-in vec3 vTerrainStats;
+in vec4 vTerrainStats;
 in vec2 vWorldUV;
 uniform float uTime;
 

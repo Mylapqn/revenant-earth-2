@@ -33,7 +33,7 @@ export class Planter extends Component {
         this.onEntity("update", (dt) => this.update(dt));
     }
 
-    terrainData: TerrainData = { pollution: 0, fertility: 1, erosion: 0.9, moisture: 0.3 };
+    terrainData: TerrainData = { pollution: 0, fertility: 1, erosion: 0.9, moisture: 0.3,grassiness:0 };
     atmoData: AtmoData = { pollution: 0 };
 
     override toData(): ComponentData {
@@ -126,6 +126,9 @@ export class Planter extends Component {
                 removeMoisture(x, value) {
                     return Terrain.prototype.removeMoisture.call(this, x, value);
                 },
+                addGrass(x, value) {
+                    return Terrain.prototype.addGrass.call(this, x, value);
+                }
 
             }, atmo: {
                 getProperties: (x: number | Vectorlike) => this.atmoData,
@@ -149,6 +152,7 @@ export interface ITerrainEvnironmentProvider {
     consumeFertility(x: number | Vectorlike, filterRate: number, limit?: number): number
     fixErosion(x: number | Vectorlike, value: number): void
     removeMoisture(x: number | Vectorlike, value: number): void
+    addGrass(x: number | Vectorlike, value: number): void
 
 }
 

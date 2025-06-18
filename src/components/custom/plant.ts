@@ -119,7 +119,7 @@ export class Plant extends Component {
                 this.envirnonmentProvider.atmo.co2 += releasedCo2;
                 this.storedCo2 -= releasedCo2;
                 if (this.storedCo2 <= 0) this.storedCo2 = 0;
-                Debug.log("released co2: " + releasedCo2);
+                //Debug.log("released co2: " + releasedCo2);
             }
             return;
         }
@@ -190,6 +190,9 @@ export class Plant extends Component {
             let requiredMoisture = dt * this.species.statsPerTime.water * (this.growth + 2) * .000025;
             if (tdata.moisture < requiredMoisture) {
                 this.damage((requiredMoisture - tdata.moisture) * 8 * clamp(1 - (this.growth / this.species.statsPerGrowth.maxGrowth), .2, 1), "lack of water");
+            }
+            else {
+                this.envirnonmentProvider.terrain.addGrass(this.transform.position.x, this.species.statsPerTime.grassiness * .01 * dt * this.growth / this.species.statsPerGrowth.maxGrowth);
             }
             this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, requiredMoisture);
         }
