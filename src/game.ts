@@ -144,6 +144,7 @@ export class Game {
                         { alias: "player_anim", src: "./anim/player2.json" },
                         { alias: "director_anim", src: "./anim/director.json" },
                         { alias: "bg", src: "./bg2.png" },
+                        { alias: "barrel", src: "./barrel.png" },
                         { alias: "metal_bg", src: "./interior_bg.png" },
                         { alias: "space", src: "./space_tile.png" },
                         { alias: "monogram", src: "./font/monogram.ttf" },
@@ -799,5 +800,9 @@ export class Game {
             },
             this.activeScene
         );
-    }
+
+        for (let x = 0; x < 10; x++) {
+            Prefab.Polluter({scene: this.activeScene, x: 3200 + x * 100 + Math.random() * 90, pollution: 10});
+        }
+    }    
 }

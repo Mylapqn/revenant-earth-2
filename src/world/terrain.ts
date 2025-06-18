@@ -378,6 +378,9 @@ export class Terrain implements ISerializable, ISceneObject {
             if (a.moisture > waterkeep) {
                 // in water
                 evaporated = 0.001 * game.atmo.celsius * dt;
+                if (a.pollution > 0.1) {
+                    a.pollution -= 0.001 * dt * a.pollution;
+                }
             }
             // has water
             evaporated += a.moisture * 0.00002 * game.atmo.celsius * dt;
@@ -386,6 +389,7 @@ export class Terrain implements ISerializable, ISceneObject {
                 evaporated = a.moisture;
             }
         }
+
         a.moisture -= evaporated;
         game.atmo.waterLevel += evaporated;
         // energy to evaporate
