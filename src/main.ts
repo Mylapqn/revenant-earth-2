@@ -13,21 +13,23 @@ import { UI, UIQuickInventory } from './ui/ui';
 
 async function init() {
     const app = new Application();
-    await app.init({ background: '#000000', resizeTo: window, antialias: false, powerPreference: "high-performance",roundPixels:false});
+    await app.init({ background: '#000000', resizeTo: window, antialias: false, powerPreference: "high-performance", roundPixels: false });
     document.body.appendChild(app.canvas);
-    
+
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('dragstart', event => event.preventDefault());
 
     FadeScreen.init();
     const game = new Game(app);
-    //new MainMenu(game);
-    await game.load();
+    new MainMenu(game);
+    
+    /*await game.load();
     await game.init();
     await game.initWorld();
-        setTimeout(() => {
-            UI.quickInventory!.toggle();
-        }, 20);
+    setTimeout(() => {
+        UI.quickInventory!.toggle();
+    }, 20);*/
+
     //DevSync.init();
 }
 

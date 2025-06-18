@@ -82,7 +82,7 @@ export class Atmo implements ISerializable, ISceneObject {
 
         this.processGlobal(dt);
 
-        Object.entries(game.atmo.energyMove).forEach(([k, v]) => Debug.log(k + ": " + v.toFixed(1)));
+        //Object.entries(game.atmo.energyMove).forEach(([k, v]) => Debug.log(k + ": " + v.toFixed(1)));
 
         this.energyMove = {};
 

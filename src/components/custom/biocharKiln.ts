@@ -40,8 +40,8 @@ export class BiocharKiln extends Component {
         new ParticleText(`processed ${plantsInRadius.length} plants`, this.transform.position.clone().add(new Vector(0, -50)));
         for (const plant of plantsInRadius) {
             plant.entity.remove();
-            game.score.addWithFx(100, game.camera.worldToRender(plant.transform.position));
-            await sleep(100);    
+            game.score.addWithFx(90 * plant.health + 10, game.camera.worldToRender(plant.transform.position));
+            await sleep(100);
         }
     }
 }
