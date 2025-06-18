@@ -1,6 +1,7 @@
 import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { primitiveObject } from "../../hierarchy/serialise";
 import { MouseButton } from "../../input";
 import { BasicSprite } from "./basicSprite";
 import { Interactable } from "./interactable";
@@ -22,6 +23,10 @@ export class EntityTooltip extends Component {
         if (value == this._enabled) return;
         if (!value) this.entity.emit("hoverOff");
         this._enabled = value;
+    }
+
+    override applyData(data?: { tooltipName?: string }): void {
+        this.tooltipName = data?.tooltipName ?? "";
     }
 
     constructor(parent: Entity) {

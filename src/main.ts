@@ -9,6 +9,7 @@ import './stylesheets/mainMenu.css';
 import { DevSync } from './dev/devsync';
 import { MainMenu } from './ui/mainMenu';
 import { FadeScreen } from './ui/fadeScreen';
+import { UI, UIQuickInventory } from './ui/ui';
 
 async function init() {
     const app = new Application();
@@ -20,8 +21,13 @@ async function init() {
 
     FadeScreen.init();
     const game = new Game(app);
-    new MainMenu(game);
-    //await game.init();
+    //new MainMenu(game);
+    await game.load();
+    await game.init();
+    await game.initWorld();
+        setTimeout(() => {
+            UI.quickInventory!.toggle();
+        }, 20);
     //DevSync.init();
 }
 

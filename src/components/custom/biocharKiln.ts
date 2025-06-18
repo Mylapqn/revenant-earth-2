@@ -11,7 +11,7 @@ export class BiocharKiln extends Component {
     constructor(entity: Entity) {
         super(entity);
         this.onEntity("update", (dt) => this.update(dt));
-        this.onEntity("firstUpdate", () => this.kiln());
+        this.onEntity("interact", () => this.kiln());
     }
     update(dt: number) {
     }

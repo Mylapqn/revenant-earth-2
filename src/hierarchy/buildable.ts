@@ -8,6 +8,7 @@ import { Prefab } from "./prefabs";
 import { Plant } from "../components/custom/plant";
 import { Planter } from "../components/custom/planter";
 import { Debug } from "../dev/debug";
+import { Item, itemDefinitions, ItemGroup } from "../itemDefinitions";
 
 export type ValidateResults = { valid: boolean, reason: string, warning?: string };
 export type CheckResults = ValidateResults & { snap: Vectorlike };
@@ -85,6 +86,7 @@ export class Buildable {
                 const planter = game.activeScene.findComponent(Planter, (planter) => planter.transform.position.distanceSquared(position) < planter.radius ** 2);
                 const plant = Prefab.Plant({ position: position, species: species.name, growth: 2 });
                 plant.getComponent(Plant)!.plantedIn = planter ? planter : undefined;
+                game.player.inventory?.spend(Object.entries(itemDefinitions).find(([, item]) => item.name == species.name)![0] as Item);
                 return plant;
             },
             drawGhost: () => {
@@ -120,6 +122,7 @@ export class Buildable {
             name: "Sprinkler",
             onBuild: (position) => {
                 const prefab = Prefab.SprinklerArray({ position: position, scene: game.activeScene })[0];
+                game.player.inventory?.spend(Item.sprinkler);
                 return prefab;
             },
             texture: await Assets.load("./gfx/building/water_tank.png"),
@@ -128,6 +131,7 @@ export class Buildable {
             name: "Biochar Kiln",
             onBuild: (position) => {
                 const prefab = Prefab.BiocharKiln({ position: position, scene: game.activeScene });
+                game.player.inventory?.spend(Item.biocharKiln);
                 return prefab;
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
@@ -136,6 +140,7 @@ export class Buildable {
             name: "Battery",
             onBuild: (position) => {
                 const prefab = Prefab.Battery({ position: position, scene: game.activeScene });
+                game.player.inventory?.spend(Item.battery);
                 return prefab;
             },
             texture: await Assets.load("./gfx/building/biochar.png"),
@@ -145,6 +150,7 @@ export class Buildable {
             name: "Solar Panel",
             onBuild: (position) => {
                 const prefab = Prefab.SolarPanel({ position: position, scene: game.activeScene });
+                game.player.inventory?.spend(Item.solarPanel);
                 return prefab;
             },
             texture: await Assets.load("./window.png"),

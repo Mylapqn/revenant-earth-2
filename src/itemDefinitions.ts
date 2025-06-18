@@ -5,12 +5,12 @@ export enum ItemGroup {
 }
 
 export enum Item {
-    tree,
-    grass,
-    sprinkler,
-    biocharKiln,
-    battery,
-    solarPanel
+    tree = "tree",
+    grass = "grass",
+    sprinkler = "sprinkler",
+    biocharKiln = "biocharKiln",
+    battery = "battery",
+    solarPanel = "solarPanel"
 }
 
 
