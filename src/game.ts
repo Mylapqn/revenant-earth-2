@@ -313,7 +313,16 @@ export class Game {
             component: [
                 {
                     componentType: "Inventory",
-                    data: {}
+                    data: {
+                        items: {
+                            "solarPanel": 100,
+                            "grass": 100,
+                            "tree": 100,
+                            "biocharKiln": 100,
+                            "battery": 100,
+                            "sprinkler": 100,
+                        }
+                    }
                 }
             ]
         }, this.globalScene);
@@ -397,6 +406,11 @@ export class Game {
         this.score.update(dt);
 
         this.tooltip.update(realDt);
+
+        if (this.input.key("-")) {
+            let out = prompt("spawn");
+            if (out) Debug.prefab(out);
+        }
 
 
 
@@ -484,6 +498,10 @@ export class Game {
             //UI.fullscreenMenu.element.innerHTML = stats;
         }
 
+        if (this.input.keyDown("e")) {
+            UI.quickInventory!.toggle();
+        }
+
         if (this.inputEnabled) {
             if (this.input.keyDown("t")) {
                 if (!this.selectedSeed) {
@@ -528,7 +546,7 @@ export class Game {
                 this.weather.weatherData.rainBuildup += 2;
             }
             if (this.input.keyDown("escape")) {
-                if(MainMenu.instance?.updating) {
+                if (MainMenu.instance?.updating) {
                     MainMenu.instance.continueGame();
                 }
                 else {

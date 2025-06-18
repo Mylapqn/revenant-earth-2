@@ -1,5 +1,6 @@
-import { Component } from "../../hierarchy/component";
+import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { primitiveObject } from "../../hierarchy/serialise";
 import { Item } from "../../itemDefinitions";
 
 
@@ -11,12 +12,16 @@ export class Inventory extends Component {
     items = new Map<Item, number>();
     constructor(parent: Entity) {
         super(parent);
-        this.items.set(Item.grass, 10);
-        this.items.set(Item.tree, 3);
-        this.items.set(Item.sprinkler, 999);
-        this.items.set(Item.biocharKiln, 999);
-        this.items.set(Item.battery, 999);
-        this.items.set(Item.solarPanel, 2);
+    }
+
+    override toData(): ComponentData {
+        const items: Record<string, number> = {}
+        for (const [item, amount] of this.items) items[item.toString()] = amount;
+        return super.toData({ items });
+    }
+
+    override applyData(data?: { items?: Record<string, number> }): void {
+        for (const [item, amount] of Object.entries(data?.items ?? {})) this.items.set(item as Item, amount);
     }
 
     add(item: Item, amount: number) {
@@ -27,6 +32,11 @@ export class Inventory extends Component {
     getAmount(item: Item) {
         if (this.items.has(item)) return this.items.get(item)!;
         else return 0;
+    }
+
+    lootContainer(inventory: Inventory) {
+        for (const [item, amount] of inventory.items) this.add(item, amount);
+        inventory.items.clear();
     }
 
     /**

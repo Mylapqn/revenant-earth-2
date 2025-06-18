@@ -24,6 +24,7 @@ import { AnimatedSpriteRenderer } from "./generic/animatedSprite";
 import { TalkComponent } from "./generic/talk";
 import { Power, PowerNetwork } from "./generic/power";
 import { SolarPanel } from "./custom/solarPanel";
+import { LootComponent } from "./custom/loot";
 
 
 export function initComponents(){
@@ -53,4 +54,5 @@ export function initComponents(){
     Component.register(Power);
     Component.register(PowerNetwork);
     Component.register(SolarPanel);
+    Component.register(LootComponent);
 }

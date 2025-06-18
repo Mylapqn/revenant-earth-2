@@ -273,4 +273,32 @@ export class Prefab {
         newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
         return newEntity;
     }
+
+    static Chest(params: PrefabParams) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Chest",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "oxygenator1.png",
+                        },
+                    },
+                    {
+                        componentType: "Inventory",
+                        data: {}
+                    },
+                    {
+                        componentType: "LootComponent",
+                    }
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
 }

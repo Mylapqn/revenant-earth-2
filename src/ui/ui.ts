@@ -1,5 +1,4 @@
-import { Inventory } from "../components/generic/inventory";
-import { Debug } from "../dev/debug";
+import type { Inventory } from "../components/generic/inventory";
 import { Game, game } from "../game";
 import { ItemDefinition, itemDefinitions, ItemGroup } from "../itemDefinitions";
 import { Vector } from "../utils/vector";
@@ -8,6 +7,7 @@ export class UI {
     static container: HTMLDivElement;
     static mouseOverUI = 0;
     static lastHoveredElement?: UIElement;
+    static quickInventory?: UIQuickInventory;
     static customElement<T = HTMLElement>(type: string, parent: HTMLElement, ...classes: string[]): T {
         const element = document.createElement(type);
         element.classList.add(...classes);
@@ -31,8 +31,9 @@ export class UI {
         UI.fullscreenMenu = new UIFullscreenMenu();
         //setTimeout(() => UI.fullscreenMenu.toggle(true), 100);
         UI.mouseOverUI = 0;
+        UI.quickInventory = new UIQuickInventory();
     }
-    static destroy(){
+    static destroy() {
         UI.container.remove();
         UI.fullscreenMenu.element.remove();
     }
@@ -53,13 +54,13 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         this.htmlElement.classList.add(...classes);
         this.htmlElement.addEventListener("mouseenter", () => {
             if (this.hoverSFX) game.soundManager.play("hover");
-            if(this.blockMouse){
+            if (this.blockMouse) {
                 UI.mouseOverUI++;
                 UI.lastHoveredElement = this;
             }
         });
         this.htmlElement.addEventListener("mouseleave", () => {
-            if(this.blockMouse) {
+            if (this.blockMouse) {
                 UI.mouseOverUI = UI.mouseOverUI > 0 ? UI.mouseOverUI - 1 : 0;
                 if (UI.mouseOverUI == 0)
                     UI.lastHoveredElement = undefined;
@@ -92,7 +93,7 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         }
     }
 
-    static create<T extends HTMLElement>(options: { type: string, classes?: string[], parent: HTMLElement, content?: string, soundEffects?: boolean,blockMouse?: boolean }): UIElement<T> {
+    static create<T extends HTMLElement>(options: { type: string, classes?: string[], parent: HTMLElement, content?: string, soundEffects?: boolean, blockMouse?: boolean }): UIElement<T> {
         const element = new UIElement<T>(options.type, ...(options.classes ?? []));
         element.hoverSFX = options.soundEffects ?? false;
         element.clickSFX = options.soundEffects ?? false;
@@ -234,6 +235,81 @@ export class UIContextMenu extends UIPanel {
         super.remove();
     }
 }
+export class UIQuickInventory extends UIPanel {
+    element: UIElement;
+    visible = false;
+    constructor() {
+        super();
+        this.element = UIElement.create({ type: "div", classes: ["quickInventory"], parent: document.body });
+        this.element.htmlElement.style.display = "none";
+    }
+
+    toggle() {
+        if (this.visible) {
+            this.hide();
+        }
+        else {
+            this.element.htmlElement.style.display = "";
+            this.renderItems(game.player.inventory!);
+            this.visible = true;
+        }
+    }
+
+    hide() {
+        this.element.htmlElement.style.display = "none";
+        this.visible = false;
+        UI.mouseOverUI = 0;
+    }
+
+    currentGroup = ItemGroup.Seed;
+
+    renderItems(inventory: Inventory) {
+        this.element.htmlElement.innerHTML = "";
+
+        {
+            const inventoryItem = UIElement.create({ type: "div", classes: ["quickInventoryItem"], parent: this.element.htmlElement, soundEffects: true });
+            //UIElement.create<HTMLImageElement>({ type: "img", classes: ["quickInventoryItemImage"], parent: inventoryItem.htmlElement }).htmlElement.src
+
+            const itemName = UIElement.create({ type: "div", classes: ["quickInventoryItemName"], parent: inventoryItem.htmlElement });
+            itemName.htmlElement.innerText = "Swap to " + (this.currentGroup == ItemGroup.Seed ? "Tools" : "Seeds");
+
+            inventoryItem.htmlElement.addEventListener("click", () => {
+                this.currentGroup = this.currentGroup == ItemGroup.Seed ? ItemGroup.Tool : ItemGroup.Seed;
+                this.renderItems(game.player.inventory!);
+            })
+        }
+
+        for (const [item, amount] of inventory.items) {
+            const info = itemDefinitions[item];
+            if (info.group != this.currentGroup) continue;
+            const inventoryItem = UIElement.create({ type: "div", classes: ["quickInventoryItem"], parent: this.element.htmlElement, soundEffects: true });
+            UIElement.create<HTMLImageElement>({ type: "img", classes: ["quickInventoryItemImage"], parent: inventoryItem.htmlElement }).htmlElement.src = info.icon;
+            const itemAmount = UIElement.create({ type: "div", classes: ["quickInventoryItemAmount"], parent: inventoryItem.htmlElement });
+            itemAmount.htmlElement.innerText = amount.toString();
+            const itemName = UIElement.create({ type: "div", classes: ["quickInventoryItemName"], parent: inventoryItem.htmlElement });
+            itemName.htmlElement.innerText = info.name;
+
+            inventoryItem.htmlElement.addEventListener("click", () => {
+                game.player.buildable(info.name);
+                this.hide();
+
+            })
+        }
+
+        {
+            const inventoryItem = UIElement.create({ type: "div", classes: ["quickInventoryItem"], parent: this.element.htmlElement, soundEffects: true });
+            //UIElement.create<HTMLImageElement>({ type: "img", classes: ["quickInventoryItemImage"], parent: inventoryItem.htmlElement }).htmlElement.src
+
+            const itemName = UIElement.create({ type: "div", classes: ["quickInventoryItemName"], parent: inventoryItem.htmlElement });
+            itemName.htmlElement.innerText = "Close"
+
+            inventoryItem.htmlElement.addEventListener("click", () => {
+                this.hide();
+            })
+        }
+
+    }
+}
 
 export class UIAbsoluteElement extends UIElement {
     constructor(type: string, worldPosition: Vector, ...classes: string[]) {
@@ -261,3 +337,4 @@ export class UIAbsoluteElement extends UIElement {
         this.htmlElement.style.top = position.y + "px";
     }
 }
+

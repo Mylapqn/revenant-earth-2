@@ -87,7 +87,8 @@
 }
 
 .inventoryItem.active,
-.inventoryItem:hover {
+.inventoryItem:hover,
+.quickInventoryItem:hover {
     background: #136DD9;
 }
 
@@ -124,4 +125,43 @@
     letter-spacing: 0%;
     vertical-align: middle;
     text-transform: uppercase;
+}
+
+.quickInventory {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    transform: translateX(-50%);
+    font-family: Chakra Petch;
+    color: #fff;
+    gap: 5px;
+}
+
+.quickInventoryItem {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    width: 100px;
+    height: 100px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #233243;
+}
+
+.quickInventoryItemName {
+    font-weight: 600;
+    text-align: center;
+}
+
+.quickInventoryItemAmount {
+    position: absolute;
+}
+
+.quickInventoryItemImage {
+    flex-shrink: 0;
+    width: 64px;
+    aspect-ratio: 1 / 1;
 }

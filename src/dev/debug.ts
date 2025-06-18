@@ -16,6 +16,7 @@ import { Vector } from "../utils/vector";
 import { ParticleText } from "../hierarchy/particleText";
 import { StateMode } from "../hierarchy/serialise";
 import { objcount } from "../utils/counter";
+import { Prefab } from "../hierarchy/prefabs";
 
 const entityDistance = 50;
 
@@ -245,6 +246,10 @@ export class Debug {
         return newEntity;
     }
 
+    static prefab(name: string) {
+        // @ts-ignore
+        Prefab[name]({ position: game.worldMouse, scene: game.activeScene });
+    }
 
     private static lastMem = new Map<string, number>();
     private static memBenchmark = new Map<string, number>();
