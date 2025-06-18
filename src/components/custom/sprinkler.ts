@@ -46,7 +46,7 @@ export class Sprinkler extends Component {
             else this.basicSprite.sprite.texture = Assets.get("sprinkler");
         }
         if (!this.sprinklerCore.active) return;
-        if (this.sprinklerCore.waterLevel <= 0) return;
+        if (this.sprinklerCore.waterLevel <= 0.4) return;
         this.ticker += dt;
         if (this.ticker > 2) {
             this.tick();

@@ -114,14 +114,16 @@ export class UIFullscreenMenu {
     element: HTMLDivElement;
     shown = false;
     itemHolder: UIElement;
+    badgeContainer: UIElement;
     constructor() {
         this.element = UI.customDiv(document.body, "fullscreenMenu");
         const bg = UIElement.create({ type: "div", classes: ["menuBG"], parent: this.element });
         const border = UIElement.create({ type: "div", classes: ["menuBorder"], parent: bg.htmlElement });
         const pattern = UIElement.create({ type: "div", classes: ["menuPattern"], parent: border.htmlElement });
         const title = UIElement.create({ type: "div", classes: ["menuTitle"], content: "Revenant Earth 2", parent: this.element });
+        const contentHolder = UIElement.create({ type: "div", classes: ["contentHolder"], parent: this.element });
 
-        const inventoryPanel = UIElement.create({ type: "div", classes: ["inventoryPanel"], parent: this.element });
+        const inventoryPanel = UIElement.create({ type: "div", classes: ["inventoryPanel"], parent: contentHolder.htmlElement });
         const categoryFilter = UIElement.create({ type: "div", classes: ["categoryFilterWrapper"], parent: inventoryPanel.htmlElement });
         const seedFilter = UIElement.create({ type: "div", parent: categoryFilter.htmlElement });
         seedFilter.htmlElement.classList.add("active");
@@ -147,7 +149,8 @@ export class UIFullscreenMenu {
         UIElement.create({ type: "div", parent: itemHeader.htmlElement }).htmlElement.innerText = "Amount";
         this.itemHolder = UIElement.create({ type: "div", classes: ["itemHolder"], parent: inventoryPanel.htmlElement });
 
-
+        const progressPanel = UIElement.create({ type: "div", classes: ["progressPanel"], parent: contentHolder.htmlElement });
+        this.badgeContainer = UIElement.create({ type: "div", classes: ["badgeContainer"], parent: progressPanel.htmlElement });
     }
 
     selectedGroup = ItemGroup.Seed;
@@ -159,6 +162,7 @@ export class UIFullscreenMenu {
             this.element.classList.remove("menuHide");
             this.shown = true;
             this.renderItems(game.player.inventory);
+            this.renderProgress()
         }
         else {
             this.element.classList.add("menuHide");
@@ -166,6 +170,29 @@ export class UIFullscreenMenu {
             this.shown = false;
             UI.mouseOverUI = 0;
         }
+    }
+
+    async renderProgress() {
+        const { temp, co2, averageAirPollution, averageGroundPollution } = await game.getGraphs();
+        this.badgeContainer.htmlElement.innerHTML = "";
+        this.progressBadge("Temperature", temp);
+        this.progressBadge("CO2", co2);
+        this.progressBadge("Average Air Pollution", averageAirPollution);
+        this.progressBadge("Average Ground Pollution", averageGroundPollution);
+    }
+
+    private progressBadge(name: string, { value, trend, img }: { value: string, trend: number, img: HTMLImageElement }) {
+        const badge = UIElement.create({ type: "div", classes: ["progressBadge"], parent: this.badgeContainer.htmlElement });
+        const leftContainer = UIElement.create({ type: "div", classes: ["leftContainer"], parent: badge.htmlElement });
+        const rightContainer = UIElement.create({ type: "div", classes: ["rightContainer"], parent: badge.htmlElement });
+        const badgeName = UIElement.create({ type: "div", classes: ["badgeName"], parent: leftContainer.htmlElement });
+        badgeName.htmlElement.innerText = name;
+        const leftBottom = UIElement.create({ type: "div", classes: ["leftBottom"], parent: leftContainer.htmlElement });
+        const trendDirection = trend > 0 ? "up" : trend < 0 ? "down" : "flat";
+        const trendValue = UIElement.create({ type: "div", classes: ["trendValue", trendDirection], parent: leftBottom.htmlElement });
+        const badgeValue = UIElement.create({ type: "div", classes: ["badgeValue"], parent: leftBottom.htmlElement });
+        badgeValue.htmlElement.innerText = value;
+        rightContainer.htmlElement.appendChild(img);
     }
 
     renderItems(inventory?: Inventory) {
