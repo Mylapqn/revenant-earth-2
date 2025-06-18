@@ -144,8 +144,10 @@ export class Terrain implements ISerializable, ISceneObject {
     defaultTerrain() {
         let lastHeight = 0;
         for (let index = 0; index < this.totalNodes; index++) {
+            let r = index / this.totalNodes;
+            const height = Math.abs(Math.cos(r * Math.PI * 4 - Math.PI / 2));
             lastHeight += Math.random() * 5 - 2.5;
-            this.terrainMesh.push(new TerrainNode(this.widthPerNode * index, lastHeight));
+            this.terrainMesh.push(new TerrainNode(this.widthPerNode * index, lastHeight - 50 * (height ** 2) + 25));
         }
 
         let index = 0;
@@ -155,8 +157,15 @@ export class Terrain implements ISerializable, ISceneObject {
         }
 
         for (let index = 0; index < this.totalWidth; index += this.dataWidth) {
-            this.terrainData.push({ pollution: 0, fertility: 0, erosion: 0.9, moisture: 0.3 });
+            let r = index / this.totalWidth;
+            this.terrainData.push({
+                pollution: Math.abs(Math.cos(r * Math.PI * 2) * 0.8),
+                fertility: Math.abs(Math.cos(r * Math.PI * 3 + Math.PI / 8) * 0.2),
+                erosion: Math.abs(Math.cos(r * Math.PI * 4 - Math.PI / 2) * 0.9),
+                moisture: 0.3
+            });
         }
+
 
         //this.changeFixer(new Set(this.terrainMesh));
         this.considerNodes();
