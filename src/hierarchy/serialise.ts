@@ -17,7 +17,7 @@ export type ObjectKind = "Player" | "Terrain" | "Atmo" | "Entity" | "Scene" | "P
 
 export type primitive = string | number | boolean;
 export type primitiveArray = Array<primitive | primitiveObject>;
-export type primitiveObject = { [key: string]: primitive | primitiveObject | primitiveArray };
+export type primitiveObject = { [key: string]: primitive | primitiveObject | primitiveArray | undefined };
 
 export type KindedObject = primitiveObject & { kind: ObjectKind };
 

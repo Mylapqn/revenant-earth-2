@@ -1,3 +1,4 @@
+import { WellDefinedComponentData } from "../components/componentIndex";
 import { SprinklerCore } from "../components/custom/sprinklerCore";
 import { game } from "../game";
 import { Entity } from "./entity";
@@ -60,6 +61,9 @@ export class Prefab {
                     },
                     {
                         componentType: "EntityTooltip"
+                    },
+                    {
+                        componentType: "Interactable",
                     },
                     {
                         componentType: "TerrainAlign",
@@ -208,6 +212,12 @@ export class Prefab {
                         },
                     },
                     {
+                        componentType: "EntityTooltip",
+                        data: {
+                            tooltipName: "Battery"
+                        }
+                    },
+                    {
                         componentType: "Power",
                         data: { capacity: 100 }
                     }
@@ -260,10 +270,16 @@ export class Prefab {
                     },
                     {
                         componentType: "SolarPanel",
-                        data: {}
+                    },
+                                        {
+                        componentType: "EntityTooltip",
+                        data: {
+                            tooltipName: "Solar Panel"
+                        } 
                     },
                     {
                         componentType: "Power",
+                        data: { capacity: 1 }
                     }
                 ],
             },
