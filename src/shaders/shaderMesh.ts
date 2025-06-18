@@ -67,6 +67,7 @@ export class ShaderMesh extends Mesh {
         //console.log(game.app.renderer.globalUniforms.bindGroup);
     }
     resize(width: number, height: number) {
+        if(!this.geometry) return;
         this.geometry.positions = new Float32Array([
             -width * this.anchor.x, -height * this.anchor.y,
             -width * this.anchor.x, height * (1 - this.anchor.y),

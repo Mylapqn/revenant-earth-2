@@ -54,12 +54,14 @@ export class Hitbox extends Component {
             }),
         });
         Assets.load("floor.png").then((texture) => {
+            if(!this.hitboxMesh?.shader) return;
             this.edgeTexture = texture;
             this.edgeTexture.source.scaleMode = "nearest";
             this.edgeTexture.source.addressMode = "repeat";
             this.hitboxMesh.shader!.resources.uSampler = this.edgeTexture.source
         });
         Assets.load("interior_bg.png").then((texture) => {
+            if(!this.bgSprite) return;
             this.bgTexture = texture;
             this.bgSprite.texture = this.bgTexture;
         });

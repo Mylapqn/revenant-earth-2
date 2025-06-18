@@ -15,7 +15,7 @@ export class Interactable extends Component {
     promptTextElement!: UIElement;
     enabled = true;
     offset = new Vector(0, 0);
-    initialText!:string;
+    initialText!: string;
 
     constructor(parent: Entity) {
         super(parent);
@@ -36,8 +36,9 @@ export class Interactable extends Component {
     applyData(data?: { text?: string, offset?: Vectorlike }): void {
         this.parentElement = new UIAbsoluteElement("div", new Vector());
         UI.container.appendChild(this.parentElement.htmlElement);
-        this.promptElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt"], content: "F" });
-        this.promptTextElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt-text"], content: "Interact" });
+        this.parentElement.blockMouse = false;
+        this.promptElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt"], content: "F", blockMouse: false });
+        this.promptTextElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt-text"], content: "Interact", blockMouse: false });
         data = data ?? {};
         this.initialText = data.text ?? "Interact";
         this.setText(this.initialText);

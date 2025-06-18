@@ -166,13 +166,16 @@ export class Game {
                 }
             ]
         }
+        console.log("Loading bundle", performance.now() - startTime);
         Assets.init({ manifest });
         await Assets.loadBundle(["bundle"]);
         Assets.get("sprinkler_active").source.scaleMode = 'nearest';
         Assets.get("sprinkler").source.scaleMode = 'nearest';
+        console.log("Loading backgrounds", performance.now() - startTime);
         this.backgroundTextures = new Set(Object.values((await Assets.loadBundle(["backgrounds"])).backgrounds));
-
+        console.log("Loading hitboxes", performance.now() - startTime);
         await this.hitboxLibrary.init();
+        console.log("Loading sounds", performance.now() - startTime);
         await this.soundManager.loadSounds();
         const endTime = performance.now();
         console.log("Game loaded in", endTime - startTime, "ms");
@@ -525,8 +528,13 @@ export class Game {
                 this.weather.weatherData.rainBuildup += 2;
             }
             if (this.input.keyDown("escape")) {
-                game.loadScene("Menu");
-                MainMenu.instance?.show();
+                if(MainMenu.instance?.updating) {
+                    MainMenu.instance.continueGame();
+                }
+                else {
+                    game.loadScene("Menu");
+                    MainMenu.instance?.show();
+                }
             }
             if (this.input.keyDown("č")) {
                 this.weather.weatherData.dayTime += this.weather.dayLength / 8;

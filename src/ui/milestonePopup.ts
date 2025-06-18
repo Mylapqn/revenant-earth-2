@@ -25,11 +25,11 @@ export class MilestonePopupManager {
         const waitMult = 1;
         game.soundManager.soundLibrary.play("milestone", { singleInstance: true });
 
-        const panel = UIElement.create({ type: "div", classes: ["milestone"], parent: UI.container, content: `` });
+        const panel = UIElement.create({ type: "div", classes: ["milestone"], parent: UI.container, content: ``, blockMouse: false });
         this.currentPopup = panel;
-        const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Milestone achieved" });
-        const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: options.questName });
-        const details = UIElement.create({ type: "p", parent: panel.htmlElement, content: options.detailsText ?? "", classes: ["details"] });
+        const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Milestone achieved", blockMouse: false });
+        const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: options.questName, blockMouse: false });
+        const details = UIElement.create({ type: "p", parent: panel.htmlElement, content: options.detailsText ?? "", classes: ["details"], blockMouse: false });
         requestAnimationFrame(() => {
             panel.htmlElement.classList.add("appear");
             header.htmlElement.classList.add("appear");
@@ -53,11 +53,11 @@ export class MilestonePopupManager {
         const waitMult = 1;
         game.soundManager.soundLibrary.play("quest_issue", { singleInstance: true, volume: 0.2 });
 
-        const panel = UIElement.create({ type: "div", classes: ["milestone", "issue"], parent: UI.container, content: `` });
+        const panel = UIElement.create({ type: "div", classes: ["milestone", "issue"], parent: UI.container, content: ``, blockMouse: false });
         this.currentPopup = panel;
-        const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Task issued" });
-        const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: options.questName });
-        const details = UIElement.create({ type: "p", parent: panel.htmlElement, content: options.detailsText ?? "", classes: ["details"] });
+        const header = UIElement.create({ type: "p", parent: panel.htmlElement, content: "Task issued", blockMouse: false });
+        const title = UIElement.create({ type: "h1", parent: panel.htmlElement, content: options.questName, blockMouse: false });
+        const details = UIElement.create({ type: "p", parent: panel.htmlElement, content: options.detailsText ?? "", classes: ["details"], blockMouse: false });
         requestAnimationFrame(() => {
             panel.htmlElement.classList.add("appear");
             header.htmlElement.classList.add("appear");

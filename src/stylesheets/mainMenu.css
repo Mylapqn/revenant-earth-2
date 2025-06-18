@@ -10,6 +10,7 @@
     align-items: center;
     background-color: #000F18;
     z-index: 10;
+    user-select: none;
 
 }
 
@@ -80,18 +81,25 @@
     transition: opacity 1s ease-in-out;
     opacity: 0;
     z-index: 20;
+    color: #ffffff;
+    font-family: "Chakra Petch";
+    font-size: 20px;
 }
 
 .fade-screen.appear {
     opacity: 1;
 }
 
-.fade-screen .quote {
-    opacity: 0;
-    color: #ffffff;
-    font-family: "Chakra Petch";
-    font-size: 20px;
+.fade-screen>* {
     transition: opacity 1s ease-in-out;
+    opacity: 0;
+}
+
+.fade-screen>*.appear {
+    opacity: 1;
+}
+
+.fade-screen .quote {
     font-style: italic;
     width: 700px;
     font-weight: normal;
@@ -107,12 +115,29 @@
     font-style: normal;
 }
 
-.fade-screen .quote.appear {
-    opacity: 1;
-}
-
 .logo {
     position: absolute;
     left: 0;
     top: 0;
+}
+
+.fade-screen .credits {
+    text-align: left;
+    width: 700px;
+    font-weight: normal;
+    line-height: 1.8em;
+    display: flex;
+    flex-direction: column;
+}
+
+.fade-screen .credits h2 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.fade-screen .credits img{
+    width: 500px;
+    margin-top: -500px;
+    margin-bottom: 50px;
+    align-self:  center;
 }

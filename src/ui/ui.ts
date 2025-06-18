@@ -30,6 +30,7 @@ export class UI {
         UI.container = UI.customDiv(document.body, "uiContainer");
         UI.fullscreenMenu = new UIFullscreenMenu();
         //setTimeout(() => UI.fullscreenMenu.toggle(true), 100);
+        UI.mouseOverUI = 0;
     }
     static destroy(){
         UI.container.remove();
@@ -44,6 +45,7 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
     public children: UIElement[];
     hoverSFX = false;
     clickSFX = false;
+    blockMouse = true;
     onclick?: () => void;
     constructor(type: string, ...classes: string[]) {
         this.children = [];
@@ -51,13 +53,17 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         this.htmlElement.classList.add(...classes);
         this.htmlElement.addEventListener("mouseenter", () => {
             if (this.hoverSFX) game.soundManager.play("hover");
-            UI.mouseOverUI++;
-            UI.lastHoveredElement = this;
+            if(this.blockMouse){
+                UI.mouseOverUI++;
+                UI.lastHoveredElement = this;
+            }
         });
         this.htmlElement.addEventListener("mouseleave", () => {
-            UI.mouseOverUI = UI.mouseOverUI > 0 ? UI.mouseOverUI - 1 : 0;
-            if (UI.mouseOverUI == 0)
-                UI.lastHoveredElement = undefined;
+            if(this.blockMouse) {
+                UI.mouseOverUI = UI.mouseOverUI > 0 ? UI.mouseOverUI - 1 : 0;
+                if (UI.mouseOverUI == 0)
+                    UI.lastHoveredElement = undefined;
+            }
         });
         this.htmlElement.addEventListener("click", () => {
             if (this.clickSFX) game.soundManager.play("click");
@@ -86,10 +92,11 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         }
     }
 
-    static create<T extends HTMLElement>(options: { type: string, classes?: string[], parent: HTMLElement, content?: string, soundEffects?: boolean }): UIElement<T> {
+    static create<T extends HTMLElement>(options: { type: string, classes?: string[], parent: HTMLElement, content?: string, soundEffects?: boolean,blockMouse?: boolean }): UIElement<T> {
         const element = new UIElement<T>(options.type, ...(options.classes ?? []));
         element.hoverSFX = options.soundEffects ?? false;
         element.clickSFX = options.soundEffects ?? false;
+        element.blockMouse = options.blockMouse ?? true;
         options.parent.appendChild(element.htmlElement);
         if (options.content) element.htmlElement.innerHTML = options.content;
         return element;

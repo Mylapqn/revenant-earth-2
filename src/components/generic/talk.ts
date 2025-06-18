@@ -44,8 +44,8 @@ export class TalkComponent extends Component {
         //game.player.position.set(...this.transform.position.xy());
         this.interactable = this.entity.getComponent(Interactable)!;
         this.interactable.setText("Talk");
-        this.talkElement = UIElement.create({ type: "div", parent: this.interactable.parentElement.htmlElement, classes: ["talk"], content: "" });
-        this.talkContent = UIElement.create({ type: "p", parent: this.talkElement.htmlElement });
+        this.talkElement = UIElement.create({ type: "div", parent: this.interactable.parentElement.htmlElement, classes: ["talk"], content: "",blockMouse: false });
+        this.talkContent = UIElement.create({ type: "p", parent: this.talkElement.htmlElement,blockMouse: false });
     }
 
     override toData(): ComponentData {

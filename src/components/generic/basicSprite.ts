@@ -38,6 +38,7 @@ export class BasicSprite extends Component {
         container.addChild(this.sprite);
         this.sprite.anchor.set(0.5);
         Assets.load(data.asset).then((texture) => {
+            if(!this.sprite) return;
             this.sprite.texture = texture;
             this.sprite.texture.source.scaleMode = 'nearest';
         });

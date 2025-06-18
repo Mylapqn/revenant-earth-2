@@ -63,6 +63,7 @@ export class WindowRenderer extends Component {
         });
 
         Assets.load(data.asset).then((texture) => {
+            if (!this.renderMesh || !this.emissiveMesh) return;
             this.renderMesh.texture = texture;
             this.emissiveMesh.texture = texture;
             game.bgContainer.addChild(this.renderMesh);

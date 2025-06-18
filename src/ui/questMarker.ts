@@ -18,8 +18,9 @@ export class QuestMarker {
         this.removeWhenClose = removeWhenClose ?? false;
         this.parentElement = new UIAbsoluteElement("div", this.position, "marker");
         UI.container.appendChild(this.parentElement.htmlElement);
-        this.arrowElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["arrow"] });
-        this.textElement = UIElement.create({ type: "p", parent: this.parentElement.htmlElement, content: text });
+        this.parentElement.blockMouse = false;
+        this.arrowElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["arrow"],blockMouse: false });
+        this.textElement = UIElement.create({ type: "p", parent: this.parentElement.htmlElement, content: text,blockMouse: false });
         QuestMarker.list.push(this);
     }
     static atEntity(entity: Entity, text: string, removeWhenClose?: boolean) {

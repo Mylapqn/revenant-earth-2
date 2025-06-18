@@ -34,23 +34,26 @@ export class MainMenu {
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Play", soundEffects: true }).htmlElement.onclick = () => this.startGame();
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Continue", soundEffects: true }).htmlElement.onclick = () => this.continueGame();
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Options", soundEffects: true }).htmlElement.onclick = () => this.startGame();
-        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Credits", soundEffects: true }).htmlElement.onclick = () => this.startGame();
+        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Credits", soundEffects: true }).htmlElement.onclick = () => this.credits();
         this.parentElement.onmousemove = (e) => this.mouseMove(e);
         this.init();
         MainMenu.instance = this;
     }
     init() {
         this.gameLoadedPromise = game.load();
-        this.updating = true;
+        this.show();
     }
-    show() {
+    async show() {
         this.updating = true;
         this.parentElement.style.display = "flex";
+        await this.gameLoadedPromise;
+        this.game.soundManager.play("music_menu");
         //game.timeScale = 0;
     }
     hide() {
         this.updating = false;
         this.parentElement.style.display = "none";
+        this.game.soundManager.stop("music_menu");
         //game.timeScale = 1;
     }
     update() {
@@ -60,7 +63,7 @@ export class MainMenu {
         this.smoothMouse = Vector.lerp(this.smoothMouse, this.mousePosition, 4 * dt);
         const halfScreen = new Vector(this.parentElement.clientWidth / 2, this.parentElement.clientHeight / 2);
         const bgImgDimensions = new Vector(this.backgroundElement.offsetWidth, this.backgroundElement.offsetHeight);
-        const offset = this.smoothMouse.clone().sub(halfScreen).mult(0.05);
+        const offset = this.smoothMouse.clone().sub(halfScreen).mult(-0.05);
         const bgImgOffset = new Vector(halfScreen.x - bgImgDimensions.x / 2, 0).add(offset);
         const logoOffset = bgImgOffset.clone().add(bgImgDimensions.clone().vecmult({ x: 0.53, y: -0.16 })).add(offset.clone().mult(-0.5));
         this.backgroundElement.style.left = `${bgImgOffset.x}px`;
@@ -74,22 +77,20 @@ export class MainMenu {
         if (this.updating) this.mousePosition.set(e.clientX, e.clientY);
     }
     async startGame() {
-        if(game.inited){
+        if (game.inited) {
             game.destroyGame();
         }
         await FadeScreen.fadeIn();
         const quote = UIElement.create({ type: "div", classes: ["quote"], parent: FadeScreen.element, content: "We don’t dream of the stars anymore. We dream of wind, fresh air, and water that wasn’t produced in a lab.<p>- Zora Solano, Environmental Technician on UNERA Space Station</p>" });
-        await nextFrame();
-        quote.htmlElement.classList.add("appear");
+        this.fadeInElement(quote.htmlElement, 1000);
         this.updating = false;
         this.hide();
-        const sleepTimer = sleep(5000);
+        const sleepTimerPromise = sleep(6000);
         if (!game.loaded && this.gameLoadedPromise) {
             await this.gameLoadedPromise;
         }
-        await sleepTimer;
-        quote.htmlElement.classList.remove("appear");
-        await sleep(1000);
+        await sleepTimerPromise;
+        await this.fadeOutElement(quote.htmlElement, 1000);
         await game.init();
         await game.initTutorial();
         await FadeScreen.fadeOut();
@@ -112,6 +113,26 @@ export class MainMenu {
         await game.initWorld();
         await fadeScreen;
         await FadeScreen.fadeOut(300);
+    }
+    async credits() {
+        await FadeScreen.fadeIn(300);
+        const quote = UIElement.create({ type: "div", classes: ["credits"], parent: FadeScreen.element, content: "<img src='public/logo.svg'><h2>Matouš Marek (Mylapqn)</h2>Concept, design, art, code<h2>Andrej Karovin (NotRustyBot)</h2>Code, advice<br><br><br>Sound effects licenced from Soundly<br><br><br>Thesis supervisor: Pavel Novák<br>FMK TBU Zlín 2025" });
+        await this.fadeInElement(quote.htmlElement, 1000);
+        await sleep(6000);
+        await this.fadeOutElement(quote.htmlElement, 1000);
+        await FadeScreen.fadeOut(300);
+    }
+    async fadeInElement(element: HTMLElement, duration = 1000) {
+        element.style.transitionDuration = duration + "ms";
+        await nextFrame();
+        element.classList.add("appear");
+        await sleep(duration);
+    }
+    async fadeOutElement(element: HTMLElement, duration = 1000) {
+        element.style.transitionDuration = duration + "ms";
+        element.classList.remove("appear");
+        await sleep(duration);
+        element.remove();
     }
     static instance?: MainMenu;
 }

@@ -1,4 +1,4 @@
-import { sound as pixiSound, PlayOptions, Sound, SoundLibrary } from "@pixi/sound";
+import { Options, sound as pixiSound, PlayOptions, Sound, SoundLibrary } from "@pixi/sound";
 import { game } from "../game";
 import { ParticleText } from "../hierarchy/particleText";
 import { Vector, Vectorlike } from "../utils/vector";
@@ -28,22 +28,43 @@ export class SoundManager {
             await this.loadOneshot(name, url, volume);
         }
     }
+    async loadSound(alias: string, options: Options) {
+        if (!options.url) return null;
+        options.preload = true;
+        const sound = await new Promise<Sound>((resolve, reject) => Sound.from({
+            ...options,
+            loaded(err, sound) {
+                if (err || !sound) {
+                    reject(err);
+                }
+                else {
+                    resolve(sound);
+                }
+            },
+        }));
+        this.soundLibrary.add(alias, sound);
+        return sound;
+    }
     public play(sound: string, options?: PlayOptions) { if (game.loaded) this.soundLibrary.play(sound, options); }
+    public stop(sound: string) { if (game.loaded) this.soundLibrary.stop(sound); }
     async loadSounds() {
         pixiSound.volumeAll = .5;
-        this.loadOneshotRange("footstep_dirt", "./sound/footsteps/dirt/footsmuddry_%.wav", 5, 1);
-        this.loadOneshotRange("footstep_metal", "./sound/footsteps/metal/footsteps_metal-%.mp3", 5, 1, .3);
-        this.loadOneshotRange("thunder", "./sound/sfx/thunder/thunder_%.mp3", 3, 1);
-        this.soundLibrary.add("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true, preload: true });
-        this.soundLibrary.add("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true, preload: true });
-        this.soundLibrary.add("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false, preload: true });
-        this.soundLibrary.add("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false, preload: true });
-        this.soundLibrary.add("score", { url: "./sound/ui/score2.mp3", loop: false, singleInstance: false, speed: 2, autoPlay: false, preload: true });
-        this.soundLibrary.add("milestone", { url: "./sound/ui/milestone.mp3", loop: false, singleInstance: false, autoPlay: false, preload: true });
-        this.soundLibrary.add("click", { url: "./sound/ui/pack/RevenantEarth_UI_clickMain_v2.wav", loop: false, singleInstance: false, autoPlay: false, preload: true });
-        this.soundLibrary.add("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false, volume: .5, preload: true });
-        this.soundLibrary.add("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false, preload: true });
-        this.soundLibrary.add("sprinkler", { url: "./sound/sfx/sprinkler.mp3", loop: false, singleInstance: false, autoPlay: false, volume: .2, preload: true });
+        await Promise.all([
+            this.loadOneshotRange("footstep_dirt", "./sound/footsteps/dirt/footsmuddry_%.wav", 5, 1),
+            this.loadOneshotRange("footstep_metal", "./sound/footsteps/metal/footsteps_metal-%.mp3", 5, 1, .3),
+            this.loadOneshotRange("thunder", "./sound/sfx/thunder/thunder_%.mp3", 3, 1),
+            this.loadSound("rain_heavy", { url: "./sound/ambient/rain_heavy.mp3", loop: true }),
+            this.loadSound("rain_light", { url: "./sound/ambient/rain_light.mp3", loop: true }),
+            this.loadSound("wind", { url: "./sound/ambient/wind.mp3", loop: true, singleInstance: true, autoPlay: false }),
+            this.loadSound("space", { url: "./sound/ambient/space.mp3", loop: true, singleInstance: true, autoPlay: false }),
+            this.loadSound("score", { url: "./sound/ui/score2.mp3", loop: false, singleInstance: false, speed: 2, autoPlay: false }),
+            this.loadSound("milestone", { url: "./sound/ui/milestone.mp3", loop: false, singleInstance: false, autoPlay: false }),
+            this.loadSound("click", { url: "./sound/ui/pack/RevenantEarth_UI_clickMain_v2.wav", loop: false, singleInstance: false, autoPlay: false }),
+            this.loadSound("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false, volume: .5 }),
+            this.loadSound("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false }),
+            this.loadSound("sprinkler", { url: "./sound/sfx/sprinkler.mp3", loop: false, singleInstance: false, autoPlay: false, volume: .2 }),
+            this.loadSound("music_menu", { url: "./sound/music/menu.mp3", loop: true, singleInstance: true, autoPlay: false, volume: .5 }),
+        ]);
     }
 }
 
