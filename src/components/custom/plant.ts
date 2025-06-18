@@ -13,6 +13,7 @@ import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
 import { IEvnironmentProvider, Planter } from "./planter";
 import { SurfaceMaterial } from "../../world/terrain";
+import { Debug } from "../../dev/debug";
 
 export class Plant extends Component {
     static componentType = "Plant";
@@ -33,6 +34,7 @@ export class Plant extends Component {
     fullyGrown = false;
     inView = false;
     plantedIn?: Planter;
+    storedCo2 = 0;
     private tempPlantedIn?: number;
 
 
@@ -111,7 +113,16 @@ export class Plant extends Component {
             this.inView = false;
         }
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
-        if (this.dead) return;
+        if (this.dead) {
+            if (this.storedCo2 > 0) {
+                const releasedCo2 = Math.min(this.storedCo2, (this.storedCo2 + .01) * dt * .01);
+                this.envirnonmentProvider.atmo.co2 += releasedCo2;
+                this.storedCo2 -= releasedCo2;
+                if (this.storedCo2 <= 0) this.storedCo2 = 0;
+                Debug.log("released co2: " + releasedCo2);
+            }
+            return;
+        }
         if (this.health <= 0) {
             //if already dead
             this.damage(1, "unknown reasons");
@@ -154,9 +165,23 @@ export class Plant extends Component {
                 this.growth += addedGrowth;
                 game.score.add(addedGrowth);
                 usedGrowth += addedGrowth;
+                if (this.growth >= this.species.statsPerGrowth.maxGrowth) {
+                    this.growth = this.species.statsPerGrowth.maxGrowth;
+                    if (!this.fullyGrown) {
+                        this.fullyGrown = true;
+                        game.events.emit("plantGrow", this);
+                    }
+                }
+            }
+            else if (this.health >= 1 && this.growth >= this.species.statsPerGrowth.maxGrowth && this.seedProgress <= this.nextseed) {
+                //seed if over max
+                this.seedProgress += addedGrowth;
+                usedGrowth += addedGrowth;
             }
             this.envirnonmentProvider.terrain.consumeFertility(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.nutrients * 3);
-            this.envirnonmentProvider.atmo.co2 -= usedGrowth * this.species.statsPerGrowth.co2 * .1;
+            const capturedCo2 = usedGrowth * this.species.statsPerGrowth.co2 * .1;
+            this.storedCo2 += capturedCo2;
+            this.envirnonmentProvider.atmo.co2 -= capturedCo2;
             this.envirnonmentProvider.atmo.co2 = clamp(this.envirnonmentProvider.atmo.co2, 200, 800);
             this.envirnonmentProvider.terrain.fixErosion(this.transform.position.x + Math.random() * 60, usedGrowth * this.species.statsPerGrowth.erosion * .002);
             this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, usedGrowth * this.species.statsPerGrowth.water * .0025);
@@ -166,16 +191,9 @@ export class Plant extends Component {
             if (tdata.moisture < requiredMoisture) {
                 this.damage((requiredMoisture - tdata.moisture) * 8 * clamp(1 - (this.growth / this.species.statsPerGrowth.maxGrowth), .2, 1), "lack of water");
             }
-            else if (this.growth >= this.species.statsPerGrowth.maxGrowth) {
-                if (!this.fullyGrown) {
-                    this.fullyGrown = true;
-                    game.events.emit("plantGrow", this);
-                }
-                this.seedProgress += dt * this.health * .1;
-            }
             this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, requiredMoisture);
         }
-        if (this.seedProgress > this.nextseed && !this.plantedIn) {
+        if (this.seedProgress >= this.nextseed && !this.plantedIn) {
             this.nextseed *= 2;
             let seedPos = this.transform.position.x + (80 * Math.random() - 40) * 10;
             let seedValid = true;
@@ -203,8 +221,10 @@ export class Plant extends Component {
             this.health = 0;
             this.dead = true;
             this.drawPlant();
-            if (oldHealth > 0)
+            if (oldHealth > 0) {
                 new ParticleText("died from " + reason, this.transform.position.clone().add(new Vector(0, -40)));
+                console.log("died with co2 " + this.storedCo2);
+            }
             if (this.tooltipComponent) {
                 //this.tooltipComponent.tooltipData.set("status", "died from " + reason);
                 this.tooltipComponent.tooltipData.clear();

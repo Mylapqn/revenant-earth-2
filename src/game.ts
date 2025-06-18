@@ -395,7 +395,7 @@ export class Game {
             this.frameHistory.shift();
         if (Debug.editorMode)
             Debug.log("fps: " + displayNumber(1 / avgFrame, 0));
-        const dt = realDt * this.timeScale * (!this.input.key("g") ? 1 : .2);
+        const dt = realDt * this.timeScale * (!this.input.key("g") ? 1 : 4);
         this.elapsedTime += dt;
 
         TimedShader.update(this.elapsedTime);
