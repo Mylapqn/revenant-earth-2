@@ -256,6 +256,36 @@ export class Prefab {
         return newEntity;
     }
 
+    static Polluter(params: PrefabParams & { pollution?: number }) {
+        let newEntity = Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Polluter",
+                component: [
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "barrel",
+                        },
+                    },
+                    {
+                        componentType: "Polluter",
+                        data: {
+                            pollution: params.pollution ?? 1
+                        }
+                    },
+                    { componentType: "Interactable" },
+                    { componentType: "TerrainAlign" },
+                ],
+            },
+            params.scene ?? game.activeScene
+        );
+
+        newEntity.transform.position.set(params.x ?? params.position?.x ?? 0, params.y ?? params.position?.y ?? 0);
+        return newEntity;
+    }
+
+
     static SolarPanel(params: PrefabParams) {
         let newEntity = Entity.fromData(
             {
@@ -271,11 +301,11 @@ export class Prefab {
                     {
                         componentType: "SolarPanel",
                     },
-                                        {
+                    {
                         componentType: "EntityTooltip",
                         data: {
                             tooltipName: "Solar Panel"
-                        } 
+                        }
                     },
                     {
                         componentType: "Power",

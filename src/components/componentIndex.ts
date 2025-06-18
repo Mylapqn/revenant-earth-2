@@ -25,6 +25,7 @@ import { TalkComponent } from "./generic/talk";
 import { Power, PowerNetwork } from "./generic/power";
 import { SolarPanel } from "./custom/solarPanel";
 import { LootComponent } from "./custom/loot";
+import { Polluter } from "./custom/polluter";
 
 
 export function initComponents() {
@@ -55,6 +56,8 @@ export function initComponents() {
     Component.register(PowerNetwork);
     Component.register(SolarPanel);
     Component.register(LootComponent);
+    Component.register(Polluter);
+
 }
 
 
@@ -168,6 +171,10 @@ export type WellDefinedComponentData = {
         {
             componentType: "LootComponent"
             data: ComponentDataOf<LootComponent>
+        } |
+        {
+            componentType: "Polluter"
+            data: ComponentDataOf<Polluter>
         }
     )
 
