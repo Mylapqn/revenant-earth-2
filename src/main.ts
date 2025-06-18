@@ -6,6 +6,7 @@ import './stylesheets/inventory.css';
 import './stylesheets/quest.css';
 import './stylesheets/hacking.css';
 import './stylesheets/mainMenu.css';
+import './stylesheets/progress.css';
 import { DevSync } from './dev/devsync';
 import { MainMenu } from './ui/mainMenu';
 import { FadeScreen } from './ui/fadeScreen';
@@ -25,9 +26,6 @@ async function init() {
     await game.load();
     await game.init();
     await game.initWorld();
-        setTimeout(() => {
-            UI.quickInventory!.toggle();
-        }, 20);
     //DevSync.init();
 }
 

@@ -412,6 +412,12 @@ export class Game {
             if (out) Debug.prefab(out);
         }
 
+        if (this.dataCollectionTimer <= 0) {
+            this.dataCollectionTimer = this.collectionFrequency;
+            this.dataCollectionTick();
+        } else {
+            this.dataCollectionTimer -= dt;
+        }
 
 
         this.camera.processPosition(dt);
@@ -483,6 +489,96 @@ export class Game {
         return nearest;
     }
 
+
+    graphableData = new Array<{
+        temp: number;
+        co2: number;
+        averageAirPollution: number;
+        averageGroundPollution: number;
+    }>
+    dataCollectionTimer = 0;
+    collectionFrequency = 5;
+    lookback = 120;
+    public dataCollectionTick() {
+        if (this.activeScene.name != "Scene") return;
+        const data = this.currentData();
+
+        if (this.graphableData.length == 0) {
+            for (let i = 0; i < this.lookback; i++) {
+                this.graphableData.push(data);
+            }
+        } else {
+            const data = this.currentData();
+            this.graphableData.push(data);
+            if (this.graphableData.length > this.lookback) this.graphableData.shift();
+            if (UI.fullscreenMenu.shown) UI.fullscreenMenu.renderProgress();
+        }
+    }
+
+    private tempGraph = new Graphics();
+    private co2Graph = new Graphics();
+    private averageAirPollutionGraph = new Graphics();
+    private averageGroundPollutionGraph = new Graphics();
+
+    async getGraphs(): Promise<{
+        temp: { img: HTMLImageElement, value: string, trend: number },
+        co2: { img: HTMLImageElement, value: string, trend: number },
+        averageAirPollution: { img: HTMLImageElement, value: string, trend: number },
+        averageGroundPollution: { img: HTMLImageElement, value: string, trend: number },
+    }> {
+        function graphData(g: Graphics, data: number[], max = 1) {
+            g.clear();
+            const height = 75;
+            const width = 120;
+            g.rect(0, 0, width, height);
+            g.fill({ color: 0x000000, alpha: 0.0 });
+            for (let i = 0; i < data.length; i++) {
+                const value = (data[i]) / max;
+                const x = i / (data.length - 1) * width;
+                const y = height - value * (height - 4) + 2;
+                if (i == 0) {
+                    g.moveTo(x, y);
+                } else {
+                    g.lineTo(x, y);
+                }
+            }
+            g.stroke({ color: 0xffffff, width: 2 });
+        }
+
+        graphData(this.tempGraph, this.graphableData.map(d => d.temp), 60);
+        graphData(this.co2Graph, this.graphableData.map(d => d.co2), 800);
+        graphData(this.averageAirPollutionGraph, this.graphableData.map(d => d.averageAirPollution));
+        graphData(this.averageGroundPollutionGraph, this.graphableData.map(d => d.averageGroundPollution));
+
+        const out = await Promise.all([
+            this.app.renderer.extract.image(this.tempGraph),
+            this.app.renderer.extract.image(this.co2Graph),
+            this.app.renderer.extract.image(this.averageAirPollutionGraph),
+            this.app.renderer.extract.image(this.averageGroundPollutionGraph),
+        ]);
+
+        const lastIndex = this.graphableData.length - 1;
+        const secondLastIndex = this.graphableData.length - 2;
+
+
+        return {
+            temp: { img: out[0], value: `${this.graphableData[lastIndex].temp.toFixed(1)}°C`, trend: Math.sign(this.graphableData[lastIndex].temp - this.graphableData[secondLastIndex].temp) },
+            co2: { img: out[1], value: `${this.graphableData[lastIndex].co2.toFixed(0)}ppm`, trend: Math.sign(this.graphableData[lastIndex].co2 - this.graphableData[secondLastIndex].co2) },
+            averageAirPollution: { img: out[2], value: `${Math.round(this.graphableData[lastIndex].averageAirPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageAirPollution - this.graphableData[secondLastIndex].averageAirPollution) },
+            averageGroundPollution: { img: out[3], value: `${Math.round(this.graphableData[lastIndex].averageGroundPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageGroundPollution - this.graphableData[secondLastIndex].averageGroundPollution) },
+        };
+    }
+
+    private currentData() {
+        const data: typeof this.graphableData[0] = {
+            temp: game.atmo.celsius,
+            co2: game.atmo.co2,
+            averageAirPollution: game.atmo.atmoData.reduce((a, b) => a + b.pollution, 0) / game.atmo.atmoData.length,
+            averageGroundPollution: game.terrain.terrainData.reduce((a, b) => a + b.pollution, 0) / game.terrain.terrainData.length
+        }
+        return data;
+    }
+
     private handleNormalInput() {
         if (this.input.keyDown("h")) {
             if (this.hacking) this.hacking = this.hacking.close();
@@ -520,7 +616,7 @@ export class Game {
                 let out = this.stateManager.serialise(StateMode.full);
                 htcrudSave(address, out);
             }
-
+    
             if (this.input.keyDown("e")) {
                 htcrudLoad(address).then((data) => {
                     this.stateManager.deserialise(data);
@@ -612,7 +708,7 @@ export class Game {
         ],
     },
     this.activeScene
-);*/
+    );*/
 
         Entity.fromData(
             {

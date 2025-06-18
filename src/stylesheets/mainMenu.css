@@ -54,12 +54,7 @@
     text-transform: uppercase;
 }
 
-.left-menu:not(:hover) .menu-item:first-of-type {
-    background-color: #ffffff;
-    color: black;
-    height: 80px;
-}
-
+.left-menu:not(:hover) .menu-item:first-of-type,
 .left-menu .menu-item:hover {
     background-color: #ffffff;
     color: black;
