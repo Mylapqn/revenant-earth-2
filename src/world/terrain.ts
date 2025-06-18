@@ -404,6 +404,7 @@ export class Terrain implements ISerializable, ISceneObject {
         if (this.nodes.length < 2) return;
 
         const terrainStats: number[] = [];
+        const terrainStats2: number[] = [];
         const atmoStats: number[] = [];
         const terrainInspect: number[] = [];
         const depth = 50;
@@ -417,6 +418,9 @@ export class Terrain implements ISerializable, ISceneObject {
 
             terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion, tdata.grassiness);
             terrainStats.push(tdata.moisture, tdata.fertility, tdata.erosion, tdata.grassiness);
+
+            terrainStats2.push(tdata.pollution);
+            terrainStats2.push(tdata.pollution);
 
             atmoStats.push(adata.pollution);
             atmoStats.push(adata.pollution);
@@ -435,7 +439,7 @@ export class Terrain implements ISerializable, ISceneObject {
             depth: depth,
             perspectiveDepth: 0.2,
             customAttributes: {
-                aTerrainStats: terrainStats, aTerrainInspect: terrainInspect
+                aTerrainStats: terrainStats, aTerrainStats2: terrainStats2, aTerrainInspect: terrainInspect
             },
         });
 

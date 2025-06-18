@@ -5,6 +5,8 @@ uniform int uInspectMode;
 in vec2 vUV;
 //moisture, fertility, erosion, grassiness
 in vec4 vTerrainStats;
+//pollution
+in float vTerrainStats2;
 in float vTerrainInspect;
 out vec4 color;
 
@@ -125,6 +127,7 @@ void main() {
     vec3 fertColor = vec3(0.23f, 0.05f, 0.04f);
     vec3 crackColor = vec3(0.07f, 0.06f, 0.06f);
     vec3 grassColor = vec3(0.35f, 0.57f, 0.24f);
+    vec3 pollutionColor = vec3(0.44f, 0.63f, 0.1f);
     vec3 inspectLowColor = vec3(0.56f, 0.09f, 0.01f);
     vec3 inspectHighColor = vec3(0.07f, 0.93f, 0.17f);
     float inspect = posterise(vTerrainInspect * 1.1f, 5);
@@ -135,8 +138,9 @@ void main() {
     mixedColor *= mix(vec3(1.f), wetColor, wetness);
     //mixedColor = mix(mixedColor, baseColor*1.4f, cracks);
     mixedColor = mix(mixedColor, crackColor, cracks);
-    vec3 surfaceColor = mix(baseColor * 1.4f, grassColor, step(clamp(HFnoise * .9f + .1f, 0.f, 1.f), vTerrainStats.w));
+    vec3 surfaceColor = mix(baseColor * 1.4f, grassColor, step(clamp(HFnoise * .9f + .1f, 0.1f, .9f), vTerrainStats.w));
     mixedColor = mix(mixedColor, surfaceColor, surfaceLight);
+    mixedColor = mix(mixedColor, pollutionColor, step(clamp(HFnoise * .8f + .7f, 0.6f, 1.1f), vTerrainStats2));
     color = vec4(mixedColor, 1.f);
     color.rgb = mix(color.rgb, inspectColor, float(uInspectMode));
     baseMask = mix(baseMask, step(.5f, (1.f - uv.y) * .7f + HFnoise * .5f * clamp(.2f + inspect * .2f, 0.f, .99f)), float(uInspectMode));

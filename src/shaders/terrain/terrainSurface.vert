@@ -3,11 +3,13 @@
 in vec2 aPosition;
 in vec2 aUV;
 in vec4 aTerrainStats;
+in float aTerrainStats2;
 in float aTerrainInspect;
 
 out vec2 vUV;
 out vec4 vTerrainStats;
 out float vTerrainInspect;
+out float vTerrainStats2;
 
 uniform mat3 uProjectionMatrix;
 uniform mat3 uWorldTransformMatrix;
@@ -22,5 +24,6 @@ void main() {
 
     vUV = aUV;
     vTerrainStats = aTerrainStats;
+    vTerrainStats2 = aTerrainStats2;
     vTerrainInspect = aTerrainInspect;
 }
