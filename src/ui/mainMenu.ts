@@ -27,9 +27,9 @@ export class MainMenu {
         this.game = game;
         this.parentElement = UIElement.create({ type: "div", classes: ["main-menu"], parent: document.body }).htmlElement;
         this.backgroundElement = UIElement.create({ type: "img", classes: ["bg"], parent: this.parentElement }).htmlElement as HTMLImageElement;
-        this.backgroundElement.src = "public/space_menu.png";
+        this.backgroundElement.src = "space_menu.png";
         this.logoElement = UIElement.create({ type: "img", classes: ["logo"], parent: this.parentElement }).htmlElement as HTMLImageElement;
-        this.logoElement.src = "public/logo.svg";
+        this.logoElement.src = "logo.svg";
         this.leftMenuElement = UIElement.create({ type: "div", classes: ["left-menu"], parent: this.parentElement }).htmlElement;
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Play", soundEffects: true }).htmlElement.onclick = () => this.startGame();
         UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Continue", soundEffects: true }).htmlElement.onclick = () => this.continueGame();
@@ -116,7 +116,7 @@ export class MainMenu {
     }
     async credits() {
         await FadeScreen.fadeIn(300);
-        const quote = UIElement.create({ type: "div", classes: ["credits"], parent: FadeScreen.element, content: "<img src='public/logo.svg'><h2>Matouš Marek (Mylapqn)</h2>Concept, design, art, code<h2>Andrej Karovin (NotRustyBot)</h2>Code, advice<br><br><br>Sound effects licenced from Soundly<br><br><br>Thesis supervisor: Pavel Novák<br>FMK TBU Zlín 2025" });
+        const quote = UIElement.create({ type: "div", classes: ["credits"], parent: FadeScreen.element, content: "<img src='logo.svg'><h2>Matouš Marek (Mylapqn)</h2>Concept, design, art, code<h2>Andrej Karovin (NotRustyBot)</h2>Code, advice<br><br><br>Sound effects licenced from Soundly<br><br><br>Thesis supervisor: Pavel Novák<br>FMK TBU Zlín 2025" });
         await this.fadeInElement(quote.htmlElement, 1000);
         await sleep(6000);
         await this.fadeOutElement(quote.htmlElement, 1000);
