@@ -115,10 +115,10 @@ export class Player implements ISerializable {
         const tdata = game.terrain.getProperties(this.position.x);
         const adata = game.atmo.getProperties(this.position.x);
 
-        this.oxygen -= (adata.pollution - .5) * dt * 10;
+        this.oxygen -= (adata.pollution - .5) * dt * 1;
         this.oxygen = Math.max(0, Math.min(100, this.oxygen));
 
-        if (this.oxygen <= 0) this.health -= dt * 10 * adata.pollution;
+        if (this.oxygen <= 0) this.health -= dt * 1 * adata.pollution;
 
         this.health = Math.max(0, Math.min(100, this.health));
 
@@ -162,16 +162,17 @@ export class Player implements ISerializable {
             }
             game.soundManager.playOneshot("footstep_" + footstepType);
         }
+        const dtRatio = 1;
         if (input.x == 0) {
             this.footstepProgress = .4;
             if (this.grounded) this.velocity.x *= clamp(1 - dt * 100, 0, 1);
             this.animatedSprite.swapAnimation("idle");
-            this.animatedSprite.animationSpeed = .1;
+            this.animatedSprite.animationSpeed = .1 / dtRatio;
             this.animatedSprite.scale.x = game.input.mouse.position.x > game.camera.worldToScreen(this.position).x ? 1 : -1;
         }
         else {
             this.animatedSprite.swapAnimation("run");
-            this.animatedSprite.animationSpeed = sprint ? .15 : .1;
+            this.animatedSprite.animationSpeed = (sprint ? .15 : .1) / dtRatio;
             this.animatedSprite.scale.x = input.x;
             if (input.x > 0 && this.velocity.x < maxSpeed || input.x < 0 && this.velocity.x > -maxSpeed) {
                 this.velocity.x += accel * dt * input.x;

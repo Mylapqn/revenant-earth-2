@@ -58,7 +58,7 @@ export class Score {
         if (oldDisplay != this.currentDisplay) {
             //game.soundManager.soundLibrary.play("score", { volume: 0.01 });
         }
-        this.display.htmlElement.textContent = this.currentDisplay.toString();
+        this.display.htmlElement.textContent = this.currentDisplay.toString() + " TP";
         this.updateParticles(dt);
     }
     updateParticles(dt: number) {

@@ -206,7 +206,7 @@ export class Plant extends Component {
             this.nextseed *= 2;
             let potentialSeedPositions = [];
             let seedValidArray = [];
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 5; i++) {
                 potentialSeedPositions[i] = this.transform.position.x + (2 * Math.random() - .5) * (100 + i * 40);
                 seedValidArray[i] = true;
             }
@@ -220,7 +220,7 @@ export class Plant extends Component {
                     if (!seedValidArray[i]) continue;
                     if (Math.abs(plant.entity.transform.position.x - potentialSeedPositions[i]) < avoidRadius) {
                         seedValidArray[i] = false;
-                        new ParticleText("seed blocked", new Vector(potentialSeedPositions[i], this.transform.position.y - 40));
+                        //new ParticleText("seed blocked", new Vector(potentialSeedPositions[i], this.transform.position.y - 40));
                     }
                 }
             }
