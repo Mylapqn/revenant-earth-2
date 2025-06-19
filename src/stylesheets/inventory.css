@@ -68,14 +68,17 @@
     display: flex;
     padding: 17px 33px;
     align-items: center;
+    height: 120px;
+    overflow: hidden;
     cursor: pointer;
 }
 
 .itemImage {
     flex-shrink: 0;
     width: 83px;
+    height: auto;
     margin-right: 58px;
-    aspect-ratio: 1 / 1;
+    image-rendering: pixelated;
 }
 
 .inventoryItem:nth-child(odd) {
@@ -87,8 +90,7 @@
 }
 
 .inventoryItem.active,
-.inventoryItem:hover,
-.quickInventoryItem:hover {
+.inventoryItem:hover {
     background: #136DD9;
 }
 
@@ -129,39 +131,58 @@
 
 .quickInventory {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 50%;
+    transform: translate(-50%, -50%);
+    height: 220px;
     display: flex;
     align-items: center;
-    transform: translateX(-50%);
     font-family: Chakra Petch;
+    font-size: 20px;
     color: #fff;
-    gap: 5px;
+    /* gap: 5px; */
 }
 
 .quickInventoryItem {
     display: flex;
     flex-direction: column;
     padding: 4px;
-    width: 100px;
-    height: 100px;
+    width: 180px;
+    height: 180px;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background: #233243;
+    background: #2D2925;
+    overflow: hidden;
+    padding: 10px;
+    transition: background-color 0.2s, height 0.2s;
+}
+
+.quickInventoryItem:hover {
+    background: #485e75;
+    height: 220px;
 }
 
 .quickInventoryItemName {
-    font-weight: 600;
+    margin-top: 10px;
+    text-transform: uppercase;
     text-align: center;
 }
 
 .quickInventoryItemAmount {
-    position: absolute;
+    color: #b0b0b0;
+    text-align: center;
+}
+.quickInventoryItemAmount.payBad{
+    color: #ed5648;
+}
+.quickInventoryItemAmount.payGood{
+    color: #00d4ff;
 }
 
+
 .quickInventoryItemImage {
+    image-rendering: pixelated;
     flex-shrink: 0;
-    width: 64px;
-    aspect-ratio: 1 / 1;
+    height: 100px;
 }

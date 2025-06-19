@@ -99,7 +99,7 @@ class Mouse {
         document.addEventListener('contextmenu', event => event.preventDefault());
     }
     private mouseButtons(e: MouseEvent) {
-        if(UI.mouseOverUI > 0) return;
+        if(UI.mouseOverElements.size > 0) return;
         this.buttonsHeld = e.buttons;
     }
     private mouseMove(e: MouseEvent) {

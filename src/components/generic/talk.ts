@@ -3,7 +3,7 @@ import { game, Game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
-import { UIElement } from "../../ui/ui";
+import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { nextFrame, sleep } from "../../utils/utils";
 import { Vector } from "../../utils/vector";
@@ -44,8 +44,8 @@ export class TalkComponent extends Component {
         //game.player.position.set(...this.transform.position.xy());
         this.interactable = this.entity.getComponent(Interactable)!;
         this.interactable.setText("Talk");
-        this.talkElement = UIElement.create({ type: "div", parent: this.interactable.parentElement.htmlElement, classes: ["talk"], content: "",blockMouse: false });
-        this.talkContent = UIElement.create({ type: "p", parent: this.talkElement.htmlElement,blockMouse: false });
+        this.talkElement = new UIElement({ type: "div", parent: this.interactable.parentElement.htmlElement, classes: ["talk"], content: "",blockMouse: false });
+        this.talkContent = new UIElement({ type: "p", parent: this.talkElement.htmlElement,blockMouse: false });
     }
 
     override toData(): ComponentData {

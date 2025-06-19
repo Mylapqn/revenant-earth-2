@@ -1,3 +1,4 @@
+import { Door } from "../components/custom/door";
 import { Plant } from "../components/custom/plant";
 import { TalkComponent } from "../components/generic/talk";
 import { Entity } from "./entity";
@@ -9,6 +10,8 @@ export type GameEvents = {
     plantGrow: [Plant],
     triggerEnter: [string],
     triggerExit: [string],
+    entityInteract: [Entity],
+    doorEnter: [Door],
     talkEnd: [TalkComponent]
 }
 

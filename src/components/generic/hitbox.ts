@@ -11,7 +11,7 @@ import { placeholderGeometry } from "../../utils/utils";
 import vertex from "../../shaders/vert.vert?raw";
 import fragment from "../../shaders/frag.frag?raw";
 import { HitboxGeometry } from "../../shaders/hitboxGeometry";
-import { UIElement } from "../../ui/ui";
+import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { Debug } from "../../dev/debug";
 import { Shadowmap } from "../../shaders/lighting/shadowmap";
@@ -53,18 +53,15 @@ export class Hitbox extends Component {
                 }
             }),
         });
-        Assets.load("floor.png").then((texture) => {
-            if(!this.hitboxMesh?.shader) return;
-            this.edgeTexture = texture;
-            this.edgeTexture.source.scaleMode = "nearest";
+        if (this.hitboxMesh?.shader) {
+            this.edgeTexture = Assets.get("floor");
             this.edgeTexture.source.addressMode = "repeat";
             this.hitboxMesh.shader!.resources.uSampler = this.edgeTexture.source
-        });
-        Assets.load("interior_bg.png").then((texture) => {
-            if(!this.bgSprite) return;
-            this.bgTexture = texture;
+        }
+        if (this.bgSprite) {
+            this.bgTexture = Assets.get("interior_bg");
             this.bgSprite.texture = this.bgTexture;
-        });
+        }
     }
 
     override toData(): ComponentData {
@@ -159,9 +156,12 @@ export class Hitbox extends Component {
             points.push(points[2]);
             this.bgSprite.position.set(-1000 + this.transform.position.x, -1000 + this.transform.position.y);
         }
+        else {
+            points.push(points[1]);
+        }
         const hbGeo = new HitboxGeometry({
             points: points,
-            depth: this.edgeTexture.height,
+            depth: (this.isInterior ? 1 : -1) * this.edgeTexture.height,
             perspectiveDepth: 0,
             UVWidth: this.edgeTexture.width
         });

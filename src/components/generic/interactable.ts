@@ -2,7 +2,9 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
-import { UI, UIElement, UIAbsoluteElement } from "../../ui/ui";
+import { UI } from "../../ui/ui";
+import { UIAbsoluteElement } from "../../ui/uiAbsoluteElement";
+import { UIElement } from "../../ui/uiElement";
 import { Vector, Vectorlike } from "../../utils/vector";
 import { BasicSprite } from "./basicSprite";
 
@@ -34,11 +36,11 @@ export class Interactable extends Component {
     }
 
     applyData(data?: { text?: string, offset?: Vectorlike }): void {
-        this.parentElement = new UIAbsoluteElement("div", new Vector());
+        this.parentElement = new UIAbsoluteElement({ type: "div", worldPosition: new Vector() });
         UI.container.appendChild(this.parentElement.htmlElement);
         this.parentElement.blockMouse = false;
-        this.promptElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt"], content: "F", blockMouse: false });
-        this.promptTextElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt-text"], content: "Interact", blockMouse: false });
+        this.promptElement = new UIElement({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt"], content: "F", blockMouse: false });
+        this.promptTextElement = new UIElement({ type: "div", parent: this.parentElement.htmlElement, classes: ["prompt-text"], content: "Interact", blockMouse: false });
         data = data ?? {};
         this.initialText = data.text ?? "Interact";
         this.setText(this.initialText);
@@ -88,6 +90,7 @@ export class Interactable extends Component {
             if (this.highlighted && game.input.keyDown("f")) {
                 game.soundManager.soundLibrary.play("click");
                 this.entity.emit("interact");
+                game.events.emit("entityInteract", this.entity);
             }
             this.promptElement.htmlElement.classList.toggle("highlight", this.highlighted);
             this.promptTextElement.htmlElement.classList.toggle("highlight", this.highlighted);

@@ -1,10 +1,9 @@
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { ParticleText } from "../../hierarchy/particleText";
 import { primitiveObject } from "../../hierarchy/serialise";
 import { Item } from "../../itemDefinitions";
-
-
-
+import { Vector } from "../../utils/vector";
 
 
 export class Inventory extends Component {

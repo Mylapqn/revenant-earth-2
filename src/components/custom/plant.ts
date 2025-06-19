@@ -35,6 +35,7 @@ export class Plant extends Component {
     inView = false;
     plantedIn?: Planter;
     storedCo2 = 0;
+    plantedByPlayer = false;
     private tempPlantedIn?: number;
 
 
@@ -55,7 +56,7 @@ export class Plant extends Component {
         this.shaderMeshComponent?.container.addChild(this.graphics);
 
         if (this.health > 0) {
-            game.score.add(100);
+            //game.score.add(100);
         }
         Plant.list.push(this);
         this.drawPlant();
@@ -64,12 +65,14 @@ export class Plant extends Component {
     override toData(): ComponentData {
         const data = { growth: this.growth, species: this.species.name, health: this.health } as Parameters<this["applyData"]>[0];
         if (this.plantedIn) data.plantedIn = this.plantedIn.entity.id;
+        if (this.plantedByPlayer) data.plantedByPlayer = this.plantedByPlayer;
         return super.toData(data);
     }
 
-    override applyData(data: { growth: number; species: string; health: number, plantedIn?: number }): void {
+    override applyData(data: { growth: number; species: string; health: number, plantedIn?: number, plantedByPlayer?: boolean }): void {
         this.growth = data.growth;
         this.health = data.health ?? 1;
+        this.plantedByPlayer = data.plantedByPlayer ?? false;
         if (data.plantedIn) this.tempPlantedIn = data.plantedIn;
         //console.log(data.species);
         if (data.species) this.species = PlantSpecies.species.get(data.species)!;
@@ -118,7 +121,13 @@ export class Plant extends Component {
                 const releasedCo2 = Math.min(this.storedCo2, (this.storedCo2 + .01) * dt * .01);
                 this.envirnonmentProvider.atmo.co2 += releasedCo2;
                 this.storedCo2 -= releasedCo2;
-                if (this.storedCo2 <= 0) this.storedCo2 = 0;
+                if (this.storedCo2 <= 0) {
+                    this.storedCo2 = 0;
+                    if (this.plantedByPlayer) {
+                        this.entity.remove();
+                        return;
+                    }
+                }
                 //Debug.log("released co2: " + releasedCo2);
             }
             return;
@@ -132,13 +141,10 @@ export class Plant extends Component {
         let adata = this.envirnonmentProvider.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
             this.tooltipComponent.tooltipName = this.species.name;
-            this.tooltipComponent.tooltipData.set("treeHealth", parseFloat(this.health.toFixed(2)).toString());
-            this.tooltipComponent.tooltipData.set("treeGrowth", parseFloat(this.growth.toFixed(2)).toString());
-            //pollution fertility
-            this.tooltipComponent.tooltipData.set("pollution", parseFloat(tdata.pollution.toFixed(2)).toString());
-            this.tooltipComponent.tooltipData.set("fertility", parseFloat(tdata.fertility.toFixed(2)).toString());
+            this.tooltipComponent.tooltipData.set("Health", parseFloat(this.health.toFixed(2)).toString());
+            this.tooltipComponent.tooltipData.set("Growth", parseFloat(this.growth.toFixed(2)).toString());
             //seed
-            this.tooltipComponent.tooltipData.set("seedProgress", parseFloat(this.seedProgress.toFixed(2)).toString());
+            this.tooltipComponent.tooltipData.set("Seed Progress", parseFloat(this.seedProgress.toFixed(2)).toString());
             //this.tooltipComponent.tooltipData.set("species", this.species.name);
         }
         if (tdata == undefined) return;
@@ -196,21 +202,34 @@ export class Plant extends Component {
             }
             this.envirnonmentProvider.terrain.removeMoisture(this.transform.position.x, requiredMoisture);
         }
-        if (this.seedProgress >= this.nextseed && !this.plantedIn) {
+        if (this.seedProgress >= this.nextseed * 0.1 && !this.plantedIn) {
             this.nextseed *= 2;
-            let seedPos = this.transform.position.x + (80 * Math.random() - 40) * 10;
-            let seedValid = true;
+            let potentialSeedPositions = [];
+            let seedValidArray = [];
+            for (let i = 0; i < 10; i++) {
+                potentialSeedPositions[i] = this.transform.position.x + (2 * Math.random() - .5) * (100 + i * 40);
+                seedValidArray[i] = true;
+            }
+            console.log(potentialSeedPositions);
             for (const plant of Plant.list) {
-                if (Math.abs(plant.entity.transform.position.x - seedPos) < 10) {
-                    seedValid = false;
-                    break;
+                if (plant.dead) continue;
+                let avoidRadius = 40;
+                if (plant.species == this.species) avoidRadius = 80;
+                if (this.species.name == "Vetiver grass") avoidRadius = 20;
+                for (let i = 0; i < potentialSeedPositions.length; i++) {
+                    if (!seedValidArray[i]) continue;
+                    if (Math.abs(plant.entity.transform.position.x - potentialSeedPositions[i]) < avoidRadius) {
+                        seedValidArray[i] = false;
+                        new ParticleText("seed blocked", new Vector(potentialSeedPositions[i], this.transform.position.y - 40));
+                    }
                 }
             }
-            if (seedValid) {
-                let newtree = Prefab.Plant({ species: this.species.name, scene: this.entity.scene });
+            let validSeed = seedValidArray.indexOf(true);
+            if (validSeed != -1) {
+                let newPlant = Prefab.Plant({ species: this.species.name, scene: this.entity.scene });
                 new ParticleText("seed", this.transform.position.clone().add(new Vector(0, -40)));
-                newtree.transform.position.x = seedPos;
-                newtree.transform.position.y = this.transform.position.y;
+                newPlant.transform.position.x = potentialSeedPositions[validSeed];
+                newPlant.transform.position.y = this.transform.position.y;
             }
         }
         //this.shaderMeshComponent.renderMesh.scale.set(Math.sqrt(this.growth) * .3);
@@ -243,21 +262,34 @@ export class Plant extends Component {
         let thickness = options.thickness;
         let pos = options.position;
         let growth = options.growth;
+        let branchProbability = .4;
+        let branchAngleRandomness = .6;
+        let growthAngleRandomness = .2;
+        let leavesRadius = 1;
+        let growthBranchMultiplier = .5;
+        if (options.species.name === "Sea buckthorn") {
+            branchProbability = .6;
+            thickness *= .5;
+            leavesRadius = 1.5;
+            branchAngleRandomness = 1;
+            growthAngleRandomness = .4;
+            growthBranchMultiplier = .8;
+        }
         const color = options.species.generatorData.leaves ? CustomColor.randomAroundHSL(random, 20, 5, 0.3, 0.1, 0.3, 0.1).toPixi() : CustomColor.randomAroundHSL(random, 130 * options.health, 10, 0.4 * options.health + .3, 0.2, 0.3, 0.05).toPixi();
         for (let i = 0; i < growth; i++) {
             let remainingGrowth = growth - i;
             let radius = remainingGrowth * .2 + 1 * thickness;
             const newRandom = random.child();
-            if (remainingGrowth > 2 && newRandom.float() < .4) {
-                let angleOffset = (newRandom.float() - .5) * .6 * Math.PI;
+            if (remainingGrowth > 2 && newRandom.float() < branchProbability) {
+                let angleOffset = (newRandom.float() - .5) * branchAngleRandomness * Math.PI;
                 thickness = Math.max(2, thickness);
                 if (i > growth * .2) {
-                    this.branch({ angle: angle + angleOffset, length: length, position: pos.clone(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * .5, species: options.species, graphics: options.graphics, health: options.health });
+                    this.branch({ angle: angle + angleOffset, length: length, position: pos.clone(), random: newRandom, thickness: thickness / 2, growth: remainingGrowth * growthBranchMultiplier, species: options.species, graphics: options.graphics, health: options.health });
                 }
                 angle -= angleOffset;
                 thickness /= 2;
             }
-            angle += (random.float() - .5) * .2 * Math.PI;
+            angle += (random.float() - .5) * growthAngleRandomness * Math.PI;
             //move angle towards default
             angle = lerp(angle, -Math.PI / 2, .15);
             options.graphics.moveTo(pos.x, pos.y);

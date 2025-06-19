@@ -208,7 +208,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "vite.svg",
+                            asset: "battery",
                         },
                     },
                     {
@@ -220,6 +220,12 @@ export class Prefab {
                     {
                         componentType: "Power",
                         data: { capacity: 100 }
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 26
+                        }
                     }
                 ],
             },
@@ -265,7 +271,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "barrel",
+                            asset: Math.random() > 0.5 ? "barrel_1" : "barrel_2",
                         },
                     },
                     {
@@ -274,8 +280,18 @@ export class Prefab {
                             pollution: params.pollution ?? 1
                         }
                     },
-                    { componentType: "Interactable" },
-                    { componentType: "TerrainAlign" },
+                    {
+                        componentType: "Interactable",
+                        data: {
+                            text: "Clean up"
+                        }
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 14
+                        }
+                    }
                 ],
             },
             params.scene ?? game.activeScene
@@ -295,7 +311,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "window.png",
+                            asset: "solar_panel",
                         },
                     },
                     {
@@ -310,6 +326,12 @@ export class Prefab {
                     {
                         componentType: "Power",
                         data: { capacity: 1 }
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 26
+                        }
                     }
                 ],
             },
@@ -329,7 +351,7 @@ export class Prefab {
                     {
                         componentType: "BasicSprite",
                         data: {
-                            asset: "oxygenator1.png",
+                            asset: "chest",
                         },
                     },
                     {

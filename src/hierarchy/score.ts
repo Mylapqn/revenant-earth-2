@@ -1,5 +1,6 @@
 import { game } from "../game";
-import { UI, UIElement } from "../ui/ui";
+import { UI } from "../ui/ui";
+import { UIElement } from "../ui/uiElement";
 import { lerp } from "../utils/utils";
 import { Vector, Vectorlike } from "../utils/vector";
 
@@ -34,7 +35,7 @@ export class Score {
         }
     }
     init() {
-        this.display = UIElement.create({ type: "div", classes: ["score"], parent: UI.container });
+        this.display = new UIElement({ type: "div", classes: ["score"], parent: UI.container });
         this.score = this.score;
     }
     update(dt: number) {

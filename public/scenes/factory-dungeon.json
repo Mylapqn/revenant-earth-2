@@ -1,5 +1,16 @@
 [
     {
+        "kind": "Player",
+        "position": {
+            "x": -128.13015511804113,
+            "y": 2.600000000000001
+        },
+        "velocity": {
+            "x": 5.334216966880649e-193,
+            "y": 0
+        }
+    },
+    {
         "kind": "Ambience",
         "ambienceData": {
             "music": "",
@@ -18,31 +29,39 @@
         "name": "Door",
         "component": [
             {
-                "id": 0,
+                "id": 12,
                 "componentType": "BasicSprite",
                 "data": {
                     "asset": "./door.png"
                 }
             },
             {
-                "id": 1,
-                "componentType": "Interactable"
-            },
-            {
-                "id": 2,
-                "componentType": "Door",
+                "id": 13,
+                "componentType": "Interactable",
                 "data": {
-                    "target": "Scene",
-                    "doorId": "dungeon-door-1"
+                    "offset": {
+                        "x": 0,
+                        "y": -15
+                    },
+                    "text": "Interact"
                 }
             },
             {
-                "id": 3,
+                "id": 14,
+                "componentType": "Door",
+                "data": {
+                    "target": "Scene",
+                    "doorId": "factory-dungeon",
+                    "enabled": true
+                }
+            },
+            {
+                "id": 15,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 40,
-                        "y": 20
+                        "x": -160,
+                        "y": 0
                     },
                     "velocity": {
                         "x": 0,
@@ -55,33 +74,40 @@
     {
         "kind": "Entity",
         "id": 8,
-        "name": "Entity 8",
+        "name": "Factory Pollution Switch",
         "component": [
             {
-                "id": 0,
+                "id": 12,
                 "componentType": "BasicSprite",
                 "data": {
                     "asset": "./robo.png"
                 }
             },
             {
-                "id": 1,
-                "componentType": "Interactable"
-            },
-            {
-                "id": 2,
-                "componentType": "Button",
+                "id": 13,
+                "componentType": "Interactable",
                 "data": {
-                    "dbName": "pollutionSpeed"
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "text": "Interact"
                 }
             },
             {
-                "id": 3,
+                "id": 14,
+                "componentType": "Button",
+                "data": {
+                    "dbName": "Factory Switch"
+                }
+            },
+            {
+                "id": 15,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": 10,
-                        "y": 20
+                        "x": 578,
+                        "y": 54
                     },
                     "velocity": {
                         "x": 0,
@@ -97,7 +123,7 @@
         "name": "Dungeon Hitbox",
         "component": [
             {
-                "id": 0,
+                "id": 6,
                 "componentType": "Transform",
                 "data": {
                     "position": {
@@ -111,25 +137,14 @@
                 }
             },
             {
-                "id": 1,
+                "id": 7,
                 "componentType": "Hitbox",
                 "data": {
                     "interior": true,
-                    "hitboxName": "dungeon-1"
+                    "hitboxName": "factory-dungeon"
                 }
             }
         ]
-    },
-    {
-        "kind": "Player",
-        "position": {
-            "x": 190.53464348267576,
-            "y": 32.087649674107624
-        },
-        "velocity": {
-            "x": 0,
-            "y": 0
-        }
     },
     {
         "kind": "Entity",
@@ -137,19 +152,19 @@
         "name": "Window",
         "component": [
             {
-                "id": 0,
+                "id": 9,
                 "componentType": "WindowRenderer",
                 "data": {
                     "asset": "./window.png"
                 }
             },
             {
-                "id": 1,
+                "id": 10,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -175.9855594867576,
-                        "y": -36.19020999791623
+                        "x": -160,
+                        "y": -80
                     },
                     "velocity": {
                         "x": 0,
@@ -158,20 +173,20 @@
                 }
             },
             {
-                "id": 2,
+                "id": 11,
                 "componentType": "LightComponent",
                 "data": {
                     "lightData": {
                         "position": {
-                            "x": -0,
-                            "y": -0
+                            "x": 0,
+                            "y": 0
                         },
                         "angle": 1.5707963267948966,
                         "width": 2,
                         "color": [
-                            1.5,
+                            1.4980392156862745,
                             0.8,
-                            0.1
+                            0.09803921568627451
                         ],
                         "range": 150,
                         "intensity": 1.5
@@ -186,19 +201,19 @@
         "name": "Window",
         "component": [
             {
-                "id": 2,
+                "id": 10,
                 "componentType": "WindowRenderer",
                 "data": {
                     "asset": "./window.png"
                 }
             },
             {
-                "id": 3,
+                "id": 11,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -108.13428823752798,
-                        "y": -36.47410653033974
+                        "x": -40,
+                        "y": -80
                     },
                     "velocity": {
                         "x": 0,
@@ -207,19 +222,20 @@
                 }
             },
             {
+                "id": 12,
                 "componentType": "LightComponent",
                 "data": {
                     "lightData": {
                         "position": {
-                            "x": -0,
-                            "y": -0
+                            "x": 0,
+                            "y": 0
                         },
                         "angle": 1.5707963267948966,
                         "width": 2,
                         "color": [
-                            1.5,
+                            1.4980392156862745,
                             0.8,
-                            0.1
+                            0.09803921568627451
                         ],
                         "range": 150,
                         "intensity": 1.5
@@ -234,19 +250,19 @@
         "name": "Window",
         "component": [
             {
-                "id": 4,
+                "id": 15,
                 "componentType": "WindowRenderer",
                 "data": {
-                    "asset": "./window.png"
+                    "asset": "./window_big.png"
                 }
             },
             {
-                "id": 5,
+                "id": 16,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -39.47719949419101,
-                        "y": -36.292003220459364
+                        "x": 160,
+                        "y": 0
                     },
                     "velocity": {
                         "x": 0,
@@ -255,19 +271,118 @@
                 }
             },
             {
+                "id": 17,
                 "componentType": "LightComponent",
                 "data": {
                     "lightData": {
                         "position": {
-                            "x": -0,
-                            "y": -0
+                            "x": 0,
+                            "y": 0
                         },
                         "angle": 1.5707963267948966,
                         "width": 2,
                         "color": [
-                            1.5,
+                            1.4980392156862745,
                             0.8,
-                            0.1
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 18,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_big.png"
+                }
+            },
+            {
+                "id": 19,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 240,
+                        "y": 0
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 20,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 21,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window_big.png"
+                }
+            },
+            {
+                "id": 22,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 320,
+                        "y": 0
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 23,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
                         ],
                         "range": 150,
                         "intensity": 1.5
@@ -279,15 +394,15 @@
     {
         "kind": "Entity",
         "id": 11,
-        "name": "LightReflect",
+        "name": "Light",
         "component": [
             {
-                "id": 5,
+                "id": 23,
                 "componentType": "Transform",
                 "data": {
                     "position": {
-                        "x": -108.13428823752798,
-                        "y": -10.47410653033974
+                        "x": 577,
+                        "y": 15
                     },
                     "velocity": {
                         "x": 0,
@@ -296,7 +411,7 @@
                 }
             },
             {
-                "id": 6,
+                "id": 24,
                 "componentType": "LightComponent",
                 "data": {
                     "lightData": {
@@ -304,62 +419,17 @@
                             "x": 0,
                             "y": 0
                         },
-                        "angle": -1.5707963267948966,
-                        "width": 6,
+                        "angle": 1.5707963267948966,
+                        "width": 1.5,
                         "color": [
-                            1,
+                            0.4,
                             0.6,
-                            0.05
+                            1
                         ],
-                        "range": 250,
-                        "intensity": 1
+                        "range": 350,
+                        "intensity": 1.5
                     }
                 }
-            }
-        ]
-    },
-    {
-        "kind": "Entity",
-        "id": 650,
-        "name": "Chest",
-        "component": [
-            {
-                "id": 0,
-                "componentType": "BasicSprite",
-                "data": {
-                    "asset": "oxygenator1.png"
-                }
-            },
-            {
-                "id": 1,
-                "componentType": "Inventory",
-                "data": {
-                    "items": {
-                        "tree": 3
-                    }
-                }
-            },
-            {
-                "id": 2,
-                "componentType": "LootComponent"
-            },
-            {
-                "id": 3,
-                "componentType": "Transform",
-                "data": {
-                    "position": {
-                        "x": -246,
-                        "y": 12
-                    },
-                    "velocity": {
-                        "x": 0,
-                        "y": 0
-                    }
-                }
-            },
-            {
-                "id": 4,
-                "componentType": "Interactable"
             }
         ]
     }

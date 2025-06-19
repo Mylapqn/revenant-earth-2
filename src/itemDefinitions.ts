@@ -1,12 +1,13 @@
 
 export enum ItemGroup {
-    Tool,
+    Building,
     Seed
 }
 
 export enum Item {
     tree = "tree",
     grass = "grass",
+    bush = "bush",
     sprinkler = "sprinkler",
     biocharKiln = "biocharKiln",
     battery = "battery",
@@ -18,44 +19,58 @@ export type ItemDefinition = {
     group: ItemGroup
     name: string,
     description: string,
-    icon: string
+    icon: string,
+    cost: number
 }
 
 export const itemDefinitions: Record<Item, ItemDefinition> = {
     [Item.tree]: {
         group: ItemGroup.Seed,
-        name: "Tree",
-        description: "Tree description",
-        icon: "tree.png"
+        name: "Black poplar",
+        description: "Populus nigra",
+        icon: "tree.png",
+        cost: 200,
     },
     [Item.grass]: {
         group: ItemGroup.Seed,
-        name: "Grass",
-        description: "Grass description",
-        icon: "tree.png"
+        name: "Vetiver grass",
+        description: "Chrysopogon zizanioides",
+        icon: "grass.png",
+        cost: 50
+    },
+    [Item.bush]: {
+        group: ItemGroup.Seed,
+        name: "Sea buckthorn",
+        description: "Hippophae rhamnoides",
+        icon: "bush.png",
+        cost: 100
     },
     [Item.sprinkler]: {
-        group: ItemGroup.Tool,
+        group: ItemGroup.Building,
         name: "Sprinkler",
-        description: "Vite, ze nic nesprinkler",
-        icon: "vite.svg"
+        description: "Provides water to plants",
+        icon: "gfx/building/water_tank.png",
+        cost: 1000
     },
     [Item.biocharKiln]: {
-        group: ItemGroup.Tool,
+        group: ItemGroup.Building,
         name: "Biochar Kiln",
-        description: "Biochar, ze nic neskilnkler",
-        icon: "vite.svg"
+        description: "Processes plants to store CO2",
+        icon: "gfx/building/biochar.png",
+        cost: 500
     },
     [Item.battery]: {
-        group: ItemGroup.Tool,
+        group: ItemGroup.Building,
         name: "Battery",
-        description: "Ba, ze nic terry",
-        icon: "vite.svg"
+        description: "Stores energy",
+        icon: "gfx/building/battery.png",
+        cost: 1000
     },
     [Item.solarPanel]: {
-        group: ItemGroup.Tool,
+        group: ItemGroup.Building,
         name: "Solar Panel",
-        description: "energy when sun",
-        icon: "window.png"
+        description: "Provides energy during the day",
+        icon: "gfx/building/solar_panel.png",
+        cost: 1000
     },
 }

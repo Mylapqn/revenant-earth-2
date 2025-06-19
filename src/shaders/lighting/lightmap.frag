@@ -102,7 +102,7 @@ void main(void) {
         //angularFalloff = 1.;
 
         vec3 addition = distanceFalloff * angularFalloff * l.color * l.intensity * 4.f;
-        addition *= 1.f - nClamp((dis - shadowDist) * .4f * l.range) * shadowStrength;
+        addition *= 1.f - nClamp((dis - shadowDist) * .2f * l.range) * shadowStrength;
 
         lightMap += addition;
 

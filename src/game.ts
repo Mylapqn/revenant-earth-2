@@ -37,6 +37,9 @@ import { MilestoneManager } from "./hierarchy/milestoneManager";
 import { QuestMarker } from "./ui/questMarker";
 import { FadeScreen } from "./ui/fadeScreen";
 import { MainMenu } from "./ui/mainMenu";
+import { ItemGroup } from "./itemDefinitions";
+import { SceneLibrary } from "./environment/sceneLibrary";
+import { UIFullscreenMenu } from "./ui/uiFullscreenMenu";
 
 export let game: Game;
 
@@ -93,6 +96,7 @@ export class Game {
     soundManager = new SoundManager();
     timeScale: number = 1;
     hitboxLibrary = new HitboxLibrary();
+    sceneLibrary = new SceneLibrary();
 
     frameHistory: number[] = [];
     ambience!: Ambience;
@@ -143,8 +147,7 @@ export class Game {
                     name: "bundle", assets: [
                         { alias: "player_anim", src: "./anim/player2.json" },
                         { alias: "director_anim", src: "./anim/director.json" },
-                        { alias: "bg", src: "./bg2.png" },
-                        { alias: "barrel", src: "./barrel.png" },
+                        { alias: "bg", src: "./bg3.png" },
                         { alias: "metal_bg", src: "./interior_bg.png" },
                         { alias: "space", src: "./space_tile.png" },
                         { alias: "monogram", src: "./font/monogram.ttf" },
@@ -153,6 +156,15 @@ export class Game {
                         { alias: "planter_inspect", src: "./gfx/building/planter_mask.png" },
                         { alias: "sprinkler", src: "./gfx/building/water_sprinkler.png" },
                         { alias: "sprinkler_active", src: "./gfx/building/water_sprinkler_active.png" },
+                        { alias: "solar_panel", src: "./gfx/building/solar_panel.png" },
+                        { alias: "battery", src: "./gfx/building/battery.png" },
+                        { alias: "barrel_1", src: "./gfx/building/barrel_1.png" },
+                        { alias: "barrel_2", src: "./gfx/building/barrel_2.png" },
+                        { alias: "floor", src: "./floor.png" },
+                        { alias: "interior_bg", src: "./interior_bg.png" },
+                        { alias: "water_tank", src: "./gfx/building/water_tank.png" },
+                        { alias: "window", src: "./window.png" },
+                        { alias: "chest", src: "./gfx/building/chest.png" },
                     ]
                 },
                 {
@@ -169,13 +181,17 @@ export class Game {
         }
         console.log("Loading bundle", performance.now() - startTime);
         Assets.init({ manifest });
-        await Assets.loadBundle(["bundle"]);
-        Assets.get("sprinkler_active").source.scaleMode = 'nearest';
-        Assets.get("sprinkler").source.scaleMode = 'nearest';
+        const bundle = await Assets.loadBundle(["bundle"]);
+        if (bundle.bundle) {
+            for (const asset of Object.values(bundle.bundle)) {
+                if (asset instanceof Texture) asset.source.scaleMode = 'nearest';
+            }
+        }
         console.log("Loading backgrounds", performance.now() - startTime);
         this.backgroundTextures = new Set(Object.values((await Assets.loadBundle(["backgrounds"])).backgrounds));
-        console.log("Loading hitboxes", performance.now() - startTime);
+        console.log("Loading hitboxes and scenes", performance.now() - startTime);
         await this.hitboxLibrary.init();
+        await this.sceneLibrary.init();
         console.log("Loading sounds", performance.now() - startTime);
         await this.soundManager.loadSounds();
         const endTime = performance.now();
@@ -223,14 +239,15 @@ export class Game {
 
 
 
-        new PlantSpecies("Tree", { co2: 1, nutrients: 1, biomass: 1, water: 1, erosion: 1, maxGrowth: 50 },
-            { pollution: 1, water: 1, pollutionDamage: 1, grassiness: 0 }, {
-            initialBranches: 1,
-            lengthPerGrowth: 4,
-            leaves: true
-        });
-        Buildable.plantBuildable(PlantSpecies.species.get("Tree")!);
-        new PlantSpecies("Grass", { co2: .1, nutrients: .5, biomass: .1, water: .1, erosion: 4, maxGrowth: 7 },
+        new PlantSpecies("Black poplar", { co2: 1, nutrients: 1, biomass: 1, water: 1.5, erosion: 1, maxGrowth: 50 },
+            { pollution: 3, water: 1, pollutionDamage: .02, grassiness: 0 },
+            {
+                initialBranches: 1,
+                lengthPerGrowth: 4,
+                leaves: true
+            });
+        Buildable.plantBuildable(PlantSpecies.species.get("Black poplar")!);
+        new PlantSpecies("Vetiver grass", { co2: .1, nutrients: .5, biomass: .1, water: .1, erosion: 4, maxGrowth: 7 },
             { pollution: 0, water: 3, pollutionDamage: .5, grassiness: 1 },
             {
                 initialBranches: 8,
@@ -238,7 +255,16 @@ export class Game {
                 leaves: false
             }
         );
-        Buildable.plantBuildable(PlantSpecies.species.get("Grass")!);
+        Buildable.plantBuildable(PlantSpecies.species.get("Vetiver grass")!);
+        new PlantSpecies("Sea buckthorn", { co2: .1, nutrients: .2, biomass: .5, water: .01, erosion: 2, maxGrowth: 20 },
+            { pollution: 1, water: .2, pollutionDamage: .1, grassiness: 0 },
+            {
+                initialBranches: 1,
+                lengthPerGrowth: 2,
+                leaves: true
+            }
+        );
+        Buildable.plantBuildable(PlantSpecies.species.get("Sea buckthorn")!);
 
         await Buildable.initBuildables();
 
@@ -252,13 +278,11 @@ export class Game {
         bg.scale.set(1);
         //this.app.stage.addChild(bg);
 
-        const scene2 = Scene.deserialise({ name: "Scene 2", kind: "Scene", active: false, data: await Assets.load("./scenes/scene-2.json") });
-        const sceneSpace = Scene.deserialise({ name: "Space Station", kind: "Scene", active: false, data: await Assets.load("./scenes/space-station.json") });
+        Scene.deserialise({ name: "Seed Vault", kind: "Scene", active: false, data: this.sceneLibrary.get("seed-dungeon") });
+        Scene.deserialise({ name: "Factory", kind: "Scene", active: false, data: this.sceneLibrary.get("factory-dungeon") });
+        Scene.deserialise({ name: "Space Station", kind: "Scene", active: false, data: this.sceneLibrary.get("space-station") });
 
         this.skyLayer = new PixelLayer({ autoResize: true, autoRender: true, depth: 0, parent: this.skyContainer, worldSpace: false });
-        const a = new Sprite(await Assets.load("./tree.png"));
-        a.scale.set(1);
-        this.skyLayer.container.addChild(a);
 
         const layers = 5;
         for (let i = 0; i < layers; i++) {
@@ -316,12 +340,13 @@ export class Game {
                     componentType: "Inventory",
                     data: {
                         items: {
-                            "solarPanel": 100,
-                            "grass": 100,
-                            "tree": 100,
-                            "biocharKiln": 100,
-                            "battery": 100,
-                            "sprinkler": 100,
+                            "solarPanel": 0,
+                            "grass": 0,
+                            "tree": 2,
+                            "bush": 0,
+                            "biocharKiln": 0,
+                            "battery": 0,
+                            "sprinkler": 0,
                         }
                     }
                 }
@@ -342,10 +367,10 @@ export class Game {
         Debug.init();
         //game.loadScene("Space Station");
         for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 300 + 50) {
-            Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Tree", growth: 30, health: 0 });
+            Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Black poplar", growth: 30, health: 0 });
         }
         for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 80 + 10) {
-            Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Grass", growth: 5, health: 0 });
+            Prefab.Plant({ scene: this.activeScene, x: x, y: 100, species: "Vetiver grass", growth: 5, health: 0 });
         }
         const rand = new RandomGenerator();
         for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 30 + 10) {
@@ -595,23 +620,18 @@ export class Game {
             //UI.fullscreenMenu.element.innerHTML = stats;
         }
 
-        if (this.input.keyDown("e")) {
+        if (this.input.keyDown("e") || this.input.mouse.getButtonUp(MouseButton.Wheel)) {
             UI.quickInventory!.toggle();
         }
 
         if (this.inputEnabled) {
             if (this.input.keyDown("t")) {
-                if (!this.selectedSeed) {
-                    this.selectedSeed = "Tree";
-                }
-                else {
-                    const array = Array.from(PlantSpecies.species.keys());
-                    let index = array.indexOf(this.selectedSeed) + 1;
-                    if (index == array.length) index = 0;
-                    this.selectedSeed = array[index];
-                }
-                Buildable.activate(this.selectedSeed);
-
+                UI.quickInventory!.currentGroup = ItemGroup.Seed;
+                UI.quickInventory!.toggle();
+            }
+            if (this.input.keyDown("b")) {
+                UI.quickInventory!.currentGroup = ItemGroup.Building;
+                UI.quickInventory!.toggle();
             }
             /*if (this.input.keyDown("q")) {
                 let out = this.stateManager.serialise(StateMode.full);
@@ -624,31 +644,19 @@ export class Game {
                 });
             }*/
 
-            if (this.input.keyDown("ě")) {
-                if (this.activeScene.name != "Scene 2") {
-                    this.loadScene("Scene 2");
-                }
-            }
-
-            if (this.input.keyDown("c")) {
-                Buildable.activate("Sprinkler");
-            }
-
-            if (this.input.keyDown("+")) {
-                if (this.activeScene.name != "Scene") {
-                    this.loadScene("Scene");
-                }
-            }
             if (this.input.keyDown("r")) {
                 this.weather.weatherData.rainBuildup += 2;
             }
             if (this.input.keyDown("escape")) {
-                if (MainMenu.instance?.updating) {
-                    MainMenu.instance.continueGame();
-                }
+                if (UI.fullscreenMenu.shown) UI.fullscreenMenu.toggle();
                 else {
-                    game.loadScene("Menu");
-                    MainMenu.instance?.show();
+                    if (MainMenu.instance?.updating) {
+                        MainMenu.instance.continueGame();
+                    }
+                    else {
+                        game.loadScene("Menu");
+                        MainMenu.instance?.show();
+                    }
                 }
             }
             if (this.input.keyDown("č")) {
@@ -714,7 +722,7 @@ export class Game {
         Entity.fromData(
             {
                 kind: "Entity",
-                name: "Door",
+                name: "Seed Dungeon Door",
                 component: [
                     {
                         componentType: "Transform",
@@ -734,15 +742,8 @@ export class Game {
                     {
                         componentType: "Door",
                         data: {
-                            target: "Scene 2",
-                            doorId: "dungeon-door-1",
-                        },
-                    },
-                    {
-                        componentType: "Pollution",
-                        data: {
-                            speed: 1,
-                            dbName: "pollutionSpeed",
+                            target: "Seed Vault",
+                            doorId: "seed-dungeon",
                         },
                     },
                     {
@@ -759,12 +760,86 @@ export class Game {
         Entity.fromData(
             {
                 kind: "Entity",
-                name: "Door Space",
+                name: "Factory Door",
                 component: [
                     {
                         componentType: "Transform",
                         data: {
-                            position: { x: 1150, y: -20 },
+                            position: { x: 4300, y: -5 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./door.png",
+                        },
+                    },
+                    {
+                        componentType: "Interactable",
+                    },
+                    {
+                        componentType: "Door",
+                        data: {
+                            target: "Factory",
+                            doorId: "factory-dungeon",
+                        },
+                    },
+                    {
+                        componentType: "Pollution",
+                        data: {
+                            speed: 1,
+                            dbName: "Factory Switch",
+                        },
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 20,
+                        },
+                    }
+                ],
+            },
+            this.activeScene
+        );
+
+        Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Factory",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 4300, y: -40 },
+                        },
+                    },
+                    {
+                        componentType: "BasicSprite",
+                        data: {
+                            asset: "./gfx/bg/factory.png",
+                            container: "bg",
+                        },
+                    },
+                    {
+                        componentType: "TerrainAlign",
+                        data: {
+                            yOffset: 55,
+                        },
+                    }
+                ],
+            },
+            this.activeScene
+        );
+
+        Entity.fromData(
+            {
+                kind: "Entity",
+                name: "Landing Pod",
+                component: [
+                    {
+                        componentType: "Transform",
+                        data: {
+                            position: { x: 2000, y: -20 },
                         },
                     },
                     {
@@ -802,7 +877,7 @@ export class Game {
         );
 
         for (let x = 0; x < 10; x++) {
-            Prefab.Polluter({scene: this.activeScene, x: 3200 + x * 100 + Math.random() * 90, pollution: 10});
+            Prefab.Polluter({ scene: this.activeScene, x: 3200 + x * 100 + Math.random() * 90, pollution: 10 });
         }
-    }    
+    }
 }

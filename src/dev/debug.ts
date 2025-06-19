@@ -1,15 +1,14 @@
 import { Color, Container, Graphics, StrokeStyle } from "pixi.js";
-import { Game, game } from "../game";
+import { game } from "../game";
 import { clamp, displayNumber } from "../utils/utils";
 import { BasicSprite } from "../components/generic/basicSprite";
 import { Hitbox } from "../components/generic/hitbox";
 import { TooltipPanel } from "../ui/tooltip";
 import { MouseButton } from "../input";
-import { UIContextMenu } from "../ui/ui";
+import { UIContextMenu } from "../ui/uiContextMenu";
 import { UIButton } from "../ui/uiButton";
 import { UI } from "../ui/ui";
-import { UIElement } from "../ui/ui";
-import { UIPanel } from "../ui/ui";
+import { UIElement } from "../ui/uiElement";
 import { HitboxEditor } from "./hitbox-editor";
 import { Entity } from "../hierarchy/entity";
 import { Vector } from "../utils/vector";
@@ -119,14 +118,14 @@ export class Debug {
                 if (hitbox && !this.hitboxEditor.editing) {
                     this.drawHitbox(hitbox)
                 }
-                if (game.input.mouse.getButtonDown(MouseButton.Left) && !UI.mouseOverUI) {
+                if (game.input.mouse.getButtonDown(MouseButton.Left) && UI.mouseOverElements.size == 0) {
                     if (game.input.key("shift")) this.movingEntity = this.duplicateEntity(nearestEntity);
                     else this.movingEntity = nearestEntity;
                 }
             }
             if (game.input.mouse.getButtonUp(MouseButton.Right)) {
                 const buttons = [];
-                const header = new UIElement("div", "header");
+                const header = new UIElement({ type: "div", classes: ["header"] });
                 buttons.push(header);
                 if (nearestEntity && nearestEntity.transform.position.distance(game.worldMouse) < entityDistance) {
                     header.htmlElement.innerText = nearestEntity.name;

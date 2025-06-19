@@ -1,5 +1,7 @@
 import { Entity } from "../hierarchy/entity";
-import { UI, UIElement, UIAbsoluteElement } from "./ui";
+import { UI } from "./ui";
+import { UIAbsoluteElement } from "./uiAbsoluteElement";
+import { UIElement } from "./uiElement";
 import { game } from "../game";
 import { Vector } from "../utils/vector";
 import { displayNumber } from "../utils/utils";
@@ -16,11 +18,11 @@ export class QuestMarker {
     removeWhenClose = false;
     constructor(public position: Vector, public text: string, removeWhenClose?: boolean) {
         this.removeWhenClose = removeWhenClose ?? false;
-        this.parentElement = new UIAbsoluteElement("div", this.position, "marker");
+        this.parentElement = new UIAbsoluteElement({ type: "div", worldPosition: this.position, classes: ["marker"] });
         UI.container.appendChild(this.parentElement.htmlElement);
         this.parentElement.blockMouse = false;
-        this.arrowElement = UIElement.create({ type: "div", parent: this.parentElement.htmlElement, classes: ["arrow"],blockMouse: false });
-        this.textElement = UIElement.create({ type: "p", parent: this.parentElement.htmlElement, content: text,blockMouse: false });
+        this.arrowElement = new UIElement({ type: "div", parent: this.parentElement.htmlElement, classes: ["arrow"], blockMouse: false });
+        this.textElement = new UIElement({ type: "p", parent: this.parentElement.htmlElement, content: text, blockMouse: false });
         QuestMarker.list.push(this);
     }
     static atEntity(entity: Entity, text: string, removeWhenClose?: boolean) {
@@ -43,6 +45,10 @@ export class QuestMarker {
     }
     update() {
         if (this.parentEntity) this.position = this.parentEntity.transform.position.clone().add(new Vector(0, -50));
+        if (this.parentEntity && this.parentEntity.scene !== game.activeScene) {
+            this.parentElement.htmlElement.style.display = "none";
+            return;
+        }
         if (game.camera.inView(this.position, -200)) {
             this.parentElement.setWorldPosition(this.position);
             this.setArrow(new Vector(0, 1));

@@ -14,7 +14,7 @@ export class ParticleText {
     color: number = 0;
     text = "Text";
     graphics: Text;
-    constructor(text: string, position: Vector) {
+    constructor(text: string, position: Vector, lifespan: number = 3) {
         this.graphics = new Text({ text: text, anchor: { x: 0, y: 0 }, roundPixels: true });
         this.graphics.style.fill = 0xffffff;
         this.graphics.style.fontSize = 16;
@@ -24,6 +24,7 @@ export class ParticleText {
         this.graphics.cacheAsTexture({ antialias: false });
         //this.graphics.renderable = false;
         this.position = position.clone();
+        this.lifespan = lifespan;
         this.draw(0);
         game.worldUiLayer.addChild(this.graphics);
         ParticleText.list.push(this);

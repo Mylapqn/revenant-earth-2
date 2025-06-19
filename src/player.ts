@@ -22,8 +22,8 @@ import { Buildable } from "./hierarchy/buildable";
 import { UI } from "./ui/ui";
 
 export class Player implements ISerializable {
-    position = new Vector(1100, -50);
-    initialPosition = new Vector(1100, -50);
+    position = new Vector(2000, -50);
+    initialPosition = new Vector(2000, -50);
     sprite: Sprite;
     playerHitbox: Ellipse;
     graphics: Graphics;

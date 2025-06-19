@@ -28,6 +28,7 @@ export class Polluter extends Component {
 
     clean(): void {
         this.entity.remove();
+        game.score.addWithFx(100, game.camera.worldToRender(this.entity.transform.position));
     }
 
 

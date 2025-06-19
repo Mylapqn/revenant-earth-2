@@ -160,7 +160,7 @@ export class Terrain implements ISerializable, ISceneObject {
             let r = index / this.totalWidth;
             this.terrainData.push({
                 pollution: Math.abs(Math.cos(r * Math.PI * 2) * 0.8),
-                fertility: Math.abs(Math.cos(r * Math.PI * 3 + Math.PI / 8) * 0.2),
+                fertility: Math.abs(Math.cos(r * Math.PI * 3 + Math.PI / 8) * 0.6),
                 erosion: Math.abs(Math.cos(r * Math.PI * 4 - Math.PI / 2) * 0.9),
                 moisture: 0.3,
                 grassiness: 0
@@ -227,7 +227,9 @@ export class Terrain implements ISerializable, ISceneObject {
 
         if (game.input.key("x")) {
             const data = this.getProperties(game.worldMouse.x);
-            data.fertility = Math.min(1, data.fertility + 0.1);
+            const wantToAdd = Math.min(1 - data.fertility, 1 * dt);
+            if (game.score.pay(wantToAdd * 30))
+                data.fertility = Math.min(1, data.fertility + wantToAdd);
             //data.moisture = Math.min(1, data.moisture + 0.1);
         }
 
@@ -284,7 +286,7 @@ export class Terrain implements ISerializable, ISceneObject {
         if (index >= this.terrainData.length) index = this.terrainData.length - 1;
         if (index < 0) index = 0;
         let a = this.terrainData[index];
-        if (a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0,grassiness: 0 };
+        if (a === undefined) a = { pollution: 0, fertility: 0, erosion: 0, moisture: 0, grassiness: 0 };
         return a;
     }
 

@@ -2,7 +2,7 @@ import { game, Game } from "../game";
 import { nextFrame, sleep } from "../utils/utils";
 import { Vector } from "../utils/vector";
 import { FadeScreen } from "./fadeScreen";
-import { UIElement } from "./ui";
+import { UIElement } from "./uiElement";
 
 export class MainMenu {
     game: Game;
@@ -25,16 +25,16 @@ export class MainMenu {
     }
     constructor(game: Game) {
         this.game = game;
-        this.parentElement = UIElement.create({ type: "div", classes: ["main-menu"], parent: document.body }).htmlElement;
-        this.backgroundElement = UIElement.create({ type: "img", classes: ["bg"], parent: this.parentElement }).htmlElement as HTMLImageElement;
+        this.parentElement = new UIElement({ type: "div", classes: ["main-menu"], parent: document.body, blockMouse: true }).htmlElement;
+        this.backgroundElement = new UIElement({ type: "img", classes: ["bg"], parent: this.parentElement }).htmlElement as HTMLImageElement;
         this.backgroundElement.src = "space_menu.png";
-        this.logoElement = UIElement.create({ type: "img", classes: ["logo"], parent: this.parentElement }).htmlElement as HTMLImageElement;
+        this.logoElement = new UIElement({ type: "img", classes: ["logo"], parent: this.parentElement }).htmlElement as HTMLImageElement;
         this.logoElement.src = "logo.svg";
-        this.leftMenuElement = UIElement.create({ type: "div", classes: ["left-menu"], parent: this.parentElement }).htmlElement;
-        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Play", soundEffects: true }).htmlElement.onclick = () => this.startGame();
-        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Continue", soundEffects: true }).htmlElement.onclick = () => this.continueGame();
-        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Options", soundEffects: true }).htmlElement.onclick = () => this.startGame();
-        UIElement.create({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Credits", soundEffects: true }).htmlElement.onclick = () => this.credits();
+        this.leftMenuElement = new UIElement({ type: "div", classes: ["left-menu"], parent: this.parentElement }).htmlElement;
+        new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Play", mouseSoundEffects: true, onclick: () => this.startGame() });
+        new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Continue", mouseSoundEffects: true, onclick: () => this.continueGame() });
+        //new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Options", mouseSoundEffects: true, onclick: () => this.startGame() });
+        new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Credits", mouseSoundEffects: true, onclick: () => this.credits() });
         this.parentElement.onmousemove = (e) => this.mouseMove(e);
         this.init();
         MainMenu.instance = this;
@@ -81,7 +81,7 @@ export class MainMenu {
             game.destroyGame();
         }
         await FadeScreen.fadeIn();
-        const quote = UIElement.create({ type: "div", classes: ["quote"], parent: FadeScreen.element, content: "We don’t dream of the stars anymore. We dream of wind, fresh air, and water that wasn’t produced in a lab.<p>- Zora Solano, Environmental Technician on UNERA Space Station</p>" });
+        const quote = new UIElement({ type: "div", classes: ["quote"], parent: FadeScreen.element, content: "We don’t dream of the stars anymore. We dream of wind, fresh air, and water that wasn’t produced in a lab.<p>- Zora Solano, Environmental Technician on UNERA Space Station</p>" });
         this.fadeInElement(quote.htmlElement, 1000);
         this.updating = false;
         this.hide();
@@ -116,7 +116,7 @@ export class MainMenu {
     }
     async credits() {
         await FadeScreen.fadeIn(300);
-        const quote = UIElement.create({ type: "div", classes: ["credits"], parent: FadeScreen.element, content: "<img src='logo.svg'><h2>Matouš Marek (Mylapqn)</h2>Concept, design, art, code<h2>Andrej Karovin (NotRustyBot)</h2>Code, advice<br><br><br>Sound effects licenced from Soundly<br><br><br>Thesis supervisor: Pavel Novák<br>FMK TBU Zlín 2025" });
+        const quote = new UIElement({ type: "div", classes: ["credits"], parent: FadeScreen.element, content: "<img src='logo.svg'><h2>Matouš Marek (Mylapqn)</h2>Concept, design, art, code<h2>Andrej Karovin (NotRustyBot)</h2>Code, advice<br><br><br>Sound effects licenced from Soundly<br><br><br>Thesis supervisor: Pavel Novák<br>FMK TBU Zlín 2025" });
         await this.fadeInElement(quote.htmlElement, 1000);
         await sleep(6000);
         await this.fadeOutElement(quote.htmlElement, 1000);

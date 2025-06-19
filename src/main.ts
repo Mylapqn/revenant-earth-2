@@ -10,7 +10,8 @@ import './stylesheets/progress.css';
 import { DevSync } from './dev/devsync';
 import { MainMenu } from './ui/mainMenu';
 import { FadeScreen } from './ui/fadeScreen';
-import { UI, UIQuickInventory } from './ui/ui';
+import { UI } from './ui/ui';
+import { UIQuickInventory } from "./ui/uiQuickInventory";
 
 async function init() {
     const app = new Application();

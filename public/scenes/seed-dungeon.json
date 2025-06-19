@@ -1,0 +1,637 @@
+[
+    {
+        "kind": "Ambience",
+        "ambienceData": {
+            "music": "",
+            "sound": "",
+            "background": "bg",
+            "ambientColor": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    {
+        "kind": "Entity",
+        "id": 7,
+        "name": "Door",
+        "component": [
+            {
+                "id": 20,
+                "componentType": "BasicSprite",
+                "data": {
+                    "asset": "./door.png"
+                }
+            },
+            {
+                "id": 21,
+                "componentType": "Interactable",
+                "data": {
+                    "offset": {
+                        "x": 0,
+                        "y": -15
+                    },
+                    "text": "Interact"
+                }
+            },
+            {
+                "id": 22,
+                "componentType": "Door",
+                "data": {
+                    "target": "Scene",
+                    "doorId": "seed-dungeon",
+                    "enabled": true
+                }
+            },
+            {
+                "id": 23,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 20,
+                        "y": 15
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 9,
+        "name": "Dungeon Hitbox",
+        "component": [
+            {
+                "id": 10,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 11,
+                "componentType": "Hitbox",
+                "data": {
+                    "interior": true,
+                    "hitboxName": "seed-dungeon"
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Player",
+        "position": {
+            "x": -41.11069736420445,
+            "y": 19
+        },
+        "velocity": {
+            "x": 0,
+            "y": 0
+        }
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 15,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 16,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -720,
+                        "y": -70
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 17,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 16,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 17,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -300,
+                        "y": -30
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 18,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 18,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 19,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -80,
+                        "y": -30
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 20,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 11,
+        "name": "LightReflect",
+        "component": [
+            {
+                "id": 15,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -157,
+                        "y": 30
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 16,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": -1.5707963267948966,
+                        "width": 6,
+                        "color": [
+                            1,
+                            0.6,
+                            0.047058823529411764
+                        ],
+                        "range": 250,
+                        "intensity": 1
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 650,
+        "name": "Seed Chest",
+        "component": [
+            {
+                "id": 25,
+                "componentType": "BasicSprite",
+                "data": {
+                    "asset": "chest"
+                }
+            },
+            {
+                "id": 26,
+                "componentType": "Inventory",
+                "data": {
+                    "items": {
+                        "tree": 5,
+                        "grass": 15,
+                        "bush": 10
+                    }
+                }
+            },
+            {
+                "id": 27,
+                "componentType": "LootComponent"
+            },
+            {
+                "id": 28,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -720,
+                        "y": 3
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 4,
+                "componentType": "Interactable",
+                "data": {
+                    "text": "Open"
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 19,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 20,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -190,
+                        "y": -30
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 21,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 9,
+        "name": "Dungeon Hitbox",
+        "component": [
+            {
+                "id": 10,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -4,
+                        "y": 12
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 11,
+                "componentType": "Hitbox",
+                "data": {
+                    "interior": false,
+                    "hitboxName": "seed-dungeon-inner"
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 11,
+        "name": "LightReflect",
+        "component": [
+            {
+                "id": 17,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -74,
+                        "y": 104
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 18,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1,
+                            0.2,
+                            0.09803921568627451
+                        ],
+                        "range": 300,
+                        "intensity": 1.2
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 11,
+        "name": "LightReflect",
+        "component": [
+            {
+                "id": 19,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 63,
+                        "y": 104
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 20,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1,
+                            0.2,
+                            0.09803921568627451
+                        ],
+                        "range": 300,
+                        "intensity": 1.2
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 11,
+        "name": "LightReflect",
+        "component": [
+            {
+                "id": 21,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 205,
+                        "y": -36
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 22,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1,
+                            0.2,
+                            0.09803921568627451
+                        ],
+                        "range": 300,
+                        "intensity": 1.2
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 11,
+        "name": "Light",
+        "component": [
+            {
+                "id": 19,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": -491,
+                        "y": -49
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 20,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 1.5,
+                        "color": [
+                            0.4,
+                            0.6,
+                            1
+                        ],
+                        "range": 350,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "kind": "Entity",
+        "id": 10,
+        "name": "Window",
+        "component": [
+            {
+                "id": 21,
+                "componentType": "WindowRenderer",
+                "data": {
+                    "asset": "./window.png"
+                }
+            },
+            {
+                "id": 22,
+                "componentType": "Transform",
+                "data": {
+                    "position": {
+                        "x": 20,
+                        "y": -30
+                    },
+                    "velocity": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            },
+            {
+                "id": 23,
+                "componentType": "LightComponent",
+                "data": {
+                    "lightData": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "angle": 1.5707963267948966,
+                        "width": 2,
+                        "color": [
+                            1.4980392156862745,
+                            0.8,
+                            0.09803921568627451
+                        ],
+                        "range": 150,
+                        "intensity": 1.5
+                    }
+                }
+            }
+        ]
+    }
+]

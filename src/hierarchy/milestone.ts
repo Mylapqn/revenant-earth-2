@@ -59,7 +59,7 @@ export class Milestone {
         if (options.subTasks) this.children = options.subTasks.map(task => {
             task.parent = this;
             const child = new Milestone(task);
-            if (!this.sequential) child.enabled = true;
+            if (!this.sequential) child.enabled = false;
             return child;
         });
         game.milestones.milestones.set(this.id, this);
@@ -85,8 +85,8 @@ export class Milestone {
         await nextFrame();
 
         if (this.onComplete) this.onComplete(data);
-        game.milestones.displayQuests();
         this.parent?.checkChildren();
+        game.milestones.displayQuests();
     }
 
     private async completionGraphics(detailsText?: string, data?: any) {
@@ -116,8 +116,13 @@ export class Milestone {
         console.log("Issuing milestone", this.name);
         if (!this.enabled) {
             this.enabled = true;
-            if (!silent)
+            if (!silent && this.children.length == 0)
                 game.milestones.popups.add({ type: "issue", questName: this.name, detailsText: this.details });
+            if(this.children.length > 0 && !this.sequential) {
+                for (const child of this.children) {
+                    child.issue();
+                }
+            }
             this.checkChildren();
             game.milestones.displayQuests();
             if (this.onIssue) this.onIssue(this);

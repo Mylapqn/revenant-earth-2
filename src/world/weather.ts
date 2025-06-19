@@ -82,7 +82,7 @@ export class Weather implements ISerializable, ISceneObject {
             const pos = game.camera.worldPosition.x + (Math.random() - .5) * game.camera.pixelScreen.x * 1.5;
             if (pos > 0) {
                 const tdata = game.terrain.getProperties(pos);
-                game.terrain.consumeFertility(pos, dt * this.weatherData.rainIntensity * rainMult * tdata.erosion * tdata.erosion * 1000);
+                game.terrain.consumeFertility(pos, dt * this.weatherData.rainIntensity * rainMult * tdata.erosion * tdata.erosion * 100);
                 game.terrain.addMoisture(pos, dt * this.weatherData.rainIntensity * rainMult);
                 game.atmo.energy(dt * this.weatherData.rainIntensity * rainMult * 1000, "condensation");
             }

@@ -50,11 +50,15 @@ void main(void) {
     float actualAngle = vUV.x * DOUBLE_PI;
     vec2 dir = vec2(cos(actualAngle), sin(actualAngle)) * uPixelSize;
     Light l = getLight();
+    int shadowDepth = 0;
     if(l.range > .1f)
-    //this should start at 0 but is increased to reduce shadows from objects right next to the light
+    //i should start at 0 but is increased to reduce shadows from objects right next to the light
         for(float i = 10.f / l.range; i < 1.f; i += 1.f / l.range / 2.f) {
-            int a = int(texture(occluder, l.position + dir * (i * l.range+0.25)).a * 255.f);
-            if(a > 3) {
+            int alpha = int(texture(occluder, l.position + dir * (i * l.range + 0.25f)).a * 255.f);
+            if(alpha > 100) {
+                shadowDepth++;
+            }
+            if(shadowDepth > 5) {
                 shadowMap = i;
                 break;
             }

@@ -4,7 +4,9 @@ import { Vectorlike } from "../utils/vector";
 export class HitboxLibrary {
     private library: Map<string, Vectorlike[]> = new Map();
     async init() {
-        await this.add("dungeon-1");
+        await this.add("factory-dungeon");
+        await this.add("seed-dungeon");
+        await this.add("seed-dungeon-inner");
         await this.add("space-station");
     }
     async add(name: string, fileName?: string) {

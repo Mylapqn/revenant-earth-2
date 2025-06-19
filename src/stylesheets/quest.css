@@ -66,11 +66,11 @@
 .quest-list h1 {
     font-size: inherit;
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .quest-list p {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     text-align: left;
 }
 
@@ -79,13 +79,22 @@
 }
 
 .quest .sub-quest {
-    margin-left: 10px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #909090;
+    padding: 10px;
+    transition: background-color 0.2s ease-in-out;
 }
 
 .quest .details {
-    margin-left: 20px;
-    font-weight: 100;
-    opacity: .5;
+    font-weight: lighter;
+    opacity: 1;
+    color: #d4d4d4;
+}
+
+.sub-quest:hover {
+    background-color: #00000042;
+    cursor: pointer;
 }
 
 .marker {

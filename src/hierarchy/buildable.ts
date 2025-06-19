@@ -85,7 +85,9 @@ export class Buildable {
             onBuild: (position) => {
                 const planter = game.activeScene.findComponent(Planter, (planter) => planter.transform.position.distanceSquared(position) < planter.radius ** 2);
                 const plant = Prefab.Plant({ position: position, species: species.name, growth: 2 });
-                plant.getComponent(Plant)!.plantedIn = planter ? planter : undefined;
+                const plantComponent = plant.getComponent(Plant)!;
+                plantComponent.plantedIn = planter ? planter : undefined;
+                plantComponent.plantedByPlayer = true;
                 game.player.inventory?.spend(Object.entries(itemDefinitions).find(([, item]) => item.name == species.name)![0] as Item);
                 return plant;
             },
@@ -121,11 +123,11 @@ export class Buildable {
         new Buildable({
             name: "Sprinkler",
             onBuild: (position) => {
-                const prefab = Prefab.SprinklerArray({ position: position, scene: game.activeScene })[0];
                 game.player.inventory?.spend(Item.sprinkler);
+                const prefab = Prefab.SprinklerArray({ position: position, scene: game.activeScene })[0];
                 return prefab;
             },
-            texture: await Assets.load("./gfx/building/water_tank.png"),
+            texture: await Assets.get("water_tank"),
         });
         new Buildable({
             name: "Biochar Kiln",
@@ -134,7 +136,7 @@ export class Buildable {
                 game.player.inventory?.spend(Item.biocharKiln);
                 return prefab;
             },
-            texture: await Assets.load("./gfx/building/biochar.png"),
+            texture: await Assets.get("biochar"),
         });
         new Buildable({
             name: "Battery",
@@ -143,7 +145,7 @@ export class Buildable {
                 game.player.inventory?.spend(Item.battery);
                 return prefab;
             },
-            texture: await Assets.load("./gfx/building/biochar.png"),
+            texture: await Assets.get("battery"),
         });
 
         new Buildable({
@@ -153,7 +155,7 @@ export class Buildable {
                 game.player.inventory?.spend(Item.solarPanel);
                 return prefab;
             },
-            texture: await Assets.load("./window.png"),
+            texture: await Assets.get("solar_panel"),
         });
     }
 }

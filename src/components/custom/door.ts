@@ -3,7 +3,7 @@ import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { FadeScreen } from "../../ui/fadeScreen";
-import { UIElement, UIPanel } from "../../ui/ui";
+import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
 import { Interactable } from "../generic/interactable";
@@ -52,6 +52,7 @@ export class Door extends Component {
         await FadeScreen.fadeIn(200);
         const scene = game.loadScene(this.targetScene);
         FadeScreen.fadeOut(700);
+        game.events.emit("doorEnter", this);
         const targetDoor = scene.findComponents(Door).find(comp => comp.doorId === this.doorId);
         if (targetDoor) {
             game.player.position = targetDoor.transform.position.clone();

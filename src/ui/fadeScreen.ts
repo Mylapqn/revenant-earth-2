@@ -1,11 +1,11 @@
 import { nextFrame, sleep } from "../utils/utils";
-import { UIElement } from "./ui";
+import { UIElement } from "./uiElement";
 
 export class FadeScreen {
     static element: HTMLElement;
     static inProgress = false;
     static init(){
-        this.element = UIElement.create({ type: "div", classes: ["fade-screen"], parent: document.body }).htmlElement;
+        this.element = new UIElement({ type: "div", classes: ["fade-screen"], parent: document.body }).htmlElement;
         this.element.style.display = "none";
     }
     private static setFadeDuration(duration: number){

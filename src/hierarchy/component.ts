@@ -1,5 +1,5 @@
 import { Graphics } from "pixi.js";
-import  { UIElement } from "../ui/ui";
+import { UIElement } from "../ui/uiElement";
 import { Callback, Entity, EntityEvents } from "./entity";
 import { primitiveObject } from "./serialise";
 
@@ -58,10 +58,9 @@ export class Component {
     }
 
     debugOptions(buttons: UIElement[],headerAppend?: string): UIElement[] {
-        //prepend element to buttons
+        //prepend component name to buttons
         if(buttons.length > 0){
-            const header = new UIElement("div", "header");
-            header.htmlElement.innerText = this.componentType;
+            const header = new UIElement({ type: "div", classes: ["header"],content: this.componentType });
             if(headerAppend) header.htmlElement.innerText += ` ${headerAppend}`;
             buttons.unshift(header);
         }
