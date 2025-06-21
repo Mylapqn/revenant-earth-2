@@ -60,14 +60,14 @@ export class EntityTooltip extends Component {
             }
         }
 
-        if (this.spriteComponent) {
+        /*if (this.spriteComponent) {
             if (this.highlighted) {
                 this.spriteComponent.sprite.tint = 0x00ffff;
             }
             else {
                 this.spriteComponent.sprite.tint = 0xffffff;
             }
-        }
+        }*/
         /*if (this.shaderMeshComponent) {
             if (this.highlighted) {
                 this.shaderMeshComponent.renderMesh.tint = 0x00ffff;
@@ -76,10 +76,10 @@ export class EntityTooltip extends Component {
                 this.shaderMeshComponent.renderMesh.tint = 0xffffff;
             }
         }*/
-        if (this.highlighted && game.input.mouse.getButtonUp(MouseButton.Left)) {
+        /*if (this.highlighted && game.input.mouse.getButtonUp(MouseButton.Left)) {
             //game.keys["f"] = false; //FOR TESTING ONLY
             this.entity.emit("interact");
-        }
+        }*/
     }
     hover(hover: boolean) {
         this.highlighted = hover;

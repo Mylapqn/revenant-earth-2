@@ -1,6 +1,7 @@
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { ParticleText } from "../../hierarchy/particleText";
 import { EntityTooltip } from "../generic/entityTooltip";
 import { Interactable } from "../generic/interactable";
 import { Power } from "../generic/power";
@@ -14,16 +15,18 @@ export class SprinklerCore extends Component {
     }
 
 
-    active = false;
+    enabled = false;
+    powered = false;
     waterLevel = 50;
+    warningTimer = 0;
 
     override toData(): ComponentData {
-        const data = { active: this.active, waterLevel: this.waterLevel } as Parameters<this["applyData"]>[0];
+        const data = { active: this.enabled, waterLevel: this.waterLevel } as Parameters<this["applyData"]>[0];
         return super.toData(data);
     }
 
     override applyData(data?: { active?: boolean, waterLevel?: number }): void {
-        if (data && data.active) this.active = data.active;
+        if (data && data.active) this.enabled = data.active;
         if (data && data.waterLevel) this.waterLevel = data.waterLevel;
     }
 
@@ -44,11 +47,18 @@ export class SprinklerCore extends Component {
             this.waterLevel = Math.min(this.waterLevel, 50);
         }
 
-        if (this.active && this.power) {
-            if (!this.power.consume(0.25 * dt)) {
-                this.active = false;
-                this.setInteractPrompt();
+        if (this.enabled && this.power) {
+            this.powered = this.power.consume(0.25 * dt);
+            if (!this.powered) {
+                /*this.active = false;
+                this.setInteractPrompt();*/
+                this.warningTimer += dt;
             }
+        }
+        if (this.warningTimer > 3) {
+            this.warningTimer = 0;
+            if (game.camera.inViewX(this.transform.position.x, 100))
+                new ParticleText("No power!", this.transform.position.clone(), 3);
         }
 
         this.tooltip?.tooltipData.set("water", `${this.waterLevel.toFixed(1)}/50.0hl`);
@@ -56,10 +66,10 @@ export class SprinklerCore extends Component {
     }
 
     toggle() {
-        this.active = !this.active;
+        this.enabled = !this.enabled;
         this.setInteractPrompt();
     }
     setInteractPrompt() {
-        this.entity.getComponent(Interactable)?.setText(this.active ? "Deactivate" : "Activate");
+        this.entity.getComponent(Interactable)?.setText(this.enabled ? "Deactivate" : "Activate");
     }
 }

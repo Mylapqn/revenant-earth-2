@@ -12,7 +12,7 @@ import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
 import { IEvnironmentProvider, Planter } from "./planter";
-import { SurfaceMaterial } from "../../world/terrain";
+import { SurfaceMaterial, TerrainInspectMode } from "../../world/terrain";
 import { Debug } from "../../dev/debug";
 
 export class Plant extends Component {
@@ -140,6 +140,7 @@ export class Plant extends Component {
         let tdata = this.envirnonmentProvider.terrain.getProperties(this.transform.position.x);
         let adata = this.envirnonmentProvider.atmo.getProperties(this.transform.position.x);
         if (this.tooltipComponent) {
+            this.tooltipComponent.enabled = game.terrain.inspectMode != TerrainInspectMode.none;
             this.tooltipComponent.tooltipName = this.species.name;
             this.tooltipComponent.tooltipData.set("Health", parseFloat(this.health.toFixed(2)).toString());
             this.tooltipComponent.tooltipData.set("Growth", parseFloat(this.growth.toFixed(2)).toString());

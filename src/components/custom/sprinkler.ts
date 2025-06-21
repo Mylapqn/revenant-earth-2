@@ -41,25 +41,29 @@ export class Sprinkler extends Component {
     ticker = 0;
     update(dt: number) {
         if (this.sprinklerCore == undefined) return;
+        if (!this.sprinklerCore.enabled || !this.sprinklerCore.powered) {
+            this.basicSprite.sprite.texture = Assets.get("sprinkler");
+            this.ticker = .5;
+            return;
+        }
         if (game.camera.inViewX(this.transform.position.x, 200)) {
-            if (this.ticker < .5 && this.sprinklerCore.active) this.basicSprite.sprite.texture = Assets.get("sprinkler_active");
+            if (this.ticker < .5 && this.sprinklerCore.enabled) this.basicSprite.sprite.texture = Assets.get("sprinkler_active");
             else this.basicSprite.sprite.texture = Assets.get("sprinkler");
         }
-        if (!this.sprinklerCore.active) return;
         if (this.sprinklerCore.waterLevel <= 0.4) return;
         this.ticker += dt;
         if (this.ticker > 2) {
-            this.tick();
+            this.spray();
         }
     }
 
-    tick() {
+    spray() {
         const sprinklerRate = 0.4
         this.sprinklerCore!.waterLevel -= sprinklerRate;
         this.ticker = 0;
         game.terrain.addMoisture(this.transform.position.x + game.terrain.dataWidth, sprinklerRate / 4);
         game.terrain.addMoisture(this.transform.position.x - game.terrain.dataWidth, sprinklerRate / 4);
         game.terrain.addMoisture(this.transform.position.x, sprinklerRate / 2);
-        if (game.camera.inViewX(this.transform.position.x, 0)) game.soundManager.play("sprinkler", { volume: 0.02, filters: [new filters.StereoFilter(clamp((this.transform.position.x - game.player.position.x) * .2, -1, 1))] });
+        if (game.camera.inViewX(this.transform.position.x, 0)) game.soundManager.play("sprinkler", { volume: 0.04, filters: [new filters.StereoFilter(clamp((this.transform.position.x - game.player.position.x) * .2, -1, 1))] });
     }
 }

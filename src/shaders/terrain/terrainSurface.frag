@@ -130,7 +130,7 @@ void main() {
     vec3 pollutionColor = vec3(0.44f, 0.63f, 0.1f);
     vec3 inspectLowColor = vec3(0.56f, 0.09f, 0.01f);
     vec3 inspectHighColor = vec3(0.07f, 0.93f, 0.17f);
-    float inspect = posterise(vTerrainInspect * 1.1f, 5);
+    float inspect = posterise(vTerrainInspect * 1.0f + HFnoise * .1f, 5);
     vec3 inspectColor = normalize(vec3(1.f - inspect, inspect, 0.1f)) * .8f;
     //inspectColor = mix(inspectLowColor, inspectHighColor, inspect);
     vec3 mixedColor = baseColor;
@@ -143,7 +143,7 @@ void main() {
     mixedColor = mix(mixedColor, pollutionColor, step(clamp(HFnoise * .8f + .7f, 0.6f, 1.1f), vTerrainStats2));
     color = vec4(mixedColor, 1.f);
     color.rgb = mix(color.rgb, inspectColor, float(uInspectMode));
-    baseMask = mix(baseMask, step(.5f, (1.f - uv.y) * .7f + HFnoise * .5f * clamp(.2f + inspect * .2f, 0.f, .99f)), float(uInspectMode));
+    baseMask = mix(baseMask, step(.5f, (1.f - uv.y) * .6f + HFnoise * .5f * clamp(.2f + inspect * .3f, 0.f, .99f)), float(uInspectMode));
     //color = vec4(1.);
     color *= baseMask;
     //color = vec4(fertility);
