@@ -1,4 +1,4 @@
-import { Application, Assets, AssetsBundle, AssetsManifest, ColorMatrixFilter, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
+import { Application, Assets, AssetsBundle, AssetsManifest, ColorMatrixFilter, Container, Graphics, Shader, Sprite, Texture, Ticker } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -40,6 +40,8 @@ import { MainMenu } from "./ui/mainMenu";
 import { ItemGroup } from "./itemDefinitions";
 import { SceneLibrary } from "./environment/sceneLibrary";
 import { UIFullscreenMenu } from "./ui/uiFullscreenMenu";
+import { ShaderMesh } from "./shaders/shaderMesh";
+import planetFrag from "./shaders/planet.frag?raw";
 
 export let game: Game;
 
@@ -107,6 +109,8 @@ export class Game {
     score: Score;
     backgroundTextures!: Set<Texture>;
 
+    planet!: ShaderMesh;
+
     loaded = false;
     inited = false;
 
@@ -140,6 +144,7 @@ export class Game {
     }
 
     async load() {
+        if (this.loaded) return;
         const startTime = performance.now();
         const manifest: AssetsManifest = {
             bundles: [
@@ -318,6 +323,9 @@ export class Game {
 
         this.buildingGhost = new BuildingGhost();
 
+
+
+
         Light.init();
         Lightmap.init();
 
@@ -326,6 +334,25 @@ export class Game {
 
         this.player = new Player();
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
+
+
+        const planetSize = 80;
+        const planetLayer = new PixelLayer({ autoResize: true, worldSpace: false, autoRender: true, parent: this.app.stage });
+
+        const planetTex = await Assets.load("./planet/earth_height_map_blur.png") as Texture;
+        planetTex.source.scaleMode = "linear";
+        this.planet = new ShaderMesh({
+            frag: planetFrag, parent: planetLayer.container, size: new Vector(planetSize, planetSize), anchor: { x: .5, y: .5 },
+            customUniforms: {
+                uLightPosition: {
+                    type: "vec3<f32>", value: [0, 1, 1]
+                }
+            },
+            texture: planetTex
+        });
+        this.planet.position.set(this.camera.middle.x / Game.pixelScale, this.camera.middle.y / Game.pixelScale);
+        this.planet.position.set(this.camera.pixelScreen.x - planetSize/2 - 10, planetSize/2 + 10);
+        //this.planet.position.set(this.camera.middle.x, this.camera.middle.y);
 
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
@@ -424,6 +451,7 @@ export class Game {
         this.elapsedTime += dt;
 
         TimedShader.update(this.elapsedTime);
+        this.planet.setUniform("uLightPosition", [...this.camera.screenToCentered(this.input.mouse.position).xy(), 1 - this.camera.screenToCentered(this.input.mouse.position).length() * 2]);
 
         this.uiGraphics.clear();
         this.worldUiGraphics.clear();

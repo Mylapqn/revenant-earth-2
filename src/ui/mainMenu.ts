@@ -35,13 +35,21 @@ export class MainMenu {
         new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Continue", mouseSoundEffects: true, onclick: () => this.continueGame() });
         //new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Options", mouseSoundEffects: true, onclick: () => this.startGame() });
         new UIElement({ type: "div", classes: ["menu-item"], parent: this.leftMenuElement, content: "Credits", mouseSoundEffects: true, onclick: () => this.credits() });
+        this.parentElement.style.display = "none";
         this.parentElement.onmousemove = (e) => this.mouseMove(e);
-        this.init();
         MainMenu.instance = this;
     }
-    init() {
+    async init(skipMenu = false) {
         this.gameLoadedPromise = game.load();
-        this.show();
+        if(!skipMenu){
+            this.show();
+            return this.gameLoadedPromise;
+        }
+        else {
+            await this.gameLoadedPromise;
+            await game.init();
+            //await game.initWorld();
+        }
     }
     async show() {
         this.updating = true;

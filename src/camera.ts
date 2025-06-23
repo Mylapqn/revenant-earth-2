@@ -128,6 +128,9 @@ export class Camera {
     screenToRender(v: Vectorlike) {
         return new Vector(v.x, v.y).vecdiv(this.screen)
     }
+    screenToCentered(v: Vectorlike) {
+        return this.renderToCentered(this.screenToRender(v));
+    }
     renderToScreen(v: Vectorlike) {
         return new Vector(v.x, v.y).vecmult(this.screen)
     }

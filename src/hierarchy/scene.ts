@@ -85,6 +85,7 @@ export class Scene implements ISerializable {
         else {
             game.terrainContainer.visible = true;
         }
+        if(game.ambience?.sound) game.soundManager.soundLibrary.play(game.ambience.sound);
         return this;
     }
 

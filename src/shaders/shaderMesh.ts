@@ -1,5 +1,5 @@
-import { Mesh, Texture, MeshGeometry, GlProgram, DestroyOptions } from "pixi.js";
-import { Vector } from "../utils/vector";
+import { Mesh, Texture, MeshGeometry, GlProgram, DestroyOptions, Container } from "pixi.js";
+import { Vector, Vectorlike } from "../utils/vector";
 import defaultVert from "../shaders/vert.vert?raw";
 import defaultFrag from "../shaders/frag.frag?raw";
 import { TimedTextureShader } from "./timedShaderTexture";
@@ -18,8 +18,9 @@ export type ShaderMeshOptions = {
     vert?: string,
     frag: string,
     customUniforms?: Uniforms,
-    anchor?: Vector,
-    size?: Vector
+    anchor?: Vectorlike,
+    size?: Vector,
+    parent?: Container
 };
 export class ShaderMesh extends Mesh {
     public get shader(): TimedTextureShader {
@@ -28,7 +29,7 @@ export class ShaderMesh extends Mesh {
     public set shader(value: TimedTextureShader) {
         super.shader = value;
     }
-    anchor = new Vector(0, 0);
+    public anchor: Vectorlike;
     set texture(value: Texture) {
         if (this.anchor)
             this.resize(value.width, value.height);
@@ -60,14 +61,14 @@ export class ShaderMesh extends Mesh {
             glProgram: GlProgram.from({ vertex, fragment }),
             resources,
         });
-        super({ texture, geometry: mesh, shader: shader as any });
-        this.anchor = options.anchor ?? new Vector(0, 0);
+        super({ texture, geometry: mesh, shader: shader as any, parent: options.parent });
+        this.anchor = options.anchor ?? { x: 0, y: 0 };
         this.resize(options.size?.x ?? texture.width, options.size?.y ?? texture.height);
         this.scale.set(1);
         //console.log(game.app.renderer.globalUniforms.bindGroup);
     }
     resize(width: number, height: number) {
-        if(!this.geometry) return;
+        if (!this.geometry) return;
         this.geometry.positions = new Float32Array([
             -width * this.anchor.x, -height * this.anchor.y,
             -width * this.anchor.x, height * (1 - this.anchor.y),

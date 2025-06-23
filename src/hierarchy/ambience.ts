@@ -19,8 +19,6 @@ export class Ambience implements ISceneObject, ISerializable {
         this.data = data;
         this.music = data.music;
         this.sound = data.sound;
-        if (this.sound != "")
-            game.soundManager.soundLibrary.play(this.sound);
         this.background = Assets.get(data.background);
     }
     serialise(mode: StateMode): KindedObject | false {

@@ -12,6 +12,7 @@ import { MainMenu } from './ui/mainMenu';
 import { FadeScreen } from './ui/fadeScreen';
 import { UI } from './ui/ui';
 import { UIQuickInventory } from "./ui/uiQuickInventory";
+import { nextFrame } from './utils/utils';
 
 async function init() {
     const app = new Application();
@@ -23,13 +24,10 @@ async function init() {
 
     FadeScreen.init();
     const game = new Game(app);
-    new MainMenu(game);
-    
-    /*await game.load();
-    await game.init();
-    await game.initWorld();
+    const menu = new MainMenu(game);
+    await menu.init(false);
+
     //DevSync.init();
-    */
 }
 
 init();
