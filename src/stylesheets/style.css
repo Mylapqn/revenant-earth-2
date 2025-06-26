@@ -337,3 +337,69 @@ button:hover {
     text-align: right;
     color: rgb(168, 168, 168);
 }
+
+.inspectModesContainer {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    text-align: left;
+    color: rgb(192, 192, 192);
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    text-transform: uppercase;
+    flex-direction: row;
+    transform: translate(-50%, 0);
+}
+
+.inspectModeButton {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.inspectModeButton:hover {
+    cursor: pointer;
+    background-color: #00000066;
+}
+
+.inspectModeButton .text {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out, color 0.1s ease-in-out;
+}
+
+.inspectModeButton:hover .text {
+    opacity: 1;
+}
+
+.inspectModeButton .icon {
+    height: 30px;
+    opacity: 0.5;
+    transition: opacity 0.1s ease-in-out, filter 0.1s ease-in-out;
+}
+
+.inspectModeButton:hover .icon {
+    opacity: 1;
+}
+
+.inspectModeButton.selected {
+    background-color: white;
+}
+
+.inspectModeButton.selected .icon {
+    opacity: 1;
+    filter: invert(1);
+}
+
+.inspectModeButton.selected .text {
+    color: black;
+    opacity: 1;
+}

@@ -27,10 +27,11 @@ export class BiocharKiln extends Component {
     //}
 
     async kiln() {
+        const range = 200;
         const plantsInRadius: Plant[] = [];
         game.activeScene.findComponents(Plant).forEach(plant => {
             const dist = plant.transform.position.distance(this.transform.position)
-            if (dist < 200) plantsInRadius.push(plant);
+            if (dist < range) plantsInRadius.push(plant);
         })
         //console.log("biochar kiln");
         //console.log(plantsInRadius);
@@ -39,6 +40,9 @@ export class BiocharKiln extends Component {
         //remove all plants
         new ParticleText(`processed ${plantsInRadius.length} plants`, this.transform.position.clone().add(new Vector(0, -50)));
         for (const plant of plantsInRadius) {
+            const tdata = plant.envirnonmentProvider.terrain.getProperties(this.transform.position.x + Math.random() * range);
+            //refund a bit of fertility for each plant
+            tdata.fertility = Math.min(1, tdata.fertility + plant.storedCo2 * 0.05 + 0.01);
             plant.entity.remove();
             game.score.addWithFx(90 * plant.health + 10, game.camera.worldToRender(plant.transform.position));
             await sleep(100);

@@ -1,3 +1,4 @@
+import { CSSClassAnimation } from "../animations/CSSClassAnimation";
 import type { Inventory } from "../components/generic/inventory";
 import { game } from "../game";
 import { ItemGroup, itemDefinitions, ItemDefinition } from "../itemDefinitions";
@@ -8,7 +9,7 @@ import { UIElement } from "./uiElement";
 export class UIFullscreenMenu {
     parentElement: UIElement<HTMLDivElement>;
     htmlElement: HTMLDivElement;
-    shown = false;
+    visible = false;
     itemHolder: UIElement;
     badgeContainer: UIElement;
     constructor() {
@@ -52,19 +53,20 @@ export class UIFullscreenMenu {
 
     selectedGroup = ItemGroup.Seed;
 
-    toggle(show?: boolean) {
-        if (show === undefined) show = !this.shown;
+    toggle(show: boolean = !this.visible) {
         if (show) {
-            this.htmlElement.classList.add("menuAppear");
-            this.htmlElement.classList.remove("menuHide");
-            this.shown = true;
+            game.animator.play(this, CSSClassAnimation.showAnimation(this.htmlElement, 300));
+            //this.htmlElement.classList.add("menuAppear");
+            //this.htmlElement.classList.remove("menuHide");
+            this.visible = true;
             this.renderItems(game.player.inventory);
             this.renderProgress();
         }
         else {
-            this.htmlElement.classList.add("menuHide");
-            this.htmlElement.classList.remove("menuAppear");
-            this.shown = false;
+            game.animator.play(this, CSSClassAnimation.hideAnimation(this.htmlElement, 300));
+            //this.htmlElement.classList.add("menuHide");
+            //this.htmlElement.classList.remove("menuAppear");
+            this.visible = false;
             UI.mouseOffElement(this.parentElement);
         }
     }

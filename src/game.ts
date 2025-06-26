@@ -42,32 +42,42 @@ import { SceneLibrary } from "./environment/sceneLibrary";
 import { UIFullscreenMenu } from "./ui/uiFullscreenMenu";
 import { ShaderMesh } from "./shaders/shaderMesh";
 import planetFrag from "./shaders/planet.frag?raw";
+import { Animator } from "./animations/animator";
 
 export let game: Game;
 
 export class Game {
     static pixelScale = 4;
 
+    //Time
     elapsedTime = 0;
-    debugView = false;
+    timeScale: number = 1;
 
+    //Constructor-time properties
+    score: Score;
+    animator: Animator;
     app: Application;
     input: Input;
-    camera!: Camera;
+
+    //Init properties
     stateManager!: StateManager;
     progressDatabase!: ProgressDatabase;
+    soundManager = new SoundManager();
+    hitboxLibrary = new HitboxLibrary();
+    sceneLibrary = new SceneLibrary();
+    events!: GameEventSystem;
+    milestones!: MilestoneManager;
+
+    //Scenes
     scenes: Map<string, Scene> = new Map<string, Scene>();
     activeScene!: Scene;
     globalScene!: Scene;
+    ambience!: Ambience;
 
-    hacking?: HackingMinigame;
+    //Rendering
+    camera!: Camera;
 
-    terrain!: Terrain;
-    atmo!: Atmo;
-    weather!: Weather;
-
-    player!: Player;
-    pixelLayer!: PixelLayer;
+    //Containers
     entityContainer!: Container;
     terrainContainer!: Container;
     playerContainer!: Container;
@@ -81,33 +91,33 @@ export class Game {
     uiGraphics!: Graphics;
     worldUiContainer!: Container;
     worldUiGraphics!: Graphics;
+    backgroundTextures!: Set<Texture>;
 
+    //PixelLayers
+    pixelLayer!: PixelLayer;
     skyLayer!: PixelLayer;
     bgLayers: PixelLayer[] = [];
-    //fgLayer!: PixelLayer;
     worldUiLayer!: PixelLayer;
 
+    //Game
+    player!: Player;
+    hacking?: HackingMinigame;
+    collisionSystem!: System;
+
+    //Environment
+    terrain!: Terrain;
+    atmo!: Atmo;
+    weather!: Weather;
+
+    //UI
+    tooltip!: UITooltip;
     buildingGhost!: BuildingGhost;
     currentBuildable?: Buildable;
-
-    collisionSystem!: System;
-    tooltip!: UITooltip;
-
     selectedSeed?: string;
 
-    soundManager = new SoundManager();
-    timeScale: number = 1;
-    hitboxLibrary = new HitboxLibrary();
-    sceneLibrary = new SceneLibrary();
-
+    //Debug
     frameHistory: number[] = [];
-    ambience!: Ambience;
-
-    events!: GameEventSystem;
-    milestones!: MilestoneManager;
-
-    score: Score;
-    backgroundTextures!: Set<Texture>;
+    debugView = false;
 
     planet!: ShaderMesh;
 
@@ -130,7 +140,7 @@ export class Game {
         game = this;
         this.app = app;
         this.input = new Input();
-
+        this.animator = new Animator();
         this.score = new Score();
     }
 
@@ -351,7 +361,7 @@ export class Game {
             texture: planetTex
         });
         this.planet.position.set(this.camera.middle.x / Game.pixelScale, this.camera.middle.y / Game.pixelScale);
-        this.planet.position.set(this.camera.pixelScreen.x - planetSize/2 - 10, planetSize/2 + 10);
+        this.planet.position.set(this.camera.pixelScreen.x - planetSize / 2 - 10, planetSize / 2 + 10);
         //this.planet.position.set(this.camera.middle.x, this.camera.middle.y);
 
         this.player.sprite.texture = await Assets.load("./char.png");
@@ -565,7 +575,7 @@ export class Game {
             const data = this.currentData();
             this.graphableData.push(data);
             if (this.graphableData.length > this.lookback) this.graphableData.shift();
-            if (UI.fullscreenMenu.shown) UI.fullscreenMenu.renderProgress();
+            if (UI.fullscreenMenu.visible) UI.fullscreenMenu.renderProgress();
         }
     }
 
@@ -676,7 +686,7 @@ export class Game {
                 this.weather.weatherData.rainBuildup += 2;
             }
             if (this.input.keyDown("escape")) {
-                if (UI.fullscreenMenu.shown) UI.fullscreenMenu.toggle();
+                if (UI.fullscreenMenu.visible) UI.fullscreenMenu.toggle();
                 else {
                     if (MainMenu.instance?.updating) {
                         MainMenu.instance.continueGame();
@@ -690,11 +700,11 @@ export class Game {
             if (this.input.keyDown("č")) {
                 this.weather.weatherData.dayTime += this.weather.dayLength / 8;
             }
-            if (this.input.keyDown("q")) {
+            /*if (this.input.keyDown("q")) {
                 this.terrain.inspectMode++;
                 if (this.terrain.inspectMode >= Terrain.inspectModes.length) this.terrain.inspectMode = 0;
                 new ParticleText(Terrain.inspectModes[this.terrain.inspectMode], this.player.position);
-            }
+            }*/
 
             if (this.currentBuildable) {
                 const result = this.currentBuildable.checkPosition(this.worldMouse);

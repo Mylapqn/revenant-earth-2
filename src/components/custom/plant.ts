@@ -53,7 +53,8 @@ export class Plant extends Component {
         this.tooltipComponent = this.entity.getComponent(EntityTooltip);
         if (this.tooltipComponent) this.tooltipComponent.tooltipName = this.species.name ?? "Tree";
         this.shaderMeshComponent = this.entity.getComponent(ShaderMeshRenderer)!;
-        this.shaderMeshComponent?.container.addChild(this.graphics);
+        this.shaderMeshComponent.container.addChild(this.graphics);
+        this.shaderMeshComponent.renderTexture.source.autoGarbageCollect = true;
 
         if (this.health > 0) {
             //game.score.add(100);
@@ -98,10 +99,10 @@ export class Plant extends Component {
 
         if (game.camera.inViewX(this.transform.position.x) || game.camera.inViewBox(this.transform.position, minBox, maxBox, 50)) {
             if (!this.inView) {
+                this.setCullVisible(true);
                 this.inView = true;
                 this.drawPlant();
                 this.timeSinceDraw = 0;
-                this.setCullVisible(true);
                 return;
             }
             this.timeSinceDraw += realDt;
@@ -118,7 +119,7 @@ export class Plant extends Component {
         if (!this.entity.components.has(this.id) || this.shaderMeshComponent == undefined) return;
         if (this.dead) {
             if (this.storedCo2 > 0) {
-                const releasedCo2 = Math.min(this.storedCo2, (this.storedCo2 + .01) * dt * .01);
+                const releasedCo2 = Math.min(this.storedCo2, (this.storedCo2 + .01) * dt * .02);
                 this.envirnonmentProvider.atmo.co2 += releasedCo2;
                 this.storedCo2 -= releasedCo2;
                 if (this.storedCo2 <= 0) {
@@ -211,7 +212,7 @@ export class Plant extends Component {
                 potentialSeedPositions[i] = this.transform.position.x + (2 * Math.random() - .5) * (100 + i * 40);
                 seedValidArray[i] = true;
             }
-            console.log(potentialSeedPositions);
+            //console.log(potentialSeedPositions);
             for (const plant of Plant.list) {
                 if (plant.dead) continue;
                 let avoidRadius = 40;
@@ -358,6 +359,12 @@ export class Plant extends Component {
             this.tooltipComponent.enabled = visible;
         this.shaderMeshComponent.renderMesh.visible = visible;
         this.shaderMeshComponent.renderMesh.shader.enabled = visible;
+        if (!visible) {
+            //this.shaderMeshComponent.renderTexture.source.unload();
+            this.graphics.clear();
+        }
+        else {
+        }
     }
 
     static list: Plant[] = [];

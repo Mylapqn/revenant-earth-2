@@ -7,7 +7,7 @@ export class UIControlPrompts {
         this.container = new UIElement({type:"div",classes:["controlPromptContainer"],parent:parent});
         /*this.addPrompt(["A","D"],"Move");
         this.addPrompt(["Space"],"Jump");*/
-        this.addPrompt(["Q"],"Inspect terrain");
+        //this.addPrompt(["Q"],"Inspect terrain");
         this.addPrompt(["T"],"Building menu");
         this.addPrompt(["M"],"Inventory");
     }

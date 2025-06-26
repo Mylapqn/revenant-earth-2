@@ -7,10 +7,10 @@
     left: 0;
     background: #18467E;
     background: radial-gradient(circle, #152434 0%, #0D1825 80%);
-    mask-image: radial-gradient(black 50%, transparent 51%);
+    /*mask-image: radial-gradient(black 50%, transparent 51%);
     mask-repeat: no-repeat;
     mask-position: 50% 50%;
-    mask-size: 0 0;
+    mask-size: 0 0;*/
     width: 100vw;
     height: 100vh;
     animation-duration: .4s;
@@ -23,9 +23,11 @@
     align-items: center;
     display: none;
     padding: 10px;
+    clip-path: circle(0%);
+    transition: clip-path 1s ease-in-out;
 }
 
-.contentHolder{
+.contentHolder {
     display: flex;
     width: 100%;
     gap: 50px;
@@ -33,15 +35,13 @@
     justify-content: center;
 }
 
-.menuAppear {
-    display: flex;
-    animation-name: menuAppear;
+.fullscreenMenu.appear {
+    clip-path: circle(75%);
 }
 
-.menuHide {
-    display: flex;
-    animation-name: menuAppear2;
-    animation-direction: reverse;
+.fullscreenMenu:not(.appear) {
+    pointer-events: none;
+
 }
 
 

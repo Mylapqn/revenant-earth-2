@@ -4,6 +4,7 @@ import { UIElement } from "./uiElement";
 import { UIFullscreenMenu } from "./uiFullscreenMenu";
 import { UIControlPrompts } from "./uiControlPrompts";
 import { UIQuickInventory } from "./uiQuickInventory";
+import { UIInspectModes } from "./uiInspectModes";
 
 export class UI {
     static container: HTMLDivElement;
@@ -33,6 +34,7 @@ export class UI {
         UI.container = UI.customDiv(document.body, "uiContainer");
         UI.fullscreenMenu = new UIFullscreenMenu();
         UI.controlPrompts = new UIControlPrompts(this.container);
+        new UIInspectModes(this.container);
         //setTimeout(() => UI.fullscreenMenu.toggle(true), 100);
         UI.mouseOverElements = new Set();
         UI.quickInventory = new UIQuickInventory();
