@@ -112,13 +112,17 @@ export class Player implements ISerializable {
 
     update(dt: number) {
         //Debug.log(this.position.y);
-        const tdata = game.terrain.getProperties(this.position.x);
-        const adata = game.atmo.getProperties(this.position.x);
-
-        this.oxygen -= (adata.pollution - .5) * dt * 1;
+        
+        if(game.activeScene.hasTerrain) {
+            const tdata = game.terrain.getProperties(this.position.x);
+            const adata = game.atmo.getProperties(this.position.x);
+            this.oxygen -= (adata.pollution - .5) * dt * 1;
+            if (this.oxygen <= 0) this.health -= dt * 1 * adata.pollution;
+        }
+        else {
+            this.oxygen += dt * 1;
+        }
         this.oxygen = Math.max(0, Math.min(100, this.oxygen));
-
-        if (this.oxygen <= 0) this.health -= dt * 1 * adata.pollution;
 
         this.health = Math.max(0, Math.min(100, this.health));
 

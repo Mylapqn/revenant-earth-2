@@ -15,6 +15,7 @@ import { UIQuickInventory } from "./ui/uiQuickInventory";
 import { nextFrame } from './utils/utils';
 
 async function init() {
+    const start = performance.now();
     const app = new Application();
     await app.init({ background: '#000000', resizeTo: window, antialias: false, powerPreference: "high-performance", roundPixels: false });
     document.body.appendChild(app.canvas);
@@ -22,14 +23,24 @@ async function init() {
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('dragstart', event => event.preventDefault());
 
+    console.log("load")
     FadeScreen.init();
     const game = new Game(app);
+    await game.preload();
+    const loadingTook = performance.now() - start;
+    if(loadingTook > 1000){
+        await FadeScreen.fadeIn(100);
+        FadeScreen.fadeOut();
+    }
+    document.getElementById("loading-screen")?.remove();
     const menu = new MainMenu(game);
     await menu.init(false);
+    console.log("done")
+
 
     //DevSync.init();
 }
 
-init();
+window.addEventListener("load", () => { init() });
 
 

@@ -54,8 +54,9 @@ export class MainMenu {
     async show() {
         this.updating = true;
         this.parentElement.style.display = "flex";
+        this.game.soundManager.soundLibrary.play("music_menu");
+        console.log("game loaded");
         await this.gameLoadedPromise;
-        this.game.soundManager.play("music_menu");
         //game.timeScale = 0;
     }
     hide() {

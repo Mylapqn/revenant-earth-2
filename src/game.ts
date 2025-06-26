@@ -153,6 +153,10 @@ export class Game {
         Shadowmap.resize();
     }
 
+    async preload() {
+        await this.soundManager.loadMenuSounds();
+    }
+
     async load() {
         if (this.loaded) return;
         const startTime = performance.now();

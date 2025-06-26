@@ -1,0 +1,30 @@
+#loading-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-family: "Chakra Petch", sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+}
+#loading-screen {
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+    z-index: 19;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}

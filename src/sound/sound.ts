@@ -47,6 +47,10 @@ export class SoundManager {
     }
     public play(sound: string, options?: PlayOptions) { if (game.loaded) this.soundLibrary.play(sound, options); }
     public stop(sound: string) { if (game.loaded) this.soundLibrary.stop(sound); }
+    async loadMenuSounds() {
+        pixiSound.volumeAll = .5;
+        await this.loadSound("music_menu", { url: "./sound/music/menu.mp3", loop: true, singleInstance: true, autoPlay: false, volume: .5 });
+    }
     async loadSounds() {
         pixiSound.volumeAll = .5;
         await Promise.all([
@@ -63,7 +67,6 @@ export class SoundManager {
             this.loadSound("hover", { url: "./sound/ui/pack/RevenantEarth_UI_hover_v2.wav", loop: false, singleInstance: false, autoPlay: false, volume: .5 }),
             this.loadSound("quest_issue", { url: "./sound/ui/quest_issue.mp3", loop: false, singleInstance: false, autoPlay: false }),
             this.loadSound("sprinkler", { url: "./sound/sfx/sprinkler.mp3", loop: false, singleInstance: false, autoPlay: false, volume: .2 }),
-            this.loadSound("music_menu", { url: "./sound/music/menu.mp3", loop: true, singleInstance: true, autoPlay: false, volume: .5 }),
         ]);
     }
 }
