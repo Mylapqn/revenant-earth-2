@@ -3,6 +3,8 @@ precision mediump float;
 uniform sampler2D uSampler;
 uniform float uTime;
 uniform vec3 uLightPosition;
+uniform float uAtmosphereQuality;
+uniform float uTerrainQuality;
 in vec2 vUV;
 out vec4 color;
 
@@ -103,8 +105,8 @@ void main() {
     sphereUV.x = (phi / (2.0f * 3.14159265f)) + 0.5f;
     sphereUV.y = 1.f - theta / (1.f * 3.14159265f); // because we're using a hemisphere (theta ∈ [0, π/2])
 
-    float landQuality = clamp(uLightPosition.y, 0.f, 1.f);
-    float airQuality = clamp(uLightPosition.x, 0.f, 1.f);
+    float landQuality = clamp(uTerrainQuality, 0.f, 1.f);
+    float airQuality = clamp(uAtmosphereQuality, 0.f, 1.f);
     float seaLevel = (1.f - landQuality + .01f) * .1f;
     float cloudCover = (airQuality*.7+1.1);
 

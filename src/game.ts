@@ -356,6 +356,12 @@ export class Game {
             customUniforms: {
                 uLightPosition: {
                     type: "vec3<f32>", value: [0, 1, 1]
+                },
+                uAtmosphereQuality: {
+                    type: "f32", value: 0
+                },
+                uTerrainQuality: {
+                    type: "f32", value: 0
                 }
             },
             texture: planetTex
@@ -559,6 +565,7 @@ export class Game {
         co2: number;
         averageAirPollution: number;
         averageGroundPollution: number;
+        averageGrassiness: number
     }>
     dataCollectionTimer = 0;
     collectionFrequency = 5;
@@ -566,6 +573,11 @@ export class Game {
     public dataCollectionTick() {
         if (this.activeScene.name != "Scene") return;
         const data = this.currentData();
+
+        const atmoQuality = 1 - data.averageAirPollution;
+        const terrainQuality = data.averageGrassiness;
+        this.planet.setUniform("uAtmosphereQuality", atmoQuality);
+        this.planet.setUniform("uTerrainQuality", terrainQuality);
 
         if (this.graphableData.length == 0) {
             for (let i = 0; i < this.lookback; i++) {
@@ -638,7 +650,8 @@ export class Game {
             temp: game.atmo.celsius,
             co2: game.atmo.co2,
             averageAirPollution: game.atmo.atmoData.reduce((a, b) => a + b.pollution, 0) / game.atmo.atmoData.length,
-            averageGroundPollution: game.terrain.terrainData.reduce((a, b) => a + b.pollution, 0) / game.terrain.terrainData.length
+            averageGroundPollution: game.terrain.terrainData.reduce((a, b) => a + b.pollution, 0) / game.terrain.terrainData.length,
+            averageGrassiness: game.terrain.terrainData.reduce((a, b) => a + b.grassiness, 0) / game.terrain.terrainData.length
         }
         return data;
     }
