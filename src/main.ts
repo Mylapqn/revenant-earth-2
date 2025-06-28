@@ -7,6 +7,7 @@ import './stylesheets/quest.css';
 import './stylesheets/hacking.css';
 import './stylesheets/mainMenu.css';
 import './stylesheets/progress.css';
+import './stylesheets/fullscreenTabMenu.css';
 import { DevSync } from './dev/devsync';
 import { MainMenu } from './ui/mainMenu';
 import { FadeScreen } from './ui/fadeScreen';
@@ -17,7 +18,7 @@ import { nextFrame } from './utils/utils';
 async function init() {
     const start = performance.now();
     const app = new Application();
-    await app.init({ background: '#000000', resizeTo: window, antialias: false, powerPreference: "high-performance", roundPixels: false });
+    await app.init({ background: '#000000', resizeTo: window, antialias: false, powerPreference: "high-performance", roundPixels: false, multiView: false});
     document.body.appendChild(app.canvas);
 
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -28,7 +29,7 @@ async function init() {
     const game = new Game(app);
     await game.preload();
     const loadingTook = performance.now() - start;
-    if(loadingTook > 1000){
+    if (loadingTook > 1000) {
         await FadeScreen.fadeIn(100);
         FadeScreen.fadeOut();
     }

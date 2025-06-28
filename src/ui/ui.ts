@@ -5,11 +5,13 @@ import { UIFullscreenMenu } from "./uiFullscreenMenu";
 import { UIControlPrompts } from "./uiControlPrompts";
 import { UIQuickInventory } from "./uiQuickInventory";
 import { UIInspectModes } from "./uiInspectModes";
+import { UIFullscreenTabMenu } from "./uiFullscreenTabMenu";
 
 export class UI {
     static container: HTMLDivElement;
     static mouseOverElements: Set<UIElement> = new Set();
     static quickInventory?: UIQuickInventory;
+    static fullscreenTabMenu: UIFullscreenTabMenu;
     static fullscreenMenu: UIFullscreenMenu;
     static controlPrompts: UIControlPrompts;
     static customElement<T = HTMLElement>(type: string, parent: HTMLElement, ...classes: string[]): T {
@@ -32,6 +34,7 @@ export class UI {
     }
     static init() {
         UI.container = UI.customDiv(document.body, "uiContainer");
+        UI.fullscreenTabMenu = new UIFullscreenTabMenu();
         UI.fullscreenMenu = new UIFullscreenMenu();
         UI.controlPrompts = new UIControlPrompts(this.container);
         new UIInspectModes(this.container);
@@ -42,6 +45,7 @@ export class UI {
     static destroy() {
         UI.container.remove();
         UI.fullscreenMenu.htmlElement.remove();
+        UI.fullscreenTabMenu.htmlElement.remove();
         UI.controlPrompts.remove();
     }
     static get isMouseOverUI() {

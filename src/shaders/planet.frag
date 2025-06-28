@@ -89,7 +89,7 @@ void main() {
     // Normalized hemisphere vector
     vec3 hemiNormal = normalize(vec3(centeredUV, zz));
 
-    mat3 rotX = rotationMatrix(uTime * .1f, vec3(0.0f, 1.0f, 0.0f));
+    mat3 rotX = rotationMatrix(uTime * .02f, vec3(0.0f, 1.0f, 0.0f));
     mat3 rotY = rotationMatrix(0.f, vec3(1.0f, 0.0f, 0.0f));
     vec3 rotatedNormal = rotX * rotY * hemiNormal;
 
@@ -108,7 +108,7 @@ void main() {
     float landQuality = clamp(uTerrainQuality, 0.f, 1.f);
     float airQuality = clamp(uAtmosphereQuality, 0.f, 1.f);
     float seaLevel = (1.f - landQuality + .01f) * .1f;
-    float cloudCover = (airQuality*.7+1.1);
+    float cloudCover = (airQuality * .7f + 1.1f);
 
     float light = (dot(norm, normalize(vec3(0.f, -1.f, -0.2f))));
     float fresnel = (dot(norm, vec3(0.f, 0.f, -1.f)) + 1.f);
@@ -118,10 +118,11 @@ void main() {
     light = clamp(light, 0.f, 1.f);
     float noise = fractalNoise(sphereUV * 1.f * vec2(2.f, 3.f) + vec2(-.5f, .5f) * uTime * .01f, 5, 2.f, .8f);
     float noise2 = fractalNoise(sphereUV * 1.f * vec2(2.f, 3.f) + vec2(-.2f, -.5f) * uTime * .02f, 6, 2.f, .9f);
-    noise2 = mix(noise2,1.,.3);
+    noise2 = mix(noise2, 1.f, .3f);
     float noiseShadow = fractalNoise(sphereUV * 1.f * vec2(2.f, 3.f) + vec2(-.5f, .5f) * uTime * .01f - vec2(0.f, .02f), 5, 2.f, .8f);
+    float noise2Shadow = fractalNoise(sphereUV * 1.f * vec2(2.f, 3.f) + vec2(-.2f, -.5f) * uTime * .02f - vec2(0.f, .02f), 6, 2.f, .9f);
     float cloud = step(.8f, noise * noise2 * cloudCover);
-    float cloudShadow = step(.8f, noiseShadow * noise2 * cloudCover);
+    float cloudShadow = step(.8f, noiseShadow * noise2Shadow * cloudCover);
     vec2 sinUV = sin(sphereUV * 100.f);
     float heightMap = texture(uSampler, sphereUV).r;
     float atmo = posterise((light * .8f + .1f) + fresnel * .5f, 8);

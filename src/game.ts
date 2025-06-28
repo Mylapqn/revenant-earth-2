@@ -1,4 +1,4 @@
-import { Application, Assets, AssetsBundle, AssetsManifest, ColorMatrixFilter, Container, Graphics, Shader, Sprite, Texture, Ticker } from "pixi.js";
+import { Application, Assets, AssetsBundle, AssetsManifest, ColorMatrixFilter, Container, Graphics, RenderOptions, Shader, Sprite, Texture, Ticker, WebGLRenderer } from "pixi.js";
 import { PixelLayer } from "./pixelRendering/pixelLayer";
 import { Terrain } from "./world/terrain";
 import { System } from "detect-collisions";
@@ -120,6 +120,8 @@ export class Game {
     debugView = false;
 
     planet!: ShaderMesh;
+    planetContainer: Container;
+    planetRenderer: WebGLRenderer;
 
     loaded = false;
     inited = false;
@@ -142,6 +144,8 @@ export class Game {
         this.input = new Input();
         this.animator = new Animator();
         this.score = new Score();
+        this.planetContainer = new Container();
+        this.planetRenderer = new WebGLRenderer();
     }
 
     resize() {
@@ -350,13 +354,20 @@ export class Game {
         this.camera.position.set(this.player.position.x * Game.pixelScale, this.player.position.y * Game.pixelScale);
 
 
-        const planetSize = 80;
+        const planetSize = game.camera.pixelScreen.y * .8;
+
+        await this.planetRenderer.init({ backgroundAlpha: 0, antialias: false, powerPreference: "high-performance", roundPixels: false, width: planetSize, height: planetSize });
+        UI.fullscreenTabMenu.htmlElement.appendChild(this.planetRenderer.canvas);
+        this.planetRenderer.canvas.classList.add("planet-canvas");
+        this.planetRenderer.canvas.style.width = `${planetSize * Game.pixelScale}px`;
+        this.planetRenderer.canvas.style.height = `${planetSize * Game.pixelScale}px`;
+
         const planetLayer = new PixelLayer({ autoResize: true, worldSpace: false, autoRender: true, parent: this.app.stage });
 
         const planetTex = await Assets.load("./planet/earth_height_map_blur.png") as Texture;
         planetTex.source.scaleMode = "linear";
         this.planet = new ShaderMesh({
-            frag: planetFrag, parent: planetLayer.container, size: new Vector(planetSize, planetSize), anchor: { x: .5, y: .5 },
+            frag: planetFrag, parent: this.planetContainer, size: new Vector(planetSize, planetSize), anchor: { x: 0, y: 0 },
             customUniforms: {
                 uLightPosition: {
                     type: "vec3<f32>", value: [0, 1, 1]
@@ -370,9 +381,7 @@ export class Game {
             },
             texture: planetTex
         });
-        this.planet.position.set(this.camera.middle.x / Game.pixelScale, this.camera.middle.y / Game.pixelScale);
-        this.planet.position.set(this.camera.pixelScreen.x - planetSize / 2 - 10, planetSize / 2 + 10);
-        //this.planet.position.set(this.camera.middle.x, this.camera.middle.y);
+        //this.planet.position.set(this.camera.pixelScreen.x - planetSize / 2 - 10, planetSize / 2 + 10);
 
         this.player.sprite.texture = await Assets.load("./char.png");
         this.player.sprite.texture.source.scaleMode = "nearest";
@@ -423,6 +432,8 @@ export class Game {
         for (let x = 0; x < this.terrain.totalWidth; x += Math.random() * 30 + 10) {
             Prefab.Rock({ scene: this.activeScene, x: x, y: 100, type: rand.int(0, 5) });
         }
+
+
         this.resize();
         this.app.ticker.add(this.update, this);
         this.inited = true;
@@ -515,6 +526,8 @@ export class Game {
         for (const layer of PixelLayer.renderLayers) {
             layer.render();
         }
+
+        this.planetRenderer.render({ container: this.planetContainer, clear: false } as RenderOptions);
 
 
         const address = "http://localhost:3000/state.json";
@@ -673,6 +686,10 @@ export class Game {
             //    stats += `${fc[0]}: ${displayNumber(fc[1], 2)}<br>`;
             //}
             //UI.fullscreenMenu.element.innerHTML = stats;
+        }
+
+        if (this.input.keyDown("n")) {
+            UI.fullscreenTabMenu.toggle();
         }
 
         if (this.input.keyDown("e") || this.input.mouse.getButtonUp(MouseButton.Wheel)) {

@@ -10,6 +10,7 @@ export class UIControlPrompts {
         //this.addPrompt(["Q"],"Inspect terrain");
         this.addPrompt(["T"],"Building menu");
         this.addPrompt(["M"],"Inventory");
+        this.addPrompt(["N"],"Test planet view");
     }
     addPrompt(keys:string[],text:string) {
         const wrapper = new UIElement({type:"div",classes:["controlPrompt"],parent:this.container.htmlElement});

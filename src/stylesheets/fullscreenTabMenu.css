@@ -1,0 +1,75 @@
+.fullscreen-tab-menu {
+    font-family: "Chakra Petch";
+    font-size: 16px;
+    color: rgb(255, 255, 255);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #0f0f0f;
+    background-image: radial-gradient(circle, #00000000 50%, #00000075 100%), url("./noise.png");
+    background-blend-mode: normal, overlay;
+    width: 100vw;
+    height: 100vh;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: none;
+    padding: 10px;
+    clip-path: circle(0%);
+    transition: clip-path 1s ease-in-out;
+}
+
+.fullscreen-tab-menu.appear {
+    clip-path: circle(75%);
+}
+
+.fullscreen-tab-menu:not(.appear) {
+    pointer-events: none;
+}
+
+.fullscreen-tab-menu .tab-title-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 200px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 50px;
+}
+
+.tab-title-panel .tab-title {
+    font-weight: 200;
+    text-transform: uppercase;
+    margin-top: -.25em;
+    text-align: center;
+    transition: font-size 1s, color 1s, padding 1s;
+}
+
+.tab-title.center {
+    font-size: 100px;
+    color: #ffffff;
+    justify-self: center;
+    padding: 0px 50px;
+}
+
+.tab-title.left,
+.tab-title.right {
+    font-size: 35px;
+    color: #ffffff30;
+}
+
+.tab-title.far-left,
+.tab-title.far-right {
+    font-size: 0px;
+    color: #ffffff00;
+}
+
+.planet-canvas {
+    image-rendering: pixelated;
+    margin-top: 7%;
+}
