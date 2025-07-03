@@ -48,11 +48,11 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         while (this.children.length > 0) {
             this.children[0].remove();
         }
+        this.htmlElement.remove();
         if (this.blockMouse) UI.mouseOffElement(this);
         if (this.parent) {
             this.parent.children.splice(this.parent.children.indexOf(this), 1);
         }
-        this.htmlElement.remove();
     }
     addChild(...uielement: UIElement[]) {
         for (const element of uielement) {
