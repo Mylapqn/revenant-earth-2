@@ -8,9 +8,9 @@ export class UIControlPrompts {
         /*this.addPrompt(["A","D"],"Move");
         this.addPrompt(["Space"],"Jump");*/
         //this.addPrompt(["Q"],"Inspect terrain");
-        this.addPrompt(["T"],"Building menu");
-        this.addPrompt(["M"],"Inventory");
-        this.addPrompt(["N"],"Test planet view");
+        this.addPrompt(["E"],"Building menu");
+        this.addPrompt(["TAB"],"Inventory");
+        this.addPrompt(["M"],"Test planet view");
     }
     addPrompt(keys:string[],text:string) {
         const wrapper = new UIElement({type:"div",classes:["controlPrompt"],parent:this.container.htmlElement});

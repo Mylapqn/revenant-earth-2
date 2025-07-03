@@ -1,8 +1,6 @@
 import { game } from "../game";
 import { UI } from "./ui";
-
-
-
+import { TooltipID } from "./uiTooltipData";
 
 export class UIElement<T extends HTMLElement = HTMLElement> {
     public htmlElement: T;
@@ -10,6 +8,7 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
     public children: UIElement[];
     mouseSoundEffects = false;
     blockMouse = true;
+    tooltipData?: TooltipID
     onclick?: () => void;
     constructor(options: UIElementOptions) {
         this.children = [];
@@ -19,17 +18,20 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         this.onclick = options.onclick;
         this.mouseSoundEffects = options.mouseSoundEffects ?? false;
         this.blockMouse = (options.blockMouse ?? false);
-        if (this.blockMouse || this.mouseSoundEffects) {
+        this.tooltipData = options.tooltip
+        if (this.blockMouse || this.mouseSoundEffects || this.tooltipData) {
             this.htmlElement.addEventListener("mouseenter", () => {
                 if (this.mouseSoundEffects) game.soundManager.play("hover");
                 if (this.blockMouse) {
                     UI.mouseOnElement(this);
                 }
+                if (this.tooltipData) game.tooltipManager.addTooltip(this.tooltipData);
             });
             this.htmlElement.addEventListener("mouseleave", () => {
                 if (this.blockMouse) {
                     UI.mouseOffElement(this);
                 }
+                if (this.tooltipData) game.tooltipManager.removeTooltip(this.tooltipData);
             });
         }
         if (this.onclick || this.mouseSoundEffects) {
@@ -65,5 +67,5 @@ export class UIElement<T extends HTMLElement = HTMLElement> {
         return new UIElement<T>(options);
     }
 }
-export type UIElementOptions = { type: string; classes?: string[]; parent?: HTMLElement; content?: string; mouseSoundEffects?: boolean; blockMouse?: boolean; onclick?: () => void; };
+export type UIElementOptions = { type: string; classes?: string[]; parent?: HTMLElement; content?: string; mouseSoundEffects?: boolean; blockMouse?: boolean; onclick?: () => void; tooltip?: TooltipID };
 

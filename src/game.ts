@@ -14,7 +14,7 @@ import { ParticleText } from "./hierarchy/particleText";
 import { HackingMinigame } from "./hacking-minigame/hacking";
 import { Input, MouseButton } from "./input";
 import { TimedShader } from "./shaders/timedShader";
-import { TooltipPanel, UITooltip } from "./ui/tooltip";
+import { TooltipPanel, TooltipLegacy } from "./ui/tooltip";
 import { Prefab } from "./hierarchy/prefabs";
 import { Atmo } from "./world/atmo";
 import { PlantSpecies } from "./plants/plantSpecies";
@@ -43,6 +43,8 @@ import { UIFullscreenMenu } from "./ui/uiFullscreenMenu";
 import { ShaderMesh } from "./shaders/shaderMesh";
 import planetFrag from "./shaders/planet.frag?raw";
 import { Animator } from "./animations/animator";
+import { UITooltip, UITooltipManager } from "./ui/uiTooltip";
+import { TooltipID } from "./ui/uiTooltipData";
 
 export let game: Game;
 
@@ -110,7 +112,8 @@ export class Game {
     weather!: Weather;
 
     //UI
-    tooltip!: UITooltip;
+    tooltipManager!: UITooltipManager;
+    tooltipLegacy!: TooltipLegacy;
     buildingGhost!: BuildingGhost;
     currentBuildable?: Buildable;
     selectedSeed?: string;
@@ -409,7 +412,8 @@ export class Game {
             ]
         }, this.globalScene);
 
-        this.tooltip = new UITooltip();
+        this.tooltipLegacy = new TooltipLegacy();
+        this.tooltipManager = new UITooltipManager();
 
         this.terrain = new Terrain();
         this.activeScene.hasTerrain = true;
@@ -490,7 +494,8 @@ export class Game {
 
         this.score.update(dt);
 
-        this.tooltip.update(realDt);
+        this.tooltipManager.update(dt);
+        this.tooltipLegacy.update(realDt);
 
         if (this.input.key("-")) {
             let out = prompt("spawn");
@@ -531,7 +536,7 @@ export class Game {
 
 
         const address = "http://localhost:3000/state.json";
-        if (this.input.keyUp("tab") && !this.input.key("alt")) {
+        if (this.input.keyUp(";") && !this.input.key("alt")) {
             Debug.editorMode = !Debug.editorMode;
         }
 
@@ -614,10 +619,10 @@ export class Game {
     private averageGroundPollutionGraph = new Graphics();
 
     async getGraphs(): Promise<{
-        temp: { img: HTMLImageElement, value: string, trend: number },
-        co2: { img: HTMLImageElement, value: string, trend: number },
-        averageAirPollution: { img: HTMLImageElement, value: string, trend: number },
-        averageGroundPollution: { img: HTMLImageElement, value: string, trend: number },
+        temp: { img: HTMLImageElement, value: string, trend: number, tooltip: TooltipID },
+        co2: { img: HTMLImageElement, value: string, trend: number, tooltip: TooltipID },
+        averageAirPollution: { img: HTMLImageElement, value: string, trend: number, tooltip: TooltipID },
+        averageGroundPollution: { img: HTMLImageElement, value: string, trend: number, tooltip: TooltipID },
     }> {
         function graphData(g: Graphics, data: number[], max = 1) {
             g.clear();
@@ -655,10 +660,10 @@ export class Game {
 
 
         return {
-            temp: { img: out[0], value: `${this.graphableData[lastIndex].temp.toFixed(1)}°C`, trend: Math.sign(this.graphableData[lastIndex].temp - this.graphableData[secondLastIndex].temp) },
-            co2: { img: out[1], value: `${this.graphableData[lastIndex].co2.toFixed(0)}ppm`, trend: Math.sign(this.graphableData[lastIndex].co2 - this.graphableData[secondLastIndex].co2) },
-            averageAirPollution: { img: out[2], value: `${Math.round(this.graphableData[lastIndex].averageAirPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageAirPollution - this.graphableData[secondLastIndex].averageAirPollution) },
-            averageGroundPollution: { img: out[3], value: `${Math.round(this.graphableData[lastIndex].averageGroundPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageGroundPollution - this.graphableData[secondLastIndex].averageGroundPollution) },
+            temp: { img: out[0], value: `${this.graphableData[lastIndex].temp.toFixed(1)}°C`, trend: Math.sign(this.graphableData[lastIndex].temp - this.graphableData[secondLastIndex].temp), tooltip: "air-temperature" },
+            co2: { img: out[1], value: `${this.graphableData[lastIndex].co2.toFixed(0)}ppm`, trend: Math.sign(this.graphableData[lastIndex].co2 - this.graphableData[secondLastIndex].co2), tooltip: "air-co2" },
+            averageAirPollution: { img: out[2], value: `${Math.round(this.graphableData[lastIndex].averageAirPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageAirPollution - this.graphableData[secondLastIndex].averageAirPollution), tooltip:"air-pollution" },
+            averageGroundPollution: { img: out[3], value: `${Math.round(this.graphableData[lastIndex].averageGroundPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageGroundPollution - this.graphableData[secondLastIndex].averageGroundPollution), tooltip:"soil-toxicity"  },
         };
     }
 
@@ -679,7 +684,7 @@ export class Game {
             else this.hacking = new HackingMinigame();
         }
 
-        if (this.input.keyDown("m")) {
+        if (this.input.keyDown("tab")) {
             UI.fullscreenMenu.toggle();
             //let stats = "";
             //for (const fc of Object.entries(game.atmo.energyMoveTotal)) {
@@ -688,7 +693,7 @@ export class Game {
             //UI.fullscreenMenu.element.innerHTML = stats;
         }
 
-        if (this.input.keyDown("n")) {
+        if (this.input.keyDown("m")) {
             UI.fullscreenTabMenu.toggle();
         }
 
@@ -763,7 +768,7 @@ export class Game {
                     if (result.reason && !result.valid) tooltips.push({ text: "CANNOT PLACE: " + result.reason, customClasses: ["error"] });
                     if (result.reason && result.valid) tooltips.push({ text: result.reason });
                     if (result.warning) tooltips.push({ text: "WARNING:\n" + result.warning, customClasses: ["warning"] });
-                    this.tooltip.hover(...tooltips);
+                    this.tooltipLegacy.hover(...tooltips);
                 }
             }
         }

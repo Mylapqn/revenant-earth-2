@@ -83,7 +83,7 @@ export class EntityTooltip extends Component {
     }
     hover(hover: boolean) {
         this.highlighted = hover;
-        game.tooltip.hoverEntity(this.entity, hover);
+        game.tooltipLegacy.hoverEntity(this.entity, hover);
 
     }
     getTooltip() {

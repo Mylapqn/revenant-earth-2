@@ -4,6 +4,7 @@ import { game } from "../game";
 import { ItemGroup, itemDefinitions, ItemDefinition } from "../itemDefinitions";
 import { UI } from "./ui";
 import { UIElement } from "./uiElement";
+import { TooltipID } from "./uiTooltipData";
 
 
 export class UIFullscreenMenu {
@@ -80,8 +81,8 @@ export class UIFullscreenMenu {
         this.progressBadge("Average Ground Pollution", averageGroundPollution);
     }
 
-    private progressBadge(name: string, { value, trend, img }: { value: string; trend: number; img: HTMLImageElement; }) {
-        const badge = new UIElement({ type: "div", classes: ["progressBadge"], parent: this.badgeContainer.htmlElement });
+    private progressBadge(name: string, { value, trend, img, tooltip }: { value: string; trend: number; img: HTMLImageElement; tooltip: TooltipID; }) {
+        const badge = new UIElement({ type: "div", classes: ["progressBadge"], parent: this.badgeContainer.htmlElement,tooltip: tooltip});
         const leftContainer = new UIElement({ type: "div", classes: ["leftContainer"], parent: badge.htmlElement });
         const rightContainer = new UIElement({ type: "div", classes: ["rightContainer"], parent: badge.htmlElement });
         const badgeName = new UIElement({ type: "div", classes: ["badgeName"], parent: leftContainer.htmlElement });

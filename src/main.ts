@@ -8,6 +8,7 @@ import './stylesheets/hacking.css';
 import './stylesheets/mainMenu.css';
 import './stylesheets/progress.css';
 import './stylesheets/fullscreenTabMenu.css';
+import './stylesheets/tooltip.css';
 import { DevSync } from './dev/devsync';
 import { MainMenu } from './ui/mainMenu';
 import { FadeScreen } from './ui/fadeScreen';

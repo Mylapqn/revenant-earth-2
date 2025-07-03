@@ -1,0 +1,30 @@
+.tooltip {
+    position: absolute;
+    z-index: 10;
+    background-color: #272727;
+    color: rgb(204, 204, 204);
+    font-family: "Chakra Petch", sans-serif;
+    font-size: 20px;
+    max-width: 500px;
+    padding: 20px;
+    box-shadow: 0px 5px 20px 0px #00000053;
+}
+
+.tooltip.locked {
+    padding: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.283);
+    pointer-events: all;
+}
+
+.tooltip .tooltip-link {
+    color:white;
+}
+
+.tooltip-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background-color: white;
+}

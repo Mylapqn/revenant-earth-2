@@ -3,7 +3,7 @@ import { game } from "../game";
 import { Entity } from "../hierarchy/entity";
 import { UI } from "./ui";
 
-export class UITooltip {
+export class TooltipLegacy {
     parentElement: HTMLDivElement;
     enabled: boolean = false;
     hoveredEntity?: Entity = undefined;

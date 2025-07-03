@@ -210,7 +210,7 @@ export class Debug {
         text = "";
         Object.entries(game.weather.weatherData).forEach(([key, value]) => text += `${key}: ${displayNumber(value, 2)}\n`);
         columns.push({ title: "Weather", text: text });
-        game.tooltip.hover(
+        game.tooltipLegacy.hover(
             { title: "Debug data" },
             { text: "X: " + Math.floor(game.worldMouse.x) + " // Y: " + Math.floor(game.worldMouse.y), highlight: true },
             { columns: columns }
