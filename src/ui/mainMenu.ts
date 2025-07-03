@@ -23,6 +23,7 @@ export class MainMenu {
         this._updating = value;
         if (value) requestAnimationFrame(this.update.bind(this));
     }
+    buttonsEnabled = true;
     constructor(game: Game) {
         this.game = game;
         this.parentElement = new UIElement({ type: "div", classes: ["main-menu"], parent: document.body, blockMouse: true }).htmlElement;
@@ -40,8 +41,9 @@ export class MainMenu {
         MainMenu.instance = this;
     }
     async init(skipMenu = false) {
+        this.buttonsEnabled = true;
         this.gameLoadedPromise = game.load();
-        if(!skipMenu){
+        if (!skipMenu) {
             this.show();
             return this.gameLoadedPromise;
         }
@@ -52,6 +54,7 @@ export class MainMenu {
         }
     }
     async show() {
+        this.buttonsEnabled = true;
         this.updating = true;
         this.parentElement.style.display = "flex";
         this.game.soundManager.soundLibrary.play("music_menu");
@@ -86,6 +89,8 @@ export class MainMenu {
         if (this.updating) this.mousePosition.set(e.clientX, e.clientY);
     }
     async startGame() {
+        if (!this.buttonsEnabled) return;
+        this.buttonsEnabled = false;
         if (game.inited) {
             game.destroyGame();
         }
@@ -106,6 +111,8 @@ export class MainMenu {
         quote.remove();
     }
     async continueGame() {
+        if (!this.buttonsEnabled) return;
+        this.buttonsEnabled = false;
         if (game.inited) {
             this.hide();
             this.game.initWorld();

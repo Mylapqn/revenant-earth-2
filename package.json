@@ -7,7 +7,8 @@
     "dev": "concurrently \"vite --host\" \"dev-fileserver\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "htcrud": "dev-fileserver"
+    "htcrud": "dev-fileserver",
+    "butler-push": "butler push dist mylapqn/revenant-earth:build"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
