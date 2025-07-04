@@ -1,17 +1,16 @@
 import { Entity } from "../../hierarchy/entity";
-import { ShaderMeshRenderer } from "./shaderMeshRenderer";
 import windowFrag from "../../shaders/window.frag?raw";
 import windowEmissiveFrag from "../../shaders/windowEmissive.frag?raw";
-import { Assets, Container, Matrix, RenderTexture, Texture } from "pixi.js";
+import { Assets, Container, Texture } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { ShaderMesh } from "../../shaders/shaderMesh";
 import { Vector } from "../../utils/vector";
-import { SpriteDirection } from "./spriteDirection";
+import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
-import { Light } from "../../shaders/lighting/light";
 
-export class WindowRenderer extends Component {
+declare module "../types" { interface ComponentRegistry { WindowRenderer: WindowRenderer } }
+export default class WindowRenderer extends Component {
     static componentType = "WindowRenderer";
     topContainer: Container;
     container: Container;

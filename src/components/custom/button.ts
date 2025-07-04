@@ -5,9 +5,11 @@ import { ParticleText } from "../../hierarchy/particleText";
 import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
-import { Interactable } from "../generic/interactable";
+import Interactable from "../generic/interactable";
 
-export class Button extends Component {
+
+declare module "../types" { interface ComponentRegistry { Button: Button } }
+export default class Button extends Component {
     static componentType = "Button";
     dbName: string = "None";
 

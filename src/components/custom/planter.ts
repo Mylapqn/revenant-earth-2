@@ -6,13 +6,13 @@ import { Vector, Vectorlike } from "../../utils/vector";
 import { AtmoData } from "../../world/atmo";
 import { SurfaceMaterial, Terrain, TerrainData, TerrainInspectMode } from "../../world/terrain";
 import { Box, SATVector } from "detect-collisions";
-import { Debug } from "../../dev/debug";
-import { BasicSprite } from "../generic/basicSprite";
+import BasicSprite from "../generic/basicSprite";
 import { CustomColor } from "../../utils/color";
 
 type PartialData = { terrainData?: Partial<TerrainData>, atmoData?: Partial<AtmoData> };
 
-export class Planter extends Component {
+declare module "../types" { interface Planter { Plant: Planter } }
+export default class Planter extends Component {
     static componentType = "Planter";
     collider!: Box;
     basicSprite!: BasicSprite;
@@ -33,7 +33,7 @@ export class Planter extends Component {
         this.onEntity("update", (dt) => this.update(dt));
     }
 
-    terrainData: TerrainData = { pollution: 0, fertility: 1, erosion: 0.9, moisture: 0.3,grassiness:0 };
+    terrainData: TerrainData = { pollution: 0, fertility: 1, erosion: 0.9, moisture: 0.3, grassiness: 0 };
     atmoData: AtmoData = { pollution: 0 };
 
     override toData(): ComponentData {

@@ -5,10 +5,9 @@ import { Vector, Vectorlike } from "../utils/vector";
 import { SurfaceMaterial } from "../world/terrain";
 import { Entity } from "./entity";
 import { Prefab } from "./prefabs";
-import { Plant } from "../components/custom/plant";
-import { Planter } from "../components/custom/planter";
-import { Debug } from "../dev/debug";
 import { Item, itemDefinitions, ItemGroup } from "../itemDefinitions";
+import Planter from "../components/custom/planter";
+import Plant from "../components/custom/plant";
 
 export type ValidateResults = { valid: boolean, reason: string, warning?: string };
 export type CheckResults = ValidateResults & { snap: Vectorlike };

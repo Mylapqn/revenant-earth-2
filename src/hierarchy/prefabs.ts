@@ -1,5 +1,3 @@
-import { WellDefinedComponentData } from "../components/componentIndex";
-import { SprinklerCore } from "../components/custom/sprinklerCore";
 import { game } from "../game";
 import { Entity } from "./entity";
 import { Scene } from "./scene";

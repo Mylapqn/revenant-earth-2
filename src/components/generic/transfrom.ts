@@ -3,8 +3,8 @@ import { Entity } from "../../hierarchy/entity";
 import { Vector, Vectorlike } from "../../utils/vector";
 
 
-
-export class Transform extends Component {
+declare module "../types" { interface ComponentRegistry { Transform: Transform } }
+export default class Transform extends Component {
     static componentType = "Transform";
     position = new Vector(0, 0);
     velocity = new Vector(0, 0);

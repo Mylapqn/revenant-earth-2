@@ -1,10 +1,11 @@
 import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { EntityTooltip } from "../generic/entityTooltip";
-import { Power } from "../generic/power";
+import EntityTooltip from "../generic/entityTooltip";
+import Power from "../generic/power";
 
-export class SolarPanel extends Component {
+declare module "../types" { interface ComponentRegistry { SolarPanel: SolarPanel } }
+export default class SolarPanel extends Component {
     static componentType = "SolarPanel";
 
     constructor(entity: Entity) {
@@ -25,7 +26,7 @@ export class SolarPanel extends Component {
         const watts = flux * dt * 0.2 * area;
         this.power?.provide(watts / 1000);
 
-        if(this.tooltip){
+        if (this.tooltip) {
             this.tooltip.tooltipData.set("flux", `${watts.toFixed(1)}W`);
         }
     }

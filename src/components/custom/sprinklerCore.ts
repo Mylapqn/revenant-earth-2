@@ -2,11 +2,12 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
-import { EntityTooltip } from "../generic/entityTooltip";
-import { Interactable } from "../generic/interactable";
-import { Power } from "../generic/power";
+import EntityTooltip from "../generic/entityTooltip";
+import Interactable from "../generic/interactable";
+import Power from "../generic/power";
 
-export class SprinklerCore extends Component {
+declare module "../types" { interface ComponentRegistry { SprinklerCore: SprinklerCore } }
+export default class SprinklerCore extends Component {
     static componentType = "SprinklerCore";
     constructor(entity: Entity) {
         super(entity);

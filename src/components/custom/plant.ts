@@ -1,21 +1,21 @@
-import { Color, getUboData, Graphics } from "pixi.js";
+import { Color, Graphics } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../utils/vector";
 import { Prefab } from "../../hierarchy/prefabs";
-import { EntityTooltip } from "../generic/entityTooltip";
-import { ShaderMeshRenderer } from "../generic/shaderMeshRenderer";
 import { clamp, lerp, RandomGenerator } from "../../utils/utils";
 import { CustomColor } from "../../utils/color";
 import { PlantSpecies } from "../../plants/plantSpecies";
 import { PlantGenerator } from "../../plants/plantGenerator";
-import { IEvnironmentProvider, Planter } from "./planter";
 import { SurfaceMaterial, TerrainInspectMode } from "../../world/terrain";
-import { Debug } from "../../dev/debug";
+import EntityTooltip from "../generic/entityTooltip";
+import ShaderMeshRenderer from "../generic/shaderMeshRenderer";
+import Planter, { IEvnironmentProvider } from "./planter";
 
-export class Plant extends Component {
+declare module "../types" { interface ComponentRegistry { Plant: Plant } }
+export default class Plant extends Component {
     static componentType = "Plant";
     growth = 0;
     health = 1;

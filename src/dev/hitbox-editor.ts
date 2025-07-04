@@ -1,4 +1,4 @@
-import { Hitbox } from "../components/generic/hitbox";
+import Hitbox from "../components/generic/hitbox";
 import { game } from "../game";
 import { MouseButton } from "../input";
 import { displayNumber } from "../utils/utils";

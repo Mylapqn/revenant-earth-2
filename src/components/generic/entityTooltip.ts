@@ -1,13 +1,12 @@
 import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { primitiveObject } from "../../hierarchy/serialise";
-import { MouseButton } from "../../input";
-import { BasicSprite } from "./basicSprite";
-import { Interactable } from "./interactable";
-import { ShaderMeshRenderer } from "./shaderMeshRenderer";
+import BasicSprite from "./basicSprite";
+import Interactable from "./interactable";
+import ShaderMeshRenderer from "./shaderMeshRenderer";
 
-export class EntityTooltip extends Component {
+declare module "../types" { interface ComponentRegistry { EntityTooltip: EntityTooltip } }
+export default class EntityTooltip extends Component {
     static componentType = "EntityTooltip";
     interactableComponent?: Interactable;
     spriteComponent?: BasicSprite;

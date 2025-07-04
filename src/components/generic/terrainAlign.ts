@@ -3,7 +3,8 @@ import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
 
-export class TerrainAlign extends Component {
+declare module "../types" { interface ComponentRegistry { TerrainAlign: TerrainAlign } }
+export default class TerrainAlign extends Component {
     static componentType = "TerrainAlign";
     yOffset = 0;
     //accumulation = 0;

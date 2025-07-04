@@ -6,9 +6,10 @@ import { FadeScreen } from "../../ui/fadeScreen";
 import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
-import { Interactable } from "../generic/interactable";
+import Interactable from "../generic/interactable";
 
-export class Door extends Component {
+declare module "../types" { interface ComponentRegistry { Door: Door } }
+export default class Door extends Component {
     static componentType = "Door";
     targetScene: string = "None";
     doorId: string = "default-door";
@@ -48,7 +49,7 @@ export class Door extends Component {
     }
 
     async enter() {
-        if(FadeScreen.inProgress) return;
+        if (FadeScreen.inProgress) return;
         await FadeScreen.fadeIn(200);
         const scene = game.loadScene(this.targetScene);
         FadeScreen.fadeOut(700);

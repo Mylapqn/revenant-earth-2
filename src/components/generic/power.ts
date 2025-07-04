@@ -1,8 +1,9 @@
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { EntityTooltip } from "./entityTooltip";
+import EntityTooltip  from "./entityTooltip";
 
-export class Power extends Component {
+declare module "../types" { interface ComponentRegistry { Power: Power } }
+export default class Power extends Component {
     static componentType = "Power";
 
     constructor(entity: Entity) {

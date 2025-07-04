@@ -1,5 +1,5 @@
 import { CSSClassAnimation } from "../animations/CSSClassAnimation";
-import type { Inventory } from "../components/generic/inventory";
+import type Inventory from "../components/generic/inventory";
 import { game } from "../game";
 import { ItemGroup, itemDefinitions, ItemDefinition } from "../itemDefinitions";
 import { UI } from "./ui";
@@ -82,7 +82,7 @@ export class UIFullscreenMenu {
     }
 
     private progressBadge(name: string, { value, trend, img, tooltip }: { value: string; trend: number; img: HTMLImageElement; tooltip: TooltipID; }) {
-        const badge = new UIElement({ type: "div", classes: ["progressBadge"], parent: this.badgeContainer.htmlElement,tooltip: tooltip});
+        const badge = new UIElement({ type: "div", classes: ["progressBadge"], parent: this.badgeContainer.htmlElement, tooltip: tooltip });
         const leftContainer = new UIElement({ type: "div", classes: ["leftContainer"], parent: badge.htmlElement });
         const rightContainer = new UIElement({ type: "div", classes: ["rightContainer"], parent: badge.htmlElement });
         const badgeName = new UIElement({ type: "div", classes: ["badgeName"], parent: leftContainer.htmlElement });

@@ -1,12 +1,9 @@
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { ParticleText } from "../../hierarchy/particleText";
-import { primitiveObject } from "../../hierarchy/serialise";
 import { Item } from "../../itemDefinitions";
-import { Vector } from "../../utils/vector";
 
-
-export class Inventory extends Component {
+declare module "../types" { interface ComponentRegistry { Inventory: Inventory } }
+export default class Inventory extends Component {
     static componentType = "Inventory";
     items = new Map<Item, number>();
     constructor(parent: Entity) {

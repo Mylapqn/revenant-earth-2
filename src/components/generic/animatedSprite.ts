@@ -2,15 +2,15 @@ import { Assets, Sprite, Texture } from "pixi.js";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
-import { SpriteDirection } from "./spriteDirection";
+import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
 import { DynamicAnimatedSprite } from "../../pixelRendering/dynamicAnimatedSprite";
 import { ColorFillFilter } from "../../shaders/filter/colorFill/colorFillFilter";
 import { CustomColor } from "../../utils/color";
 
 
-
-export class AnimatedSpriteRenderer extends Component {
+declare module "../types" { interface ComponentRegistry { AnimatedSpriteRenderer: AnimatedSpriteRenderer } }
+export default class AnimatedSpriteRenderer extends Component {
     static componentType = "AnimatedSprite";
     sprite!: DynamicAnimatedSprite;
     asset!: string;

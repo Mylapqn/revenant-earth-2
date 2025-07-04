@@ -1,9 +1,9 @@
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { primitiveObject } from "../../hierarchy/serialise";
 
-export class Polluter extends Component {
+declare module "../types" { interface ComponentRegistry { Polluter: Polluter } }
+export default class Polluter extends Component {
     static componentType = "Polluter";
 
     constructor(entity: Entity) {

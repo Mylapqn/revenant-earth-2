@@ -1,4 +1,4 @@
-import type { Inventory } from "../components/generic/inventory";
+import type Inventory from "../components/generic/inventory";
 import { game } from "../game";
 import { ItemGroup, itemDefinitions } from "../itemDefinitions";
 import { UI } from "./ui";

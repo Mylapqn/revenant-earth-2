@@ -2,12 +2,12 @@ import { Assets, Sprite, Texture } from "pixi.js";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
-import { SpriteDirection } from "./spriteDirection";
+import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
 
 
-
-export class BasicSprite extends Component {
+declare module "../types" { interface ComponentRegistry { BasicSprite: BasicSprite } }
+export default class BasicSprite extends Component {
     static componentType = "BasicSprite";
     sprite!: Sprite;
     asset!: string;
@@ -38,7 +38,7 @@ export class BasicSprite extends Component {
         container.addChild(this.sprite);
         this.sprite.anchor.set(0.5);
         Assets.load(data.asset).then((texture) => {
-            if(!this.sprite) return;
+            if (!this.sprite) return;
             this.sprite.texture = texture;
             this.sprite.texture.source.scaleMode = 'nearest';
         });

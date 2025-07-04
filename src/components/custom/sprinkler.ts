@@ -2,12 +2,14 @@ import { Assets } from "pixi.js";
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { BasicSprite } from "../generic/basicSprite";
-import { SprinklerCore } from "./sprinklerCore";
+import BasicSprite from "../generic/basicSprite";
+import SprinklerCore from "./sprinklerCore";
 import { filters } from "@pixi/sound";
 import { clamp } from "../../utils/utils";
 
-export class Sprinkler extends Component {
+
+declare module "../types" { interface ComponentRegistry { Sprinkler: Sprinkler } }
+export default class Sprinkler extends Component {
     static componentType = "Sprinkler";
 
     sprinklerCore?: SprinklerCore;

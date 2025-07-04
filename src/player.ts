@@ -17,7 +17,7 @@ import { CustomColor } from "./utils/color";
 import { Lightmap } from "./shaders/lighting/lightmap";
 import { SurfaceMaterial } from "./world/terrain";
 import { Light } from "./shaders/lighting/light";
-import { Inventory } from "./components/generic/inventory";
+import Inventory from "./components/generic/inventory";
 import { Buildable } from "./hierarchy/buildable";
 import { UI } from "./ui/ui";
 
@@ -112,8 +112,8 @@ export class Player implements ISerializable {
 
     update(dt: number) {
         //Debug.log(this.position.y);
-        
-        if(game.activeScene.hasTerrain) {
+
+        if (game.activeScene.hasTerrain) {
             const tdata = game.terrain.getProperties(this.position.x);
             const adata = game.atmo.getProperties(this.position.x);
             this.oxygen -= (adata.pollution - .5) * dt * 1;

@@ -1,17 +1,12 @@
 import { Entity } from "../../hierarchy/entity";
-import { ShaderMeshRenderer } from "./shaderMeshRenderer";
-import windowFrag from "../../shaders/window.frag?raw";
-import { Assets, Container, RenderTexture, Texture } from "pixi.js";
-import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
-import { ShaderMesh } from "../../shaders/shaderMesh";
-import { Vector, Vectorlike } from "../../utils/vector";
-import { SpriteDirection } from "./spriteDirection";
-import { Lightmap } from "../../shaders/lighting/lightmap";
+import { Vector } from "../../utils/vector";
+import SpriteDirection from "./spriteDirection";
 import { Light, LightOptions } from "../../shaders/lighting/light";
 import { CustomColor } from "../../utils/color";
 
-export class LightComponent extends Component {
+declare module "../types" { interface ComponentRegistry { LightComponent: LightComponent } }
+export default class LightComponent extends Component {
     static componentType = "LightComponent";
     light!: Light;
     offset!: Vector;

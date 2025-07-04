@@ -3,7 +3,8 @@ import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
 
-export class SpriteDirection extends Component {
+declare module "../types" { interface ComponentRegistry { SpriteDirection: SpriteDirection } }
+export default class SpriteDirection extends Component {
     static componentType = "SpriteDirection";
     direction: number = 0;
     forceDirection: number = 0;

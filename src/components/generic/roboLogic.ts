@@ -1,10 +1,9 @@
-import { DevSync } from "../../dev/devsync";
 import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { BasicSprite } from "./basicSprite";
 
-export class RoboLogic extends Component {
+declare module "../types" { interface ComponentRegistry { RoboLogic: RoboLogic } }
+export default class RoboLogic extends Component {
     static componentType = "RoboLogic";
 
     constructor(parent: Entity) {

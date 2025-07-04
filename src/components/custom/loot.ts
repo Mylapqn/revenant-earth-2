@@ -4,10 +4,11 @@ import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { itemDefinitions } from "../../itemDefinitions";
 import { Vector } from "../../utils/vector";
-import { Interactable } from "../generic/interactable";
-import { Inventory } from "../generic/inventory";
+import Interactable from "../generic/interactable";
+import Inventory from "../generic/inventory";
 
-export class LootComponent extends Component {
+declare module "../types" { interface ComponentRegistry { LootComponent: LootComponent } }
+export default class LootComponent extends Component {
     static componentType = "LootComponent";
 
     constructor(entity: Entity) {
@@ -26,7 +27,7 @@ export class LootComponent extends Component {
         if (this.inventory && game.player.inventory) {
             let text = "Looted\n";
             for (const [item, amount] of this.inventory.items) text += `${itemDefinitions[item].name} x${amount}\n`;
-            new ParticleText(text, this.transform.position.clone().add(new Vector(0, -40),),this.inventory.items.size * 2 + 3);
+            new ParticleText(text, this.transform.position.clone().add(new Vector(0, -40),), this.inventory.items.size * 2 + 3);
             game.player.inventory.lootContainer(this.inventory);
             this.interactable?.remove();
         }

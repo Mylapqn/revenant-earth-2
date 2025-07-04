@@ -1,14 +1,14 @@
 import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { primitiveObject } from "../../hierarchy/serialise";
 import { UI } from "../../ui/ui";
 import { UIAbsoluteElement } from "../../ui/uiAbsoluteElement";
 import { UIElement } from "../../ui/uiElement";
 import { Vector, Vectorlike } from "../../utils/vector";
-import { BasicSprite } from "./basicSprite";
+import BasicSprite from "./basicSprite";
 
-export class Interactable extends Component {
+declare module "../types" { interface ComponentRegistry { Interactable: Interactable } }
+export default class Interactable extends Component {
     static componentType = "Interactable";
     spriteComponent?: BasicSprite;
     highlighted = false;

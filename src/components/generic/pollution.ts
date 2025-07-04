@@ -2,11 +2,10 @@ import { game } from "../../game";
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
-import { Terrain } from "../../world/terrain";
 import { Vector } from "../../utils/vector";
-import { Debug } from "../../dev/debug";
 
-export class Pollution extends Component {
+declare module "../types" { interface ComponentRegistry { Pollution: Pollution } }
+export default class Pollution extends Component {
     static componentType = "Pollution";
     speed = 2;
     dbName = "default";

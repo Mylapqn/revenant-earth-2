@@ -5,7 +5,9 @@ import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
 import { Debug } from "../../dev/debug";
 
-export class Trigger extends Component {
+
+declare module "../types" { interface ComponentRegistry { Trigger: Trigger } }
+export default class Trigger extends Component {
     static componentType = "Trigger";
     name: string = "";
     radius: number = 100

@@ -4,9 +4,10 @@ import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { sleep } from "../../utils/utils";
 import { Vector } from "../../utils/vector";
-import { Plant } from "./plant";
+import Plant from "./plant";
 
-export class BiocharKiln extends Component {
+declare module "../types" { interface ComponentRegistry { BiocharKiln: BiocharKiln } }
+export default class BiocharKiln extends Component {
     static componentType = "BiocharKiln";
     constructor(entity: Entity) {
         super(entity);

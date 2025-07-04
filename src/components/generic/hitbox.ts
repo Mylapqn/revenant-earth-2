@@ -2,7 +2,7 @@ import { Assets, GlProgram, Graphics, Mesh, Shader, Sprite, Texture, TilingSprit
 import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
-import { SpriteDirection } from "./spriteDirection";
+import SpriteDirection from "./spriteDirection";
 import { Polygon, SATVector } from "detect-collisions";
 import { Vector, Vectorlike } from "../../utils/vector";
 import { decomp, makeCCW, quickDecomp } from "poly-decomp-es";
@@ -18,8 +18,8 @@ import { Shadowmap } from "../../shaders/lighting/shadowmap";
 import { SurfaceMaterial } from "../../world/terrain";
 
 
-
-export class Hitbox extends Component {
+declare module "../types" { interface ComponentRegistry { Hitbox: Hitbox } }
+export default class Hitbox extends Component {
     static componentType = "Hitbox";
     polygons!: Polygon[];
     nodes: Vectorlike[] = [];

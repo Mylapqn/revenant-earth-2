@@ -1,9 +1,8 @@
-import { BiocharKiln } from "../components/custom/biocharKiln";
-import { Door } from "../components/custom/door";
-import { Plant } from "../components/custom/plant";
-import { Planter } from "../components/custom/planter";
-import { Polluter } from "../components/custom/polluter";
-import { TalkComponent } from "../components/generic/talk";
+import Door from "../components/custom/door";
+import Plant from "../components/custom/plant";
+import Planter from "../components/custom/planter";
+import Polluter from "../components/custom/polluter";
+import TalkComponent from "../components/generic/talk";
 import { game } from "../game";
 import { MilestonePopupManager } from "../ui/milestonePopup";
 import { QuestMarker } from "../ui/questMarker";

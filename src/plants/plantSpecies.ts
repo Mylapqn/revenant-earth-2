@@ -1,5 +1,4 @@
-import { Plant } from "../components/custom/plant";
-import { Constructor } from "../hierarchy/component";
+import Plant from "../components/custom/plant";
 import { TreeGenerator } from "./generators/treeGenerator";
 import { PlantGenerator } from "./plantGenerator";
 

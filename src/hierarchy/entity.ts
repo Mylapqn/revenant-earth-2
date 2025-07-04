@@ -1,5 +1,5 @@
 import { WellDefinedComponentData } from "../components/componentIndex";
-import { Transform } from "../components/generic/transfrom";
+import Transform from "../components/generic/transfrom";
 import { game } from "../game";
 import { Component, ComponentData, Constructor } from "./component";
 import { ISceneObject, Scene } from "./scene";

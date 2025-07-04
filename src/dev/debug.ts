@@ -1,8 +1,6 @@
 import { Color, Container, Graphics, StrokeStyle } from "pixi.js";
 import { game } from "../game";
 import { clamp, displayNumber } from "../utils/utils";
-import { BasicSprite } from "../components/generic/basicSprite";
-import { Hitbox } from "../components/generic/hitbox";
 import { TooltipPanel } from "../ui/tooltip";
 import { MouseButton } from "../input";
 import { UIContextMenu } from "../ui/uiContextMenu";
@@ -16,6 +14,8 @@ import { ParticleText } from "../hierarchy/particleText";
 import { StateMode } from "../hierarchy/serialise";
 import { objcount } from "../utils/counter";
 import { Prefab } from "../hierarchy/prefabs";
+import BasicSprite from "../components/generic/basicSprite";
+import Hitbox from "../components/generic/hitbox";
 
 const entityDistance = 50;
 

@@ -1,4 +1,4 @@
-import { EntityTooltip } from "../components/generic/entityTooltip";
+import EntityTooltip from "../components/generic/entityTooltip";
 import { game } from "../game";
 import { Entity } from "../hierarchy/entity";
 import { UI } from "./ui";

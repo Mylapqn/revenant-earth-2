@@ -1,16 +1,15 @@
-import { Assets, Container, RenderTexture, Sprite, Texture } from "pixi.js";
-import { Component, ComponentData } from "../../hierarchy/component";
+import { Container, RenderTexture } from "pixi.js";
+import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
-import { Game, game } from "../../game";
-import { SpriteDirection } from "./spriteDirection";
-import { EntityTooltip } from "./entityTooltip";
+import { game } from "../../game";
+import SpriteDirection from "./spriteDirection";
 import { ShaderMesh } from "../../shaders/shaderMesh";
 import foliageFrag from "../../shaders/foliage.frag?raw";
 import { Vector } from "../../utils/vector";
 
 
-
-export class ShaderMeshRenderer extends Component {
+declare module "../types" { interface ComponentRegistry { ShaderMeshRenderer: ShaderMeshRenderer } }
+export default class ShaderMeshRenderer extends Component {
     static componentType = "ShaderMesh";
     topContainer: Container;
     container: Container;
@@ -24,9 +23,9 @@ export class ShaderMeshRenderer extends Component {
         this.topContainer = new Container();
         //this.topContainer.addChild(this.container);
         //this.container.scale.set(Game.pixelScale);
-        this.container.position.set(0,0);
+        this.container.position.set(0, 0);
         this.renderTexture = RenderTexture.create({ width: 32, height: 32, antialias: false, scaleMode: 'nearest' });
-        this.renderMesh = new ShaderMesh({texture:this.renderTexture,frag:foliageFrag,anchor:new Vector(.5,1)});
+        this.renderMesh = new ShaderMesh({ texture: this.renderTexture, frag: foliageFrag, anchor: new Vector(.5, 1) });
         game.foliageContainer.addChild(this.renderMesh);
     }
 
@@ -48,12 +47,12 @@ export class ShaderMeshRenderer extends Component {
         bounds.maxX += 10;
         bounds.width = bounds.maxX - bounds.minX;
         this.renderTexture.resize(bounds.width, bounds.height);
-        if(this.container.position == null){
+        if (this.container.position == null) {
             console.error("Shadermesh has been removed but is updating!");
             //return;
         }
-        this.container.position.set(-bounds.minX,bounds.height);
-        this.renderMesh.anchor.x = -bounds.minX/bounds.width;
+        this.container.position.set(-bounds.minX, bounds.height);
+        this.renderMesh.anchor.x = -bounds.minX / bounds.width;
         this.renderMesh.resize(bounds.width, bounds.height);
         game.app.renderer.render({ container: this.container, target: this.renderTexture });
         if (this.directionComponent != undefined) this.renderMesh.scale.x = this.directionComponent.direction;
