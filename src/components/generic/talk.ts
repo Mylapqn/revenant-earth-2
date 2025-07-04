@@ -1,10 +1,11 @@
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { nextFrame, sleep } from "../../utils/utils";
 import Interactable from "./interactable";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 export type TalkType = keyof typeof TalkComponent.talkDatabase;
 
@@ -45,7 +46,7 @@ export default class TalkComponent extends Component {
         this.talkContent = new UIElement({ type: "p", parent: this.talkElement.htmlElement, blockMouse: false });
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { talkId: this.talkId, enabled: this.enabled };
         return super.toData(data);
     }

@@ -21,7 +21,7 @@ export type WellDefinedComponentData = {
 } & {
     [K in keyof ComponentRegistry]: {
         componentType: K,
-        data: ComponentDataOf<ComponentRegistry[K]>
+        data?: ComponentDataOf<ComponentRegistry[K]>
     }
 }[keyof ComponentRegistry];
 type ComponentDataOf<T extends Component> = Parameters<T["applyData"]>[0]

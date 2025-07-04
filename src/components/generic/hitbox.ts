@@ -1,5 +1,4 @@
 import { Assets, GlProgram, Graphics, Mesh, Shader, Sprite, Texture, TilingSprite } from "pixi.js";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
 import SpriteDirection from "./spriteDirection";
@@ -16,6 +15,8 @@ import { UIButton } from "../../ui/uiButton";
 import { Debug } from "../../dev/debug";
 import { Shadowmap } from "../../shaders/lighting/shadowmap";
 import { SurfaceMaterial } from "../../world/terrain";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Hitbox: Hitbox } }
@@ -64,7 +65,7 @@ export default class Hitbox extends Component {
         }
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data: any = { interior: this.isInterior };
         if (this.hitboxName) data.hitboxName = this.hitboxName;
         else data.nodes = this.nodes;

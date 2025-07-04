@@ -3,11 +3,12 @@ import windowFrag from "../../shaders/window.frag?raw";
 import windowEmissiveFrag from "../../shaders/windowEmissive.frag?raw";
 import { Assets, Container, Texture } from "pixi.js";
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { ShaderMesh } from "../../shaders/shaderMesh";
 import { Vector } from "../../utils/vector";
 import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { WindowRenderer: WindowRenderer } }
 export default class WindowRenderer extends Component {
@@ -40,7 +41,7 @@ export default class WindowRenderer extends Component {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
         //new Light({position:this.transform.position.clone().add({x:0,y:-10}),width:2.5,range:150,angle:Math.PI/2,intensity:1.5});
     }
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { asset: this.asset }
         return super.toData(data);
     }

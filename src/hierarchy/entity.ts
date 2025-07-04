@@ -1,7 +1,7 @@
 import { WellDefinedComponentData } from "../components/componentIndex";
 import Transform from "../components/generic/transfrom";
 import { game } from "../game";
-import { Component, ComponentData, Constructor } from "./component";
+import { Component, Constructor } from "./component";
 import { ISceneObject, Scene } from "./scene";
 import { ISerializable, KindedObject, StateMode } from "./serialise";
 
@@ -197,5 +197,5 @@ type EntityData = {
     kind: "Entity";
     id?: number;
     name?: string;
-    component: Array<ComponentData | WellDefinedComponentData>;
+    component: Array<WellDefinedComponentData | WellDefinedComponentData>;
 };

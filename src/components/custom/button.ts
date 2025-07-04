@@ -1,11 +1,12 @@
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
 import Interactable from "../generic/interactable";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Button: Button } }
@@ -24,7 +25,7 @@ export default class Button extends Component {
         this.entity.getComponent(Interactable)?.setText("Activate");
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { dbName: this.dbName }
         return super.toData(data);
     }

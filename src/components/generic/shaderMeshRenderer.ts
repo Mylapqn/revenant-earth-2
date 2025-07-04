@@ -8,7 +8,7 @@ import foliageFrag from "../../shaders/foliage.frag?raw";
 import { Vector } from "../../utils/vector";
 
 
-declare module "../types" { interface ComponentRegistry { ShaderMeshRenderer: ShaderMeshRenderer } }
+declare module "../types" { interface ComponentRegistry { ShaderMesh: ShaderMeshRenderer } }
 export default class ShaderMeshRenderer extends Component {
     static componentType = "ShaderMesh";
     topContainer: Container;

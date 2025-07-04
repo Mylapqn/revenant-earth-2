@@ -1,5 +1,4 @@
 import { Game, game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { FadeScreen } from "../../ui/fadeScreen";
@@ -7,6 +6,8 @@ import { UIElement } from "../../ui/uiElement";
 import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
 import Interactable from "../generic/interactable";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Door: Door } }
 export default class Door extends Component {
@@ -29,12 +30,12 @@ export default class Door extends Component {
         this.interactable.offset = new Vector(0, -15);
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { target: this.targetScene, doorId: this.doorId, enabled: this.enabled };
         return super.toData(data);
     }
 
-    override applyData(data: { target: string, doorId: string, enabled: boolean }): void {
+    override applyData(data: { target: string, doorId: string, enabled?: boolean }): void {
         this.enabled = data.enabled ?? true;
         this.targetScene = data.target;
         this.doorId = data.doorId;

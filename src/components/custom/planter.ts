@@ -1,6 +1,5 @@
 import { Assets, Graphics } from "pixi.js";
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { Vector, Vectorlike } from "../../utils/vector";
 import { AtmoData } from "../../world/atmo";
@@ -8,10 +7,12 @@ import { SurfaceMaterial, Terrain, TerrainData, TerrainInspectMode } from "../..
 import { Box, SATVector } from "detect-collisions";
 import BasicSprite from "../generic/basicSprite";
 import { CustomColor } from "../../utils/color";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 type PartialData = { terrainData?: Partial<TerrainData>, atmoData?: Partial<AtmoData> };
 
-declare module "../types" { interface Planter { Plant: Planter } }
+declare module "../types" { interface ComponentRegistry { Planter: Planter } }
 export default class Planter extends Component {
     static componentType = "Planter";
     collider!: Box;
@@ -36,7 +37,7 @@ export default class Planter extends Component {
     terrainData: TerrainData = { pollution: 0, fertility: 1, erosion: 0.9, moisture: 0.3, grassiness: 0 };
     atmoData: AtmoData = { pollution: 0 };
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { terrainData: this.terrainData, atmoData: this.atmoData, keepStats: this.keepStats } as Parameters<this["applyData"]>[0];
         return super.toData(data);
     }

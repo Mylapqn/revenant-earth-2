@@ -1,7 +1,8 @@
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
+import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
+import { WellDefinedComponentData } from "../componentIndex";
 import EntityTooltip from "../generic/entityTooltip";
 import Interactable from "../generic/interactable";
 import Power from "../generic/power";
@@ -21,7 +22,7 @@ export default class SprinklerCore extends Component {
     waterLevel = 50;
     warningTimer = 0;
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { active: this.enabled, waterLevel: this.waterLevel } as Parameters<this["applyData"]>[0];
         return super.toData(data);
     }

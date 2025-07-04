@@ -1,6 +1,7 @@
-import { Component, ComponentData } from "../../hierarchy/component";
+import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { Item } from "../../itemDefinitions";
+import { WellDefinedComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Inventory: Inventory } }
 export default class Inventory extends Component {
@@ -10,7 +11,7 @@ export default class Inventory extends Component {
         super(parent);
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const items: Record<string, number> = {}
         for (const [item, amount] of this.items) items[item.toString()] = amount;
         return super.toData({ items });

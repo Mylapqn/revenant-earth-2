@@ -1,6 +1,5 @@
 import { Color, Graphics } from "pixi.js";
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../utils/vector";
@@ -13,6 +12,8 @@ import { SurfaceMaterial, TerrainInspectMode } from "../../world/terrain";
 import EntityTooltip from "../generic/entityTooltip";
 import ShaderMeshRenderer from "../generic/shaderMeshRenderer";
 import Planter, { IEvnironmentProvider } from "./planter";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Plant: Plant } }
 export default class Plant extends Component {
@@ -63,7 +64,7 @@ export default class Plant extends Component {
         this.drawPlant();
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = { growth: this.growth, species: this.species.name, health: this.health } as Parameters<this["applyData"]>[0];
         if (this.plantedIn) data.plantedIn = this.plantedIn.entity.id;
         if (this.plantedByPlayer) data.plantedByPlayer = this.plantedByPlayer;

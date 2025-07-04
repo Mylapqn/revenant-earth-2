@@ -1,5 +1,6 @@
-import { Component, ComponentData } from "../../hierarchy/component";
+import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { WellDefinedComponentData } from "../componentIndex";
 import EntityTooltip  from "./entityTooltip";
 
 declare module "../types" { interface ComponentRegistry { Power: Power } }
@@ -13,7 +14,7 @@ export default class Power extends Component {
 
     capacity = 0;
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         return super.toData({ capacity: this.capacity });
     }
 
@@ -59,13 +60,13 @@ export default class Power extends Component {
     }
 }
 
-
+declare module "../types" { interface ComponentRegistry { PowerNetwork: PowerNetwork } }
 export class PowerNetwork extends Component {
     static componentType = "PowerNetwork";
 
     power = 0;
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         return super.toData({ power: this.power });
     }
 

@@ -1,11 +1,12 @@
 import { Assets } from "pixi.js";
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import BasicSprite from "../generic/basicSprite";
 import SprinklerCore from "./sprinklerCore";
 import { filters } from "@pixi/sound";
 import { clamp } from "../../utils/utils";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Sprinkler: Sprinkler } }
@@ -30,7 +31,7 @@ export default class Sprinkler extends Component {
         this.basicSprite = this.entity.getComponent(BasicSprite)!;
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data = {} as Parameters<this["applyData"]>[0];
         if (this.sprinklerCore) data.sprinklerCore = this.sprinklerCore.entity.id;
         return super.toData(data);

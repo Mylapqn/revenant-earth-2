@@ -1,5 +1,5 @@
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
+import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { sleep } from "../../utils/utils";

@@ -1,9 +1,10 @@
 import { Assets, Sprite, Texture } from "pixi.js";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { game } from "../../game";
 import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { BasicSprite: BasicSprite } }
@@ -19,7 +20,7 @@ export default class BasicSprite extends Component {
         this.onEntity("draw", (dt) => this.draw(dt));
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         const data: any = { asset: this.asset };
         if (this.containerName) data.container = this.containerName
         return super.toData(data);

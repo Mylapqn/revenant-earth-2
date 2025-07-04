@@ -1,6 +1,7 @@
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
+import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
+import { WellDefinedComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Polluter: Polluter } }
 export default class Polluter extends Component {
@@ -18,7 +19,7 @@ export default class Polluter extends Component {
         this.pollution = data?.pollution ?? 0;
     }
 
-    override toData(): ComponentData {
+    override toData(): WellDefinedComponentData {
         return super.toData({ pollution: this.pollution });
     }
 

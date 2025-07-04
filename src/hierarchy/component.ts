@@ -2,6 +2,8 @@ import { Graphics } from "pixi.js";
 import { UIElement } from "../ui/uiElement";
 import { Callback, Entity, EntityEvents } from "./entity";
 import { primitiveObject } from "./serialise";
+import { WellDefinedComponentData } from "../components/componentIndex";
+import { ComponentRegistry } from "../components/types";
 
 export type Constructor<T> = { new(parent: Entity): T, componentType: string };
 
@@ -12,7 +14,7 @@ export class Component {
     entity: Entity;
     subscribedEvents = new Set<{ type: keyof EntityEvents, callback: Callback<any> }>();
 
-    get componentType() { return (this.constructor as typeof Component).componentType; }
+    get componentType():keyof ComponentRegistry { return (this.constructor as typeof Component).componentType as keyof ComponentRegistry; }
     get factory() { return (this.constructor as Constructor<typeof this>); }
 
     get transform() {
@@ -39,7 +41,7 @@ export class Component {
         this.constructors.set(constructor.componentType, constructor);
     }
 
-    static fromData(entity: Entity, data: ComponentData): Component {
+    static fromData(entity: Entity, data: WellDefinedComponentData): Component {
         const constructor = this.constructors.get(data.componentType)
         if (constructor === undefined) throw new Error(`Unknown component type: ${data.componentType}`);
         const component = new constructor(entity);
@@ -47,8 +49,8 @@ export class Component {
         return component;
     }
 
-    toData(data?: primitiveObject): ComponentData {
-        return { id: this.id, componentType: this.componentType, data };
+    toData(data?: primitiveObject): WellDefinedComponentData {
+        return { id: this.id, componentType: this.componentType as any, data };
     }
 
 
@@ -70,9 +72,3 @@ export class Component {
         
     }
 }
-
-export type ComponentData = {
-    id?: number;
-    componentType: string;
-    data?: primitiveObject;
-};

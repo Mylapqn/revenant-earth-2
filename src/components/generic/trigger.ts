@@ -1,9 +1,10 @@
 import { Graphics, Text } from "pixi.js";
 import { game } from "../../game";
-import { Component, ComponentData } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
 import { Debug } from "../../dev/debug";
+import { Component } from "../../hierarchy/component";
+import { WellDefinedComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Trigger: Trigger } }
@@ -20,7 +21,7 @@ export default class Trigger extends Component {
         this.radius = data.radius || 100;
         this.onEntity("update", (dt) => this.update(dt));
     }
-    toData(): ComponentData {
+    toData(): WellDefinedComponentData {
         const data: any = { name: this.name };
         if (this.radius !== 100) data.radius = this.radius
         return super.toData(data);
