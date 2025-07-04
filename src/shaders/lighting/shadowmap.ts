@@ -40,7 +40,7 @@ export class Shadowmap {
     }
     static clearOccluderTexture() {
         //game.app.renderer.render({ target: this.occluderTexture, clearColor: [0, 0, 0, 0], container: new Container() });
-        //game.app.renderer.clear({target: this.occluderTexture, clearColor: [0, 0, 0, 0], clear: CLEAR.ALL});
+        //game.app.renderer.clear({target: this.occluderTexture, clear: true}); //<-- rozbije ghost??? indexy blbě /útextur?
         //TODO: WTF how is this  working???? @ popeloišky
         Shadowmap.occluderTexture.source.update();
     }
