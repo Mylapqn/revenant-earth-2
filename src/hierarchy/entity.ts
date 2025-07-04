@@ -1,4 +1,4 @@
-import { WellDefinedComponentData } from "../components/componentIndex";
+import { ComponentData } from "../components/componentIndex";
 import Transform from "../components/generic/transfrom";
 import { game } from "../game";
 import { Component, Constructor } from "./component";
@@ -197,5 +197,5 @@ type EntityData = {
     kind: "Entity";
     id?: number;
     name?: string;
-    component: Array<WellDefinedComponentData | WellDefinedComponentData>;
+    component: Array<ComponentData>;
 };

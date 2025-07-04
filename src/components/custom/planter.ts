@@ -8,7 +8,7 @@ import { Box, SATVector } from "detect-collisions";
 import BasicSprite from "../generic/basicSprite";
 import { CustomColor } from "../../utils/color";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 type PartialData = { terrainData?: Partial<TerrainData>, atmoData?: Partial<AtmoData> };
 
@@ -37,7 +37,7 @@ export default class Planter extends Component {
     terrainData: TerrainData = { pollution: 0, fertility: 1, erosion: 0.9, moisture: 0.3, grassiness: 0 };
     atmoData: AtmoData = { pollution: 0 };
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { terrainData: this.terrainData, atmoData: this.atmoData, keepStats: this.keepStats } as Parameters<this["applyData"]>[0];
         return super.toData(data);
     }

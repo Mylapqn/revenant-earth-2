@@ -2,7 +2,7 @@ import { Graphics } from "pixi.js";
 import { UIElement } from "../ui/uiElement";
 import { Callback, Entity, EntityEvents } from "./entity";
 import { primitiveObject } from "./serialise";
-import { WellDefinedComponentData } from "../components/componentIndex";
+import { ComponentData } from "../components/componentIndex";
 import { ComponentRegistry } from "../components/types";
 
 export type Constructor<T> = { new(parent: Entity): T, componentType: string };
@@ -41,7 +41,7 @@ export class Component {
         this.constructors.set(constructor.componentType, constructor);
     }
 
-    static fromData(entity: Entity, data: WellDefinedComponentData): Component {
+    static fromData(entity: Entity, data: ComponentData): Component {
         const constructor = this.constructors.get(data.componentType)
         if (constructor === undefined) throw new Error(`Unknown component type: ${data.componentType}`);
         const component = new constructor(entity);
@@ -49,7 +49,7 @@ export class Component {
         return component;
     }
 
-    toData(data?: primitiveObject): WellDefinedComponentData {
+    toData(data?: primitiveObject): ComponentData {
         return { id: this.id, componentType: this.componentType as any, data };
     }
 

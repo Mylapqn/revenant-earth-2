@@ -4,7 +4,7 @@ import SpriteDirection from "./spriteDirection";
 import { Light, LightOptions } from "../../shaders/lighting/light";
 import { CustomColor } from "../../utils/color";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { LightComponent: LightComponent } }
 export default class LightComponent extends Component {
@@ -27,7 +27,7 @@ export default class LightComponent extends Component {
     override init(): void {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
     }
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const lightData = {
             position: this.offset.toLike(),
             angle: this.light.angle,

@@ -16,7 +16,7 @@ import { Debug } from "../../dev/debug";
 import { Shadowmap } from "../../shaders/lighting/shadowmap";
 import { SurfaceMaterial } from "../../world/terrain";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Hitbox: Hitbox } }
@@ -65,7 +65,7 @@ export default class Hitbox extends Component {
         }
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data: any = { interior: this.isInterior };
         if (this.hitboxName) data.hitboxName = this.hitboxName;
         else data.nodes = this.nodes;

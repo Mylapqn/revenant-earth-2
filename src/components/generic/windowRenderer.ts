@@ -8,7 +8,7 @@ import { Vector } from "../../utils/vector";
 import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { WindowRenderer: WindowRenderer } }
 export default class WindowRenderer extends Component {
@@ -41,7 +41,7 @@ export default class WindowRenderer extends Component {
         this.directionComponent = this.entity.getComponent(SpriteDirection);
         //new Light({position:this.transform.position.clone().add({x:0,y:-10}),width:2.5,range:150,angle:Math.PI/2,intensity:1.5});
     }
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { asset: this.asset }
         return super.toData(data);
     }

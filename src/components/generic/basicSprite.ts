@@ -4,7 +4,7 @@ import { game } from "../../game";
 import SpriteDirection from "./spriteDirection";
 import { Lightmap } from "../../shaders/lighting/lightmap";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { BasicSprite: BasicSprite } }
@@ -20,7 +20,7 @@ export default class BasicSprite extends Component {
         this.onEntity("draw", (dt) => this.draw(dt));
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data: any = { asset: this.asset };
         if (this.containerName) data.container = this.containerName
         return super.toData(data);

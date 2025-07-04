@@ -7,7 +7,7 @@ import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
 import Interactable from "../generic/interactable";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Door: Door } }
 export default class Door extends Component {
@@ -30,7 +30,7 @@ export default class Door extends Component {
         this.interactable.offset = new Vector(0, -15);
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { target: this.targetScene, doorId: this.doorId, enabled: this.enabled };
         return super.toData(data);
     }

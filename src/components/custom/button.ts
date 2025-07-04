@@ -6,7 +6,7 @@ import { UIButton } from "../../ui/uiButton";
 import { Vector } from "../../utils/vector";
 import Interactable from "../generic/interactable";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Button: Button } }
@@ -25,7 +25,7 @@ export default class Button extends Component {
         this.entity.getComponent(Interactable)?.setText("Activate");
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { dbName: this.dbName }
         return super.toData(data);
     }

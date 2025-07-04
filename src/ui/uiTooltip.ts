@@ -8,9 +8,9 @@ import { UIElement } from "./uiElement";
 import { TooltipID, UITooltipData } from "./uiTooltipData";
 
 export class UITooltipManager {
-    list: Map<string, UITooltip>
+    list: Map<TooltipID, UITooltip>
     constructor() {
-        this.list = new Map<string, UITooltip>();
+        this.list = new Map<TooltipID, UITooltip>();
     }
     update(dt: number) {
         for (const tooltip of this.list.values()) {
@@ -38,12 +38,12 @@ export class UITooltip {
     lockTimer = 0;
     locked = false;
     position: Vector;
-    dataID: string;
+    dataID: TooltipID;
     mouseEntered = false;
     removeWhenUnlocked = false;
     lockable = false;
-    constructor(options: { text?: string, tooltipData?: TooltipID }) {
-        this.dataID = options.tooltipData ?? options.text ?? "";
+    constructor(options: { text?: string, tooltipData: TooltipID }) {
+        this.dataID = options.tooltipData;
         this.uiElement = new UIElement<HTMLDivElement>({ type: "div", parent: UI.container, classes: ["tooltip"], blockMouse: true });
         this.htmlElement = this.uiElement.htmlElement;
 
@@ -54,8 +54,8 @@ export class UITooltip {
         for (const child of bChildren) {
             if (child.getAttribute("tooltip")) {
                 child.classList.add("tooltip-link");
-                child.addEventListener("mouseenter", () => game.tooltipManager.addTooltip(child.getAttribute("tooltip")! as TooltipID));
-                child.addEventListener("mouseleave", () => game.tooltipManager.removeTooltip(child.getAttribute("tooltip")! as TooltipID));
+                child.addEventListener("mouseenter", () => game.tooltipManager.addTooltip(child.getAttribute("tooltip")! as unknown as TooltipID));
+                child.addEventListener("mouseleave", () => game.tooltipManager.removeTooltip(child.getAttribute("tooltip")! as unknown as TooltipID));
             }
         }
 

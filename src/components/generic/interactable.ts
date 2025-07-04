@@ -5,7 +5,7 @@ import { UI } from "../../ui/ui";
 import { UIAbsoluteElement } from "../../ui/uiAbsoluteElement";
 import { UIElement } from "../../ui/uiElement";
 import { Vector, Vectorlike } from "../../utils/vector";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 import BasicSprite from "./basicSprite";
 
 declare module "../types" { interface ComponentRegistry { Interactable: Interactable } }
@@ -29,7 +29,7 @@ export default class Interactable extends Component {
         this.spriteComponent = this.entity.getComponent(BasicSprite);
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data: any = {};
         data.offset = this.offset.toLike();
         data.text = this.initialText;
