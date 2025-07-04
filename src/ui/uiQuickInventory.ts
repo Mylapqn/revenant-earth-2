@@ -65,7 +65,7 @@ export class UIQuickInventory {
             const itemName = new UIElement({ type: "div", classes: ["quickInventoryItemName"], parent: inventoryItem.htmlElement, content: info.name });
             const amountText = amount > 0 ? amount.toString() : `Order (${info.cost.toString()} TP)`;
             const itemAmount = new UIElement({ type: "div", classes: ["quickInventoryItemAmount"], parent: inventoryItem.htmlElement, content: amountText });
-            if (amount <= 0) itemAmount.htmlElement.classList.add(game.score.score > info.cost ? "payGood" : "payBad");
+            if (amount <= 0) itemAmount.htmlElement.classList.add(game.score.score >= info.cost ? "payGood" : "payBad");
 
             inventoryItem.htmlElement.addEventListener("click", () => {
                 if (amount > 0) {
