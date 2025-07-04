@@ -1,7 +1,7 @@
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { Vector, Vectorlike } from "../../utils/vector";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Transform: Transform } }
@@ -18,7 +18,7 @@ export default class Transform extends Component {
 
     }
 
-    toData(): WellDefinedComponentData {
+    toData(): ComponentData {
         const data = {
             position: this.position.toLike(),
             velocity: this.velocity.toLike()

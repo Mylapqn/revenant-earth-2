@@ -5,7 +5,7 @@ import { UIButton } from "../../ui/uiButton";
 import { nextFrame, sleep } from "../../utils/utils";
 import Interactable from "./interactable";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 export type TalkType = keyof typeof TalkComponent.talkDatabase;
 
@@ -46,7 +46,7 @@ export default class TalkComponent extends Component {
         this.talkContent = new UIElement({ type: "p", parent: this.talkElement.htmlElement, blockMouse: false });
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { talkId: this.talkId, enabled: this.enabled };
         return super.toData(data);
     }

@@ -11,11 +11,11 @@ export class UIInspectModes {
         this.container = new UIElement({ type: "div", classes: ["inspectModesContainer"], parent: parent, blockMouse: true });
         /*this.addPrompt(["A","D"],"Move");
         this.addPrompt(["Space"],"Jump");*/
-        this.addInspectMode("None", "cross.svg", TerrainInspectMode.none, "inspect-none");
-        this.addInspectMode("Fertility", "fertility.svg", TerrainInspectMode.fertility, "soil-fertility");
-        this.addInspectMode("Moisture", "moisture.svg", TerrainInspectMode.moisture, "soil-moisture");
-        this.addInspectMode("Erosion", "erosion.svg", TerrainInspectMode.erosion, "soil-erosion");
-        this.addInspectMode("Toxicity", "pollution.svg", TerrainInspectMode.pollution, "soil-toxicity");
+        this.addInspectMode("None", "cross.svg", TerrainInspectMode.none, TooltipID.inspectNone);
+        this.addInspectMode("Fertility", "fertility.svg", TerrainInspectMode.fertility, TooltipID.soilFertility);
+        this.addInspectMode("Moisture", "moisture.svg", TerrainInspectMode.moisture, TooltipID.soilMoisture);
+        this.addInspectMode("Erosion", "erosion.svg", TerrainInspectMode.erosion, TooltipID.soilErosion);
+        this.addInspectMode("Toxicity", "pollution.svg", TerrainInspectMode.pollution, TooltipID.soilToxicity);
         this.selected = this.prompts.get(TerrainInspectMode.none)!;
         this.select(TerrainInspectMode.none);
     }

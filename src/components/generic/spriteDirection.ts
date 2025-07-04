@@ -2,7 +2,7 @@ import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { SpriteDirection: SpriteDirection } }
 export default class SpriteDirection extends Component {
@@ -22,7 +22,7 @@ export default class SpriteDirection extends Component {
         }
     }
 
-    toData(): WellDefinedComponentData {
+    toData(): ComponentData {
         let data: primitiveObject = {};
         if (this.lookAtPlayer) data.lookAtPlayer = this.lookAtPlayer
         if (this.forceDirection != 0) data.direction = this.forceDirection

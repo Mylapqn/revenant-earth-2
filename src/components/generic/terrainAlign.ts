@@ -2,7 +2,7 @@ import { game } from "../../game";
 import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { primitiveObject } from "../../hierarchy/serialise";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { TerrainAlign: TerrainAlign } }
 export default class TerrainAlign extends Component {
@@ -17,7 +17,7 @@ export default class TerrainAlign extends Component {
     applyData(data?: { yOffset: number }): void {
         this.yOffset = data?.yOffset || 0;
     }
-    toData(data?: primitiveObject): WellDefinedComponentData {
+    toData(data?: primitiveObject): ComponentData {
         data = { yOffset: this.yOffset };
         return super.toData(data);
     }

@@ -3,7 +3,7 @@ import { Component } from "../../hierarchy/component";
 import { Entity } from "../../hierarchy/entity";
 import { ParticleText } from "../../hierarchy/particleText";
 import { Vector } from "../../utils/vector";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Pollution: Pollution } }
 export default class Pollution extends Component {
@@ -27,7 +27,7 @@ export default class Pollution extends Component {
         this.dbName = data.dbName;
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { speed: this.speed, dbName: this.dbName };
         return super.toData(data);
     }

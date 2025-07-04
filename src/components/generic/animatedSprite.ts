@@ -7,7 +7,7 @@ import { DynamicAnimatedSprite } from "../../pixelRendering/dynamicAnimatedSprit
 import { ColorFillFilter } from "../../shaders/filter/colorFill/colorFillFilter";
 import { CustomColor } from "../../utils/color";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { AnimatedSpriteRenderer: AnimatedSpriteRenderer } }
@@ -23,7 +23,7 @@ export default class AnimatedSpriteRenderer extends Component {
         this.onEntity("draw", (dt) => this.draw(dt));
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data: any = { asset: this.asset };
         if (this.containerName) data.container = this.containerName
         return super.toData(data);

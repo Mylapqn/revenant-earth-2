@@ -16,7 +16,7 @@ export function initComponents() {
 }
 
 
-export type WellDefinedComponentData = {
+export type ComponentData = {
     id?: number,
 } & {
     [K in keyof ComponentRegistry]: {

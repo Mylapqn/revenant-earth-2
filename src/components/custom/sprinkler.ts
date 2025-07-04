@@ -6,7 +6,7 @@ import SprinklerCore from "./sprinklerCore";
 import { filters } from "@pixi/sound";
 import { clamp } from "../../utils/utils";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 
 declare module "../types" { interface ComponentRegistry { Sprinkler: Sprinkler } }
@@ -31,7 +31,7 @@ export default class Sprinkler extends Component {
         this.basicSprite = this.entity.getComponent(BasicSprite)!;
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = {} as Parameters<this["applyData"]>[0];
         if (this.sprinklerCore) data.sprinklerCore = this.sprinklerCore.entity.id;
         return super.toData(data);

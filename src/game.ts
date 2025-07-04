@@ -655,12 +655,11 @@ export class Game {
         const lastIndex = this.graphableData.length - 1;
         const secondLastIndex = this.graphableData.length - 2;
 
-
         return {
-            temp: { img: out[0], value: `${this.graphableData[lastIndex].temp.toFixed(1)}°C`, trend: Math.sign(this.graphableData[lastIndex].temp - this.graphableData[secondLastIndex].temp), tooltip: "air-temperature" },
-            co2: { img: out[1], value: `${this.graphableData[lastIndex].co2.toFixed(0)}ppm`, trend: Math.sign(this.graphableData[lastIndex].co2 - this.graphableData[secondLastIndex].co2), tooltip: "air-co2" },
-            averageAirPollution: { img: out[2], value: `${Math.round(this.graphableData[lastIndex].averageAirPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageAirPollution - this.graphableData[secondLastIndex].averageAirPollution), tooltip:"air-pollution" },
-            averageGroundPollution: { img: out[3], value: `${Math.round(this.graphableData[lastIndex].averageGroundPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageGroundPollution - this.graphableData[secondLastIndex].averageGroundPollution), tooltip:"soil-toxicity"  },
+            temp: { img: out[0], value: `${this.graphableData[lastIndex].temp.toFixed(1)}°C`, trend: Math.sign(this.graphableData[lastIndex].temp - this.graphableData[secondLastIndex].temp), tooltip: TooltipID.airTemperature },
+            co2: { img: out[1], value: `${this.graphableData[lastIndex].co2.toFixed(0)}ppm`, trend: Math.sign(this.graphableData[lastIndex].co2 - this.graphableData[secondLastIndex].co2), tooltip: TooltipID.airCo2 },
+            averageAirPollution: { img: out[2], value: `${Math.round(this.graphableData[lastIndex].averageAirPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageAirPollution - this.graphableData[secondLastIndex].averageAirPollution), tooltip: TooltipID.airPollution },
+            averageGroundPollution: { img: out[3], value: `${Math.round(this.graphableData[lastIndex].averageGroundPollution * 100)}%`, trend: Math.sign(this.graphableData[lastIndex].averageGroundPollution - this.graphableData[secondLastIndex].averageGroundPollution), tooltip: TooltipID.soilToxicity },
         };
     }
 

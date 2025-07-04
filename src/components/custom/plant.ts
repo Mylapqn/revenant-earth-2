@@ -13,7 +13,7 @@ import EntityTooltip from "../generic/entityTooltip";
 import ShaderMeshRenderer from "../generic/shaderMeshRenderer";
 import Planter, { IEvnironmentProvider } from "./planter";
 import { Component } from "../../hierarchy/component";
-import { WellDefinedComponentData } from "../componentIndex";
+import { ComponentData } from "../componentIndex";
 
 declare module "../types" { interface ComponentRegistry { Plant: Plant } }
 export default class Plant extends Component {
@@ -64,7 +64,7 @@ export default class Plant extends Component {
         this.drawPlant();
     }
 
-    override toData(): WellDefinedComponentData {
+    override toData(): ComponentData {
         const data = { growth: this.growth, species: this.species.name, health: this.health } as Parameters<this["applyData"]>[0];
         if (this.plantedIn) data.plantedIn = this.plantedIn.entity.id;
         if (this.plantedByPlayer) data.plantedByPlayer = this.plantedByPlayer;
