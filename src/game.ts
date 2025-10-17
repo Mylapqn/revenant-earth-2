@@ -655,6 +655,10 @@ export class Game {
         const lastIndex = this.graphableData.length - 1;
         const secondLastIndex = this.graphableData.length - 2;
 
+        if(this.graphableData[lastIndex] == undefined) this.graphableData[lastIndex] = { temp: 0, co2: 0, averageAirPollution: 0, averageGroundPollution: 0, averageGrassiness: 0 };
+        if(this.graphableData[secondLastIndex] == undefined) this.graphableData[secondLastIndex] = { temp: 0, co2: 0, averageAirPollution: 0, averageGroundPollution: 0, averageGrassiness: 0 };
+
+
         return {
             temp: { img: out[0], value: `${this.graphableData[lastIndex].temp.toFixed(1)}°C`, trend: Math.sign(this.graphableData[lastIndex].temp - this.graphableData[secondLastIndex].temp), tooltip: TooltipID.airTemperature },
             co2: { img: out[1], value: `${this.graphableData[lastIndex].co2.toFixed(0)}ppm`, trend: Math.sign(this.graphableData[lastIndex].co2 - this.graphableData[secondLastIndex].co2), tooltip: TooltipID.airCo2 },
