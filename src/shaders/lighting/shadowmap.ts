@@ -1,6 +1,6 @@
 import fragment from './shadowmap.frag?raw';
 import vertex from '../vert.vert?raw';
-import { Container, RenderTexture, Sprite } from 'pixi.js';
+import { CLEAR, Container, GlTextureSystem, RenderTexture, Sprite } from 'pixi.js';
 import { Vector } from '../../utils/vector';
 import { CustomColor } from '../../utils/color';
 import { game } from '../../game';
@@ -39,7 +39,9 @@ export class Shadowmap {
         this.resize();
     }
     static clearOccluderTexture() {
-        game.app.renderer.render({ target: this.occluderTexture, clearColor: [0, 0, 0, 0], container: new Container() });
+        //game.app.renderer.render({ target: this.occluderTexture, clearColor: [0, 0, 0, 0], container: new Container() });
+        //game.app.renderer.clear({target: this.occluderTexture, clear: true}); //<-- rozbije ghost??? indexy blbě /útextur?
+        //TODO: WTF how is this  working???? @ popeloišky
         Shadowmap.occluderTexture.source.update();
     }
     static update() {
