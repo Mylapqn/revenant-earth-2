@@ -6,7 +6,7 @@
     top: 0;
     left: 0;
     background-color: #0f0f0f;
-    background-image: radial-gradient(circle, #00000000 50%, #00000075 100%), url("public/noise.png");
+    background-image: radial-gradient(circle, #00000000 50%, #00000075 100%), url("/noise.png");
     background-blend-mode: normal, overlay;
     width: 100vw;
     height: 100vh;
